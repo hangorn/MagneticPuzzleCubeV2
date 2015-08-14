@@ -11,7 +11,7 @@ Usage
 When you have installed [node.js](http://nodejs.org/), you can run the game like that:
 
 ```
-node index.js
+node App.js
 ```
 
 The server will listen in 8080 port unless the Environment variable 'SUBDOMAIN' is set with value 'magneticube', when the server listen in 80 port.
