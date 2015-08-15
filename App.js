@@ -90,7 +90,7 @@ sio.sockets.on('connection', function(socket) {
 	}
 
 	// Obtenemos el nucleo de la logica del servidor
-	var server = require("./Server.js");
+	var server = require("./game/Server.js");
 
 	/***************************************************************************
 	 * Registramos los eventos que recibiremos del cliente
