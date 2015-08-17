@@ -26,7 +26,7 @@ function Multiplayer() {
 	 ******************************************************************************************************************/
 
 	// Incluimos el modulo de constantes
-	var constants = require('./game/Constants.js');
+	var constants = require('./Constants.js');
 
 	// Partida que se esta jugando
 	var game;
@@ -253,7 +253,7 @@ function Multiplayer() {
 		// Si es el tipo de partida cooperativa
 		if (constants.isCooperativo(game.type)) {
 			// Creamos un puzzle pasandole el numero de cubos
-			game.puzzle = require("./game/Puzzle.js");
+			game.puzzle = require("./Puzzle.js");
 			game.puzzle.createPuzzle(numberOfCubes);
 			// Iniciamos la posicones y rotaciones iniciales de los cubos
 			for (var i = 0; i < Math.pow(numberOfCubes, 3); i++) {
@@ -267,10 +267,10 @@ function Multiplayer() {
 			game.players.host.winner = undefined;
 			game.players.host.winner = undefined;
 			// Creamos un puzzle para el host de la partida
-			game.players.host.puzzle = require("./game/Puzzle.js");
+			game.players.host.puzzle = require("./Puzzle.js");
 			game.players.host.puzzle.createPuzzle(numberOfCubes);
 			// Creamos un puzzle para el cliente de la partida
-			game.players.client.puzzle = require("./game/Puzzle.js");
+			game.players.client.puzzle = require("./Puzzle.js");
 			game.players.client.puzzle.createPuzzle(numberOfCubes);
 			// Iniciamos las posicones y rotaciones iniciales de los cubos de ambos puzzles
 			for (var i = 0; i < Math.pow(numberOfCubes, 3); i++) {

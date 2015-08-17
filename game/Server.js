@@ -28,7 +28,7 @@ Server = function() {
 	// Incluimos el modulo UUID para asignar IDs a las partidas
 	var UUID = require('node-uuid');
 	// Incluimos el modulo de constantes
-	var constants = require('./game/Constants.js');
+	var constants = require('./Constants.js');
 
 	// Mapa con todos los juegos activos, como indice tendra el id del juego
 	var games = {};
@@ -265,7 +265,7 @@ Server = function() {
 			this.saveLastScore(game.players.client);
 			this.saveLastScore(game.players.host);
 			// Iniciamos la partida
-			game.core = new (require("./game/Multiplayer.js"))();
+			game.core = new (require("./Multiplayer.js"))();
 			game.core.startGame(game, function() {
 				solvedGame(game)
 			});
@@ -332,7 +332,7 @@ Server = function() {
 	 */
 	this.sendScores = function(client, mode, submode) {
 		// Si no tenemos un DAO lo inicamos
-		dao = dao || require('./dal/DataAccessObject.js');
+		dao = dao || require('../dal/DataAccessObject.js');
 		// Obtenemos las puntuaciones solicitadas
 		dao.getScores(mode, submode, function(scores) {
 			// Enviamos la respuesta con los datos al cliente
