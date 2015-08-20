@@ -50,7 +50,7 @@ Server = function() {
 	 * Método que se ejecutará al resolver el puzzle.
 	 * 
 	 * @param Game:game
-	 *            objeto de la clase Game con los datos de la partida. Salidas:
+	 *            objeto de la clase Game con los datos de la partida.
 	 */
 	function solvedGame(game) {
 		// Si no hay partida no hacemos nada
@@ -128,10 +128,10 @@ Server = function() {
 	 * @param String[]:images
 	 *            array con cadenas de texto que representan las imágenes con las que se ha iniciado la partida
 	 *            codificadas en base 64.
-	 * @param Vector3[]:iniPos ->
+	 * @param Vector3[]:iniPos
 	 *            posiciones iniciales de los cubos de la partida creada.
-	 * @param Vector3[]:iniRot ->
-	 *            rotaciones iniciales de los cubos de la partida creada. Salidas:
+	 * @param Vector3[]:iniRot
+	 *            rotaciones iniciales de los cubos de la partida creada.
 	 */
 	this.createGame = function(client, name, type, images, iniPos, iniRot) {
 		// Creamos un objeto partida
@@ -278,7 +278,7 @@ Server = function() {
 	 * @param Client:client
 	 *            objeto de la clase cliente con los datos del cliente que quiere borrar la partida.
 	 * @param String:gameID
-	 *            ID del juego que será terminado. Salidas:
+	 *            ID del juego que será terminado.
 	 */
 	this.finishGame = function(client, gameID) {
 		// Si no encontramos la partida

@@ -41,12 +41,12 @@ DataAccessObject = function() {
 	/*******************************************************************************************************************
 	 * Constructor
 	 ******************************************************************************************************************/
-	/*
-	 * Nombre: Constructor Sinopsis: Constructor de la clase DataAccessObject. Entradas: Salidas:
+	/**
+	 * Constructor de la clase DataAccessObject.
 	 */
 
 	// Comprobamos si estamos utilizando nodejitsu
-	// if(process.env.SUBDOMAIN == 'magneticube')
+	// if(process.env.SUBDOMAIN == 'magneticube') {
 	isJitsu = true;
 
 	// Obtenemos el modulo de mongodb
@@ -125,9 +125,9 @@ DataAccessObject = function() {
 	 * 
 	 * @param Integer:mode
 	 *            modo del que se quieren obtener las puntuaciones.
-	 * @param Integer:submode ->
+	 * @param Integer:submode
 	 *            submodo del que se quieren obtener las puntuaciones.
-	 * @param Callback:callback ->
+	 * @param Callback:callback
 	 *            función de rellamada que se ejecutará cuando se consigan las puntuaciones para enviarselas al cliente.
 	 */
 	this.getScores = function(mo, sub, callback) {
@@ -151,10 +151,11 @@ DataAccessObject = function() {
 		});
 	}
 
-	/*
-	 * Nombre: saveScore Sinopsis: Método para obtener las puntuaciones de un determinado modo y submodo de la base de
-	 * datos. Entradas: -Data:data-> objeto que contendrá los datos de la puntuación a guardar : nombre, puntuación,
-	 * fecha, modo y submodo. Salidas:
+	/**
+	 * Método para obtener las puntuaciones de un determinado modo y submodo de la base de datos.
+	 * 
+	 * @param Data:data
+	 *            objeto que contendrá los datos de la puntuación a guardar : nombre, puntuación, fecha, modo y submodo.
 	 */
 	this.saveScore = function(data) {
 		doRequest(function() {
@@ -168,10 +169,11 @@ DataAccessObject = function() {
 					mode : data.mode,
 					submode : data.submode
 				} ], function(error, result) {
-					if (error)
+					if (error) {
 						console.log("cant save score");
-					else
+					} else {
 						console.log("score saved by " + data.name + " with " + data.score + "    ");
+					}
 					console.log(data);
 				});
 			});

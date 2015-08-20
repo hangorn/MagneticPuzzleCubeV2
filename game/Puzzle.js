@@ -139,7 +139,7 @@ function Puzzle() {
 	/**
 	 * Método para quitar un cubo del puzzle. Entradas:
 	 * 
-	 * @param Integer:ID ->
+	 * @param Integer:ID
 	 *            entero que identifica al cubo que se quiere quitar del puzzle.
 	 */
 	this.removeCube = function(ID) {
