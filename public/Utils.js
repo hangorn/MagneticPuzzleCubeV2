@@ -229,3 +229,47 @@ function spanishDate(d) {
 			+ " a las " + (d.getHours() < 10 ? "0" : "") + d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "")
 			+ d.getMinutes();
 }
+
+/**
+ * Función para realizar una peticion GET asincrona AJAX. Se le debe proporcionar tanto la URL donde realizar la
+ * peticion, como una función de rellamada con un parametro que se ejecutara cuando se reciba la respuesta
+ * 
+ * @param url
+ *            URL donde realizar la peticion
+ * @param callback
+ *            función de rellamada que se ejecutara cuando se reciba la respuesta, recibe como un parametro el texto de
+ *            la respuesta
+ */
+function ajaxRequest(url, callback) {
+	var request = new XMLHttpRequest();
+	request.onreadystatechange = function() {
+		if (request.readyState == 4 && request.status == 200) {
+			callback(request.responseText);
+		}
+	}
+	request.open("GET", url, true);
+	request.send();
+
+}
+
+/**
+ * Función para añadir a un objeto del DOM un componente hijo de manera dinamica. Se realizara una peticion GET
+ * asincrona AJAX para obtener el codigo del hijo y añadirlo en un contenedor (DIV) al elemento indicado. No se borra el
+ * contenido del elemento, simplemente se añade un "div" al final.
+ * 
+ * @param url
+ *            URL donde realizar la peticion
+ * @param domElement
+ *            elemento al que se le añadira el elemento
+ */
+function addDynamicComponent(url, domElement) {
+	// Si no es un elemento DOM, salimos
+	if (!domElement.appendChild) {
+		return;
+	}
+	ajaxRequest(url, function(resp) {
+		var div = document.createElement('div');
+		div.innerHTML = resp;
+		domElement.appendChild(div);
+	});
+}

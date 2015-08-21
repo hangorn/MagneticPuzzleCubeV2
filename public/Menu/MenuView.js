@@ -197,7 +197,7 @@ function MenuView(sce) {
 		}
 
 		// Obtenemos los datos de las letras si estan cargados
-		if (lettersLoad) {
+		if (lettersData) {
 			var data = lettersData[letter];
 		} else {
 			console.error("los datos de las letras no se han cargado");
@@ -491,7 +491,7 @@ function MenuView(sce) {
 		form.appendChild(descrip);
 
 		// Comprobamos que se ha cargado la informacion de los niveles
-		if (levelsLoad) {
+		if (levelsData) {
 			// Creamos los niveles y los guardamos en un array
 			var levels = [];
 			for (var i = 0; i < levelsData.length; i++) {

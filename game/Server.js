@@ -352,7 +352,7 @@ Server = function() {
 	 */
 	this.saveScore = function(client, data) {
 		// Si no tenemos un DAO lo inicamos
-		dao = dao || require('./dal/DataAccessObject.js');
+		dao = dao || require('../dal/DataAccessObject.js');
 		// Si no se trata de un modo multijugador
 		if (data.mode != constants.MODO_MULTIJUGADOR) {
 			// Unicamente guardamos las puntuaciones

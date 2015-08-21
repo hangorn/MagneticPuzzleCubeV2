@@ -69,14 +69,14 @@ function TooManyPiecesPuzzle(numC, mats) {
 	// Creamos los cubos
 	var data;
 	if (numberOfCubes == 3) {
-		if (puzzle3Load) {
+		if (puzzle3Data) {
 			data = puzzle3Data;
 		} else {
 			console.error("puzzle:los datos del puzzle3 no estan cargados");
 		}
 	}
 	if (numberOfCubes == 2) {
-		if (puzzle2Load) {
+		if (puzzle2Data) {
 			data = puzzle2Data;
 		} else {
 			console.error("puzzle:los datos del puzzle2 no estan cargados");
@@ -1019,571 +1019,659 @@ function TooManyPiecesPuzzle(numC, mats) {
 				return false;
 			}
 		}
-	}
-	if (sect1Coords.z == undefined) {
-		// Comparamos la diferencia de las coordenadas de las secciones con la diferencia de las posiciones
-		var secDifX = (sect1Coords.x - sect2Coords.x) * cubeSize * (numberOfCubes - 1) / 2;
-		var secDifY = (sect1Coords.y - sect2Coords.y) * cubeSize * (numberOfCubes - 1) / 2;
-		var posDifX = pos1.x - pos2.x;
-		var posDifY = pos1.y - pos2.y;
-		if (secDifX == posDifX && secDifY == posDifY) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-}
-
-/*
- * Nombre: getImgGroups Sinopsis: Método que obtiene a partir de una array con los cubos de cada extremo de cada eje,
- * una array con información de cada grupo de cubos en cada extremo que tiene la misma imagen y rotación y esta bien
- * colocados entre si. Entradas: @param Cube[][]:endCubes-> array con un array de objetos Cube por cada direccion de
- * cada eje siguiendo el siguiente orden 1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera, 6=trasera. @return
- * [Integer,Integer,Cube[]][][] array que contendra un array por cada extremo de cada eje que a su vez cada uno
- * contendra un array por cada grupo de cubos con la misma imagen y rotacion en las secciones, con la siguiente
- * informacion: imagen, rotacion, array con los cubos que forman el grupo.
- */
-var getImgGroups = function(endCubes) {
-	// Vamos a crear una array con un array por cada direccion de los ejes que contendra:
-	// un array por grupo de cubos que tengan una imagen y una rotacion distinta que contendra
-	// la imagen y la rotacion correspondientes y un array con los cubos que tienen esta imagen
-	// y rotacion
-	var equalImgs = [ [], [], [], [], [], [] ];
-	// Recorremos cada cara de cada extremo para comprobar que tiene las misma imagenes y con el mismo angulo
-	for (var i = 0; i < endCubes.length; i++) {
-		for (var j = 0; j < endCubes[i].length; j++) {
-			// Obtenemos la imagen y la rotacion de la seccion del cubo en su correspondiente extremo
-			var index = getFaceIndex(endCubes[i][j], i + 1);
-			var img = endCubes[i][j].getFace(index.x).getImg();
-			var rot = index.y - endCubes[i][j].getFace(index.x).getRot();
-			// Si el array correspondiente esta vacio
-			if (equalImgs[i].length == 0) {
-				// Introducimos los datos: la imagen, la rotacion, y un array con los cubos
-				equalImgs[i].push([ img, rot, [ endCubes[i][j] ] ]);
+		if (sect1Coords.z == undefined) {
+			// Comparamos la diferencia de las coordenadas de las secciones con la diferencia de las posiciones
+			var secDifX = (sect1Coords.x - sect2Coords.x) * cubeSize * (numberOfCubes - 1) / 2;
+			var secDifY = (sect1Coords.y - sect2Coords.y) * cubeSize * (numberOfCubes - 1) / 2;
+			var posDifX = pos1.x - pos2.x;
+			var posDifY = pos1.y - pos2.y;
+			if (secDifX == posDifX && secDifY == posDifY) {
+				return true;
 			} else {
-				var found = false;
-				// Buscamos la imagen y la rotacion para comprabar si ya estan
-				for (var k = 0; k < equalImgs[i].length && !found; k++) {
-					// Si lo encontramos
-					if (equalImgs[i][k][0] == img && equalImgs[i][k][1] == rot) {
-						// Añadimos el cubo al array
-						equalImgs[i][k][2].push(endCubes[i][j]);
-						found = true;
-					}
-				}
-				// Si no lo encontramos
-				if (!found) {
-					// Introducimos un nuevo elemento en el array con los datos
+				return false;
+			}
+		}
+	}
+
+	/*
+	 * Nombre: getImgGroups Sinopsis: Método que obtiene a partir de una array con los cubos de cada extremo de cada
+	 * eje, una array con información de cada grupo de cubos en cada extremo que tiene la misma imagen y rotación y esta
+	 * bien colocados entre si. Entradas: @param Cube[][]:endCubes-> array con un array de objetos Cube por cada
+	 * direccion de cada eje siguiendo el siguiente orden 1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera,
+	 * 6=trasera. @return [Integer,Integer,Cube[]][][] array que contendra un array por cada extremo de cada eje que a
+	 * su vez cada uno contendra un array por cada grupo de cubos con la misma imagen y rotacion en las secciones, con
+	 * la siguiente informacion: imagen, rotacion, array con los cubos que forman el grupo.
+	 */
+	var getImgGroups = function(endCubes) {
+		// Vamos a crear una array con un array por cada direccion de los ejes que contendra:
+		// un array por grupo de cubos que tengan una imagen y una rotacion distinta que contendra
+		// la imagen y la rotacion correspondientes y un array con los cubos que tienen esta imagen
+		// y rotacion
+		var equalImgs = [ [], [], [], [], [], [] ];
+		// Recorremos cada cara de cada extremo para comprobar que tiene las misma imagenes y con el mismo angulo
+		for (var i = 0; i < endCubes.length; i++) {
+			for (var j = 0; j < endCubes[i].length; j++) {
+				// Obtenemos la imagen y la rotacion de la seccion del cubo en su correspondiente extremo
+				var index = getFaceIndex(endCubes[i][j], i + 1);
+				var img = endCubes[i][j].getFace(index.x).getImg();
+				var rot = index.y - endCubes[i][j].getFace(index.x).getRot();
+				// Si el array correspondiente esta vacio
+				if (equalImgs[i].length == 0) {
+					// Introducimos los datos: la imagen, la rotacion, y un array con los cubos
 					equalImgs[i].push([ img, rot, [ endCubes[i][j] ] ]);
-				}
-			}
-		}
-	}
-
-	// Dividimos cada grupo de cubos que tenga la misma imagen y rotacion segun esten colocados
-	// Recorremos cada extremo
-	for (var i = 0; i < equalImgs.length; i++) {
-		// Recorremos cada grupo de cubos con la misma imagen y rotacion
-		for (var j = 0; j < equalImgs[i].length; j++) {
-			// Si el grupo tiene mas de un cubo
-			if (equalImgs[i][j][2].length > 1) {
-				// Creamos un array para guardar los que esten mal colocados y otro para los que esten bien
-				// colocados
-				var wrong = [], correct = [ equalImgs[i][j][2][0] ];
-				// Recorremos el grupo para comparar con el primer cubo
-				// Calculamos la seccion del primer cubo
-				var index = getFaceIndex(equalImgs[i][j][2][0], i + 1);
-				var sect0 = equalImgs[i][j][2][0].getFace(index.x).getSection();
-				var rot = index.y;
-				for (var k = 1; k < equalImgs[i][j][2].length; k++) {
-					// Calculamos la seccion correspondiente
-					var index = getFaceIndex(equalImgs[i][j][2][k], i + 1);
-					var sect = equalImgs[i][j][2][k].getFace(index.x).getSection();
-					// Comparamos la seccion del primer cubo con la actual, si estan bien colocadas
-					if (isSectionsProperlyPlaced(sect0, sect, equalImgs[i][j][2][0].position,
-							equalImgs[i][j][2][k].position, rot, i)) {
-						correct.push(equalImgs[i][j][2][k]);
-					} else {
-						wrong.push(equalImgs[i][j][2][k]);
-					}
-				}
-
-				// Si hay secciones distintas
-				if (wrong.length != 0) {
-					// Creamos un array que contendra los cubos divididos segun esten bien colocados
-					var newArray = [ [ equalImgs[i][j][0], equalImgs[i][j][1], correct ] ];
-
-					// Mientras haya imagenes distintas
-					while (wrong.length != 0) {
-						// Guardamos las que estaban mal colocadas para guardarlas
-						var toCompare = wrong;
-						// Vaciamos el array de figuras mal colocadas para guardar las que correspondan ahora
-						wrong = [];
-						// Guardamos en el array de los cubos colocados correctamente el primero de los que vamos a
-						// comparar
-						correct = [ toCompare[0] ];
-						// Recorremos el grupo para comparar con el primer cubo de los que estan mal colocados
-						// Calculamos la seccion del primer cubo
-						var index = getFaceIndex(toCompare[0], i + 1);
-						var sect0 = toCompare[0].getFace(index.x).getSection();
-						var rot = index.y;
-						for (var k = 1; k < toCompare.length; k++) {
-							// Calculamos la seccion correspondiente
-							var index = getFaceIndex(toCompare[k], i + 1);
-							var sect = toCompare[k].getFace(index.x).getSection();
-							// Comparamos la seccion del primer cubo con la actual, si estan bien colocadas
-							if (isSectionsProperlyPlaced(sect0, sect, toCompare[0].position, toCompare[k].position,
-									rot, i)) {
-								correct.push(toCompare[k]);
-							} else {
-								wrong.push(toCompare[k]);
-							}
+				} else {
+					var found = false;
+					// Buscamos la imagen y la rotacion para comprabar si ya estan
+					for (var k = 0; k < equalImgs[i].length && !found; k++) {
+						// Si lo encontramos
+						if (equalImgs[i][k][0] == img && equalImgs[i][k][1] == rot) {
+							// Añadimos el cubo al array
+							equalImgs[i][k][2].push(endCubes[i][j]);
+							found = true;
 						}
-						// Guardamos el nuevo grupo con secciones bien colocadas
-						newArray.push([ equalImgs[i][j][0], equalImgs[i][j][1], correct ]);
 					}
-					// Una vez objenido el nuevo conjunto de arrays lo guardamos en el viejo
-					// sustituyendolo por su entrada correspodiente
-					// Primero borramos el que ya teniamos
-					equalImgs[i].splice(j, 1);
-					// Luego introducimos los nuevos
-					for (var k = 0; k < newArray.length; k++) {
-						equalImgs[i].splice(j, 0, newArray[k]);
+					// Si no lo encontramos
+					if (!found) {
+						// Introducimos un nuevo elemento en el array con los datos
+						equalImgs[i].push([ img, rot, [ endCubes[i][j] ] ]);
 					}
-					j += newArray.length - 1;
 				}
 			}
 		}
-	}
-	return equalImgs;
-}
 
-/**
- * Método que busca un cubo con la imagen y sección suministradas
- * 
- * @param Integer:img
- *            entero que identificará la imagen.
- * @param Vector2:sect
- *            vector de 2 dimensiones con la sección de la imágen.
- * @return Cube cubo con la imagen y sección suministradas.
- */
-var searchCube = function(img, sect) {
-	for (var i = 0; i < cubes.length; i++) {
-		for (var j = 1; j <= 6; j++) {
-			if (cubes[i].getFace(j).getImg() == img && cubes[i].getFace(j).getSection().x == sect.x
-					&& cubes[i].getFace(j).getSection().y == sect.y) {
-				return cubes[i];
+		// Dividimos cada grupo de cubos que tenga la misma imagen y rotacion segun esten colocados
+		// Recorremos cada extremo
+		for (var i = 0; i < equalImgs.length; i++) {
+			// Recorremos cada grupo de cubos con la misma imagen y rotacion
+			for (var j = 0; j < equalImgs[i].length; j++) {
+				// Si el grupo tiene mas de un cubo
+				if (equalImgs[i][j][2].length > 1) {
+					// Creamos un array para guardar los que esten mal colocados y otro para los que esten bien
+					// colocados
+					var wrong = [], correct = [ equalImgs[i][j][2][0] ];
+					// Recorremos el grupo para comparar con el primer cubo
+					// Calculamos la seccion del primer cubo
+					var index = getFaceIndex(equalImgs[i][j][2][0], i + 1);
+					var sect0 = equalImgs[i][j][2][0].getFace(index.x).getSection();
+					var rot = index.y;
+					for (var k = 1; k < equalImgs[i][j][2].length; k++) {
+						// Calculamos la seccion correspondiente
+						var index = getFaceIndex(equalImgs[i][j][2][k], i + 1);
+						var sect = equalImgs[i][j][2][k].getFace(index.x).getSection();
+						// Comparamos la seccion del primer cubo con la actual, si estan bien colocadas
+						if (isSectionsProperlyPlaced(sect0, sect, equalImgs[i][j][2][0].position,
+								equalImgs[i][j][2][k].position, rot, i)) {
+							correct.push(equalImgs[i][j][2][k]);
+						} else {
+							wrong.push(equalImgs[i][j][2][k]);
+						}
+					}
+
+					// Si hay secciones distintas
+					if (wrong.length != 0) {
+						// Creamos un array que contendra los cubos divididos segun esten bien colocados
+						var newArray = [ [ equalImgs[i][j][0], equalImgs[i][j][1], correct ] ];
+
+						// Mientras haya imagenes distintas
+						while (wrong.length != 0) {
+							// Guardamos las que estaban mal colocadas para guardarlas
+							var toCompare = wrong;
+							// Vaciamos el array de figuras mal colocadas para guardar las que correspondan ahora
+							wrong = [];
+							// Guardamos en el array de los cubos colocados correctamente el primero de los que vamos a
+							// comparar
+							correct = [ toCompare[0] ];
+							// Recorremos el grupo para comparar con el primer cubo de los que estan mal colocados
+							// Calculamos la seccion del primer cubo
+							var index = getFaceIndex(toCompare[0], i + 1);
+							var sect0 = toCompare[0].getFace(index.x).getSection();
+							var rot = index.y;
+							for (var k = 1; k < toCompare.length; k++) {
+								// Calculamos la seccion correspondiente
+								var index = getFaceIndex(toCompare[k], i + 1);
+								var sect = toCompare[k].getFace(index.x).getSection();
+								// Comparamos la seccion del primer cubo con la actual, si estan bien colocadas
+								if (isSectionsProperlyPlaced(sect0, sect, toCompare[0].position, toCompare[k].position,
+										rot, i)) {
+									correct.push(toCompare[k]);
+								} else {
+									wrong.push(toCompare[k]);
+								}
+							}
+							// Guardamos el nuevo grupo con secciones bien colocadas
+							newArray.push([ equalImgs[i][j][0], equalImgs[i][j][1], correct ]);
+						}
+						// Una vez objenido el nuevo conjunto de arrays lo guardamos en el viejo
+						// sustituyendolo por su entrada correspodiente
+						// Primero borramos el que ya teniamos
+						equalImgs[i].splice(j, 1);
+						// Luego introducimos los nuevos
+						for (var k = 0; k < newArray.length; k++) {
+							equalImgs[i].splice(j, 0, newArray[k]);
+						}
+						j += newArray.length - 1;
+					}
+				}
 			}
 		}
-	}
-	return null;
-}
-
-/**
- * Método que calcula la rotación de una figura necesaria para que coincidan las secciones suministradas
- * 
- * @param Integer:face1
- *            entero que identificará la cara de la sección con la que tiene que coincidir, en que cara se encuentra.
- *            1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera, 6=trasera.
- * @param Integer:face2
- *            entero que identificará la cara donde se encuentra la sección a colocar.
- * @param Integer:rot1
- *            entero con la rotación en grados de la sección con la que tiene que coincidir.
- * @param Integer:rot2
- *            entero con la rotación en grados de la sección a colocar.
- * @return Vector3 vector de 3 elementos con la rotación calculada en radianes.
- */
-var getRotationFromSections = function(face1, face2, rot1, rot2) {
-	var rot = new THREE.Vector3();
-
-	// En funcio de en que cara tengamos que colocar la seccion 2
-	switch (face1) {
-	case 1: // Cara derecha
-		// Si es la cara derecha no lo giramos por que ya estan en la misma cara
-		// Cara izquierda
-		if (face2 == 2) {
-			rot.y = deg2Rad(180);
-		}
-		// Cara superior
-		if (face2 == 3) {
-			rot.x = deg2Rad(90);
-			rot.z = deg2Rad(270);
-		}
-		// Cara inferior
-		if (face2 == 4) {
-			rot.x = deg2Rad(270);
-			rot.z = deg2Rad(90);
-		}
-		// Cara delantera
-		if (face2 == 5) {
-			rot.y = deg2Rad(90);
-		}
-		if (face2 == 6) {// Cara trasera
-			rot.y = deg2Rad(270);
-		}
-		// Calculamos el giro en X en funcion de las rotaciones de las secciones
-		rot.x += deg2Rad((360 + rot1 - rot2) % 360);
-		break;
-	case 2: // Cara izquierda
-		if (face2 == 1) {// Cara derecha
-			rot.y = deg2Rad(180);
-		}
-		// Si es la cara izquierda no lo giramos por que ya estan en la misma cara
-		// Cara superior
-		if (face2 == 3) {
-			rot.x = deg2Rad(90);
-			rot.z = deg2Rad(90);
-		}
-		// Cara inferior
-		if (face2 == 4) {
-			rot.x = deg2Rad(270);
-			rot.z = deg2Rad(270);
-		}
-		// Cara delantera
-		if (face2 == 5) {
-			rot.y = deg2Rad(270);
-		}
-		// Cara trasera
-		if (face2 == 6) {
-			rot.y = deg2Rad(90);
-		}
-		// Calculamos el giro en X en funcion de las rotaciones de las secciones
-		rot.x += deg2Rad((360 - rot1 + rot2) % 360);
-		break;
-	case 3: // Cara superior
-		// Cara derecha
-		if (face2 == 1) {
-			rot.y = deg2Rad(270) + deg2Rad((360 + rot1 - rot2) % 360);
-			;
-			rot.z = deg2Rad(90);
-		}
-		// Cara izquierda
-		if (face2 == 2) {
-			rot.y = deg2Rad(90) + deg2Rad((360 + rot1 - rot2) % 360);
-			;
-			rot.z = deg2Rad(270);
-		}
-		// Cara superior
-		if (face2 == 3) {
-			rot.y = deg2Rad((360 + rot1 - rot2) % 360);
-		}
-		// Cara inferior
-		if (face2 == 4) {
-			rot.x = deg2Rad(180);
-			rot.y = deg2Rad((360 - rot1 + rot2) % 360);
-		}
-		// Cara delantera
-		if (face2 == 5) {
-			rot.x = deg2Rad(270);
-			rot.z = deg2Rad((360 + rot1 - rot2) % 360);
-		}
-		// Cara trasera
-		if (face2 == 6) {
-			rot.x = deg2Rad(270);
-			rot.y = deg2Rad(180);
-			rot.z = deg2Rad((360 - rot1 + rot2) % 360);
-		}
-		break;
-	case 4: // Cara inferior
-		// Cara derecha
-		if (face2 == 1) {
-			rot.y = deg2Rad(270) + deg2Rad((360 - rot1 + rot2) % 360);
-			;
-			rot.z = deg2Rad(270);
-		}
-		// Cara izquierda
-		if (face2 == 2) {
-			rot.y = deg2Rad(90) + deg2Rad((360 - rot1 + rot2) % 360);
-			;
-			rot.z = deg2Rad(90);
-		}
-		// Cara superior
-		if (face2 == 3) {
-			rot.x = deg2Rad(180);
-			rot.y = deg2Rad((360 + rot1 - rot2) % 360);
-		}
-		// Cara inferior
-		if (face2 == 4) {
-			rot.y = deg2Rad((360 - rot1 + rot2) % 360);
-		}
-		// Cara delantera
-		if (face2 == 5) {
-			rot.x = deg2Rad(90);
-			rot.z = deg2Rad((360 + rot1 - rot2) % 360);
-		}
-		// Cara trasera
-		if (face2 == 6) {
-			rot.x = deg2Rad(90);
-			rot.y = deg2Rad(180);
-			rot.z = deg2Rad((360 - rot1 + rot2) % 360);
-		}
-		break;
-	case 5: // Cara delantera
-		// Cara derecha
-		if (face2 == 1) {
-			rot.x = deg2Rad(270);
-			rot.y = deg2Rad(270) + deg2Rad((360 - rot1 + rot2) % 360);
-			rot.z = deg2Rad(270);
-		}
-		// Cara izquierda
-		if (face2 == 2) {
-			rot.x = deg2Rad(270);
-			rot.y = deg2Rad(90) + deg2Rad((360 - rot1 + rot2) % 360);
-			rot.z = deg2Rad(90);
-		}
-		// Cara superior
-		if (face2 == 3) {
-			rot.x = deg2Rad(90);
-			rot.y = deg2Rad((360 + rot1 - rot2) % 360);
-		}
-		// Cara inferior
-		if (face2 == 4) {
-			rot.x = deg2Rad(270);
-			rot.y = deg2Rad((360 - rot1 + rot2) % 360);
-		}
-		// Cara delantera
-		if (face2 == 5) {
-			rot.z = deg2Rad((360 + rot1 - rot2) % 360);
-		}
-		// Cara trasera
-		if (face2 == 6) {
-			rot.y = deg2Rad(180);
-			rot.z = deg2Rad((360 - rot1 + rot2) % 360);
-		}
-		break;
-	case 6: // Cara trasera
-		// Cara derecha
-		if (face2 == 1) {
-			rot.x = deg2Rad(90);
-			rot.y = deg2Rad(90) + deg2Rad((360 - rot1 + rot2) % 360);
-			rot.z = deg2Rad(270);
-		}
-		// Cara izquierda
-		if (face2 == 2) {
-			rot.x = deg2Rad(90);
-			rot.y = deg2Rad(270) + deg2Rad((360 - rot1 + rot2) % 360);
-			rot.z = deg2Rad(90);
-		}
-		// Cara superior
-		if (face2 == 3) {
-			rot.x = deg2Rad(270);
-			rot.y = deg2Rad(180 + (360 + rot1 - rot2) % 360);
-		}
-		// Cara inferior
-		if (face2 == 4) {
-			rot.x = deg2Rad(90);
-			rot.y = deg2Rad(180 + (360 - rot1 + rot2) % 360);
-		}
-		// Cara delantera
-		if (face2 == 5) {
-			rot.y = deg2Rad(180);
-			rot.z = deg2Rad((360 + rot1 - rot2) % 360);
-		}
-		// Cara trasera
-		if (face2 == 6) {
-			rot.z = deg2Rad((360 - rot1 + rot2) % 360);
-		}
-		break;
-
-	break;
-default:
-	console.error("Puzzle.getRotationFromSections: wrong index of face1");
-}
-return rot;
-}
-
-/***********************************************************************************************************************
- * Métodos Públicos
- **********************************************************************************************************************/
-
-/**
- * Método que devuelve un booleano en funcion de si el puzzle esta resuelto o no
- * 
- * @return Boolean true si el puzzle está resuelto y false si no.
- */
-this.isSolved = function() {
-	// Si es un puzzle de 3 cubos
-	if (numberOfCubes == 3) {
-		// Obtenemos el centro del cubo si existe
-		var center = getCenterCube();
-		// Si no existe devolvemos falso, ya que no esta resuelto, no forma un cubo
-		if (!center) {
-			return false;
-		}
-		center = center.position;
-	}
-	// Si es un puzzle de 2 cubos
-	if (numberOfCubes == 2) {
-		// Obtenemos el centro del cubo si existe
-		var center = getCenter();
-		// Si no existe devolvemos falso, ya que no esta resuelto, no forma un cubo
-		if (!center) {
-			return false;
-		}
+		return equalImgs;
 	}
 
-	// Recorremos cada cara del puzzle
-	for (var i = 1; i < 7; i++) {
-		// Obtenemos los cubos que forman la cara
-		var faceCubes = getFaceCubes(i, center);
-		// Si es el puzzle con 3 cubos, comprobamos que el cubo del centro (indice 4)
-		// tiene una seccion con coordenadas 1,1, es decir del centro de la imagen
-		if (numberOfCubes == 3 && !faceCubes[4].getFace(getFaceIndex(faceCubes[4], i).x).compareSection(1, 1)) {
-			// Si no tiene una seccion central no esta solucionado el puzzle
-			return false;
+	/**
+	 * Método que busca un cubo con la imagen y sección suministradas
+	 * 
+	 * @param Integer:img
+	 *            entero que identificará la imagen.
+	 * @param Vector2:sect
+	 *            vector de 2 dimensiones con la sección de la imágen.
+	 * @return Cube cubo con la imagen y sección suministradas.
+	 */
+	var searchCube = function(img, sect) {
+		for (var i = 0; i < cubes.length; i++) {
+			for (var j = 1; j <= 6; j++) {
+				if (cubes[i].getFace(j).getImg() == img && cubes[i].getFace(j).getSection().x == sect.x
+						&& cubes[i].getFace(j).getSection().y == sect.y) {
+					return cubes[i];
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Método que calcula la rotación de una figura necesaria para que coincidan las secciones suministradas
+	 * 
+	 * @param Integer:face1
+	 *            entero que identificará la cara de la sección con la que tiene que coincidir, en que cara se
+	 *            encuentra. 1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera, 6=trasera.
+	 * @param Integer:face2
+	 *            entero que identificará la cara donde se encuentra la sección a colocar.
+	 * @param Integer:rot1
+	 *            entero con la rotación en grados de la sección con la que tiene que coincidir.
+	 * @param Integer:rot2
+	 *            entero con la rotación en grados de la sección a colocar.
+	 * @return Vector3 vector de 3 elementos con la rotación calculada en radianes.
+	 */
+	var getRotationFromSections = function(face1, face2, rot1, rot2) {
+		var rot = new THREE.Vector3();
+
+		// En funcio de en que cara tengamos que colocar la seccion 2
+		switch (face1) {
+		case 1: // Cara derecha
+			// Si es la cara derecha no lo giramos por que ya estan en la misma cara
+			// Cara izquierda
+			if (face2 == 2) {
+				rot.y = deg2Rad(180);
+			}
+			// Cara superior
+			if (face2 == 3) {
+				rot.x = deg2Rad(90);
+				rot.z = deg2Rad(270);
+			}
+			// Cara inferior
+			if (face2 == 4) {
+				rot.x = deg2Rad(270);
+				rot.z = deg2Rad(90);
+			}
+			// Cara delantera
+			if (face2 == 5) {
+				rot.y = deg2Rad(90);
+			}
+			if (face2 == 6) {// Cara trasera
+				rot.y = deg2Rad(270);
+			}
+			// Calculamos el giro en X en funcion de las rotaciones de las secciones
+			rot.x += deg2Rad((360 + rot1 - rot2) % 360);
+			break;
+		case 2: // Cara izquierda
+			if (face2 == 1) {// Cara derecha
+				rot.y = deg2Rad(180);
+			}
+			// Si es la cara izquierda no lo giramos por que ya estan en la misma cara
+			// Cara superior
+			if (face2 == 3) {
+				rot.x = deg2Rad(90);
+				rot.z = deg2Rad(90);
+			}
+			// Cara inferior
+			if (face2 == 4) {
+				rot.x = deg2Rad(270);
+				rot.z = deg2Rad(270);
+			}
+			// Cara delantera
+			if (face2 == 5) {
+				rot.y = deg2Rad(270);
+			}
+			// Cara trasera
+			if (face2 == 6) {
+				rot.y = deg2Rad(90);
+			}
+			// Calculamos el giro en X en funcion de las rotaciones de las secciones
+			rot.x += deg2Rad((360 - rot1 + rot2) % 360);
+			break;
+		case 3: // Cara superior
+			// Cara derecha
+			if (face2 == 1) {
+				rot.y = deg2Rad(270) + deg2Rad((360 + rot1 - rot2) % 360);
+				;
+				rot.z = deg2Rad(90);
+			}
+			// Cara izquierda
+			if (face2 == 2) {
+				rot.y = deg2Rad(90) + deg2Rad((360 + rot1 - rot2) % 360);
+				;
+				rot.z = deg2Rad(270);
+			}
+			// Cara superior
+			if (face2 == 3) {
+				rot.y = deg2Rad((360 + rot1 - rot2) % 360);
+			}
+			// Cara inferior
+			if (face2 == 4) {
+				rot.x = deg2Rad(180);
+				rot.y = deg2Rad((360 - rot1 + rot2) % 360);
+			}
+			// Cara delantera
+			if (face2 == 5) {
+				rot.x = deg2Rad(270);
+				rot.z = deg2Rad((360 + rot1 - rot2) % 360);
+			}
+			// Cara trasera
+			if (face2 == 6) {
+				rot.x = deg2Rad(270);
+				rot.y = deg2Rad(180);
+				rot.z = deg2Rad((360 - rot1 + rot2) % 360);
+			}
+			break;
+		case 4: // Cara inferior
+			// Cara derecha
+			if (face2 == 1) {
+				rot.y = deg2Rad(270) + deg2Rad((360 - rot1 + rot2) % 360);
+				;
+				rot.z = deg2Rad(270);
+			}
+			// Cara izquierda
+			if (face2 == 2) {
+				rot.y = deg2Rad(90) + deg2Rad((360 - rot1 + rot2) % 360);
+				;
+				rot.z = deg2Rad(90);
+			}
+			// Cara superior
+			if (face2 == 3) {
+				rot.x = deg2Rad(180);
+				rot.y = deg2Rad((360 + rot1 - rot2) % 360);
+			}
+			// Cara inferior
+			if (face2 == 4) {
+				rot.y = deg2Rad((360 - rot1 + rot2) % 360);
+			}
+			// Cara delantera
+			if (face2 == 5) {
+				rot.x = deg2Rad(90);
+				rot.z = deg2Rad((360 + rot1 - rot2) % 360);
+			}
+			// Cara trasera
+			if (face2 == 6) {
+				rot.x = deg2Rad(90);
+				rot.y = deg2Rad(180);
+				rot.z = deg2Rad((360 - rot1 + rot2) % 360);
+			}
+			break;
+		case 5: // Cara delantera
+			// Cara derecha
+			if (face2 == 1) {
+				rot.x = deg2Rad(270);
+				rot.y = deg2Rad(270) + deg2Rad((360 - rot1 + rot2) % 360);
+				rot.z = deg2Rad(270);
+			}
+			// Cara izquierda
+			if (face2 == 2) {
+				rot.x = deg2Rad(270);
+				rot.y = deg2Rad(90) + deg2Rad((360 - rot1 + rot2) % 360);
+				rot.z = deg2Rad(90);
+			}
+			// Cara superior
+			if (face2 == 3) {
+				rot.x = deg2Rad(90);
+				rot.y = deg2Rad((360 + rot1 - rot2) % 360);
+			}
+			// Cara inferior
+			if (face2 == 4) {
+				rot.x = deg2Rad(270);
+				rot.y = deg2Rad((360 - rot1 + rot2) % 360);
+			}
+			// Cara delantera
+			if (face2 == 5) {
+				rot.z = deg2Rad((360 + rot1 - rot2) % 360);
+			}
+			// Cara trasera
+			if (face2 == 6) {
+				rot.y = deg2Rad(180);
+				rot.z = deg2Rad((360 - rot1 + rot2) % 360);
+			}
+			break;
+		case 6: // Cara trasera
+			// Cara derecha
+			if (face2 == 1) {
+				rot.x = deg2Rad(90);
+				rot.y = deg2Rad(90) + deg2Rad((360 - rot1 + rot2) % 360);
+				rot.z = deg2Rad(270);
+			}
+			// Cara izquierda
+			if (face2 == 2) {
+				rot.x = deg2Rad(90);
+				rot.y = deg2Rad(270) + deg2Rad((360 - rot1 + rot2) % 360);
+				rot.z = deg2Rad(90);
+			}
+			// Cara superior
+			if (face2 == 3) {
+				rot.x = deg2Rad(270);
+				rot.y = deg2Rad(180 + (360 + rot1 - rot2) % 360);
+			}
+			// Cara inferior
+			if (face2 == 4) {
+				rot.x = deg2Rad(90);
+				rot.y = deg2Rad(180 + (360 - rot1 + rot2) % 360);
+			}
+			// Cara delantera
+			if (face2 == 5) {
+				rot.y = deg2Rad(180);
+				rot.z = deg2Rad((360 + rot1 - rot2) % 360);
+			}
+			// Cara trasera
+			if (face2 == 6) {
+				rot.z = deg2Rad((360 - rot1 + rot2) % 360);
+			}
+			break;
+
+		break;
+	default:
+		console.error("Puzzle.getRotationFromSections: wrong index of face1");
+	}
+	return rot;
+}
+
+	/*******************************************************************************************************************
+	 * Métodos Públicos
+	 ******************************************************************************************************************/
+
+	/**
+	 * Método que devuelve un booleano en funcion de si el puzzle esta resuelto o no
+	 * 
+	 * @return Boolean true si el puzzle está resuelto y false si no.
+	 */
+	this.isSolved = function() {
+		// Si es un puzzle de 3 cubos
+		if (numberOfCubes == 3) {
+			// Obtenemos el centro del cubo si existe
+			var center = getCenterCube();
+			// Si no existe devolvemos falso, ya que no esta resuelto, no forma un cubo
+			if (!center) {
+				return false;
+			}
+			center = center.position;
+		}
+		// Si es un puzzle de 2 cubos
+		if (numberOfCubes == 2) {
+			// Obtenemos el centro del cubo si existe
+			var center = getCenter();
+			// Si no existe devolvemos falso, ya que no esta resuelto, no forma un cubo
+			if (!center) {
+				return false;
+			}
 		}
 
-		// Calculamos el indice de la cara del primer cubo
-		var currentFaceIndex = getFaceIndex(faceCubes[0], i);
-
-		// Recorremos cada cubo de la cara para comprobar si todas las caras tienen la misma imagen y la misma
-		// rotacion
-		for (var j = 0; j < faceCubes.length - 1; j++) {
-			// Calculamos el indice de la cara siguiente
-			var nextFaceIndex = getFaceIndex(faceCubes[j + 1], i);
-
-			// Comparamos cada imagen de la cara con la imagen del siguiente cubo
-			if (faceCubes[j].getFace(currentFaceIndex.x).getImg() != faceCubes[j + 1].getFace(nextFaceIndex.x).getImg()) {
+		// Recorremos cada cara del puzzle
+		for (var i = 1; i < 7; i++) {
+			// Obtenemos los cubos que forman la cara
+			var faceCubes = getFaceCubes(i, center);
+			// Si es el puzzle con 3 cubos, comprobamos que el cubo del centro (indice 4)
+			// tiene una seccion con coordenadas 1,1, es decir del centro de la imagen
+			if (numberOfCubes == 3 && !faceCubes[4].getFace(getFaceIndex(faceCubes[4], i).x).compareSection(1, 1)) {
+				// Si no tiene una seccion central no esta solucionado el puzzle
 				return false;
 			}
 
-			// Diferencia de rotacion entre la rotacion actual y la rotacion inicial
-			// (almacenada inicialmente) en esta seccion de imagen
-			var currentDif = currentFaceIndex.y - faceCubes[j].getFace(currentFaceIndex.x).getRot();
-			if (currentDif < 0) {
-				currentDif += 360;
-			}
-			// Diferencia en la seccion de imagen del cubo siguiente
-			var nextDif = nextFaceIndex.y - faceCubes[j + 1].getFace(nextFaceIndex.x).getRot();
-			if (nextDif < 0) {
-				nextDif += 360;
-			}
-			// Comparamos la diferencia de rotacion entre la actual y la original de cada seccion con la siguiente
-			if (currentDif != nextDif) {
-				return false;
-			}
+			// Calculamos el indice de la cara del primer cubo
+			var currentFaceIndex = getFaceIndex(faceCubes[0], i);
 
-			// Igualamos el indice de la siguiente cara con el actual, ya que en la siguiente iteracion sera el
-			// actual
-			currentFaceIndex = nextFaceIndex;
+			// Recorremos cada cubo de la cara para comprobar si todas las caras tienen la misma imagen y la misma
+			// rotacion
+			for (var j = 0; j < faceCubes.length - 1; j++) {
+				// Calculamos el indice de la cara siguiente
+				var nextFaceIndex = getFaceIndex(faceCubes[j + 1], i);
+
+				// Comparamos cada imagen de la cara con la imagen del siguiente cubo
+				if (faceCubes[j].getFace(currentFaceIndex.x).getImg() != faceCubes[j + 1].getFace(nextFaceIndex.x)
+						.getImg()) {
+					return false;
+				}
+
+				// Diferencia de rotacion entre la rotacion actual y la rotacion inicial
+				// (almacenada inicialmente) en esta seccion de imagen
+				var currentDif = currentFaceIndex.y - faceCubes[j].getFace(currentFaceIndex.x).getRot();
+				if (currentDif < 0) {
+					currentDif += 360;
+				}
+				// Diferencia en la seccion de imagen del cubo siguiente
+				var nextDif = nextFaceIndex.y - faceCubes[j + 1].getFace(nextFaceIndex.x).getRot();
+				if (nextDif < 0) {
+					nextDif += 360;
+				}
+				// Comparamos la diferencia de rotacion entre la actual y la original de cada seccion con la siguiente
+				if (currentDif != nextDif) {
+					return false;
+				}
+
+				// Igualamos el indice de la siguiente cara con el actual, ya que en la siguiente iteracion sera el
+				// actual
+				currentFaceIndex = nextFaceIndex;
+			}
 		}
-	}
 
-	// Si se llega a este punto es que todas las caras estan bien formadas
-	return true;
-}
-
-/**
- * Método para saber si una posición esta en la zona del puzzle
- * 
- * @param Vector2:position
- *            Posición para la que realizara el cálculo.
- * @return Boolean true si se encuentra en la zona del puzzle y false si no.
- */
-this.isPuzzleZone = function(position) {
-	if (position.x < -puzzleAreaSize / 2 || position.x > puzzleAreaSize / 2 || position.y < -puzzleAreaSize / 2
-			|| position.y > puzzleAreaSize / 2) {
-		return false;
-	} else {
+		// Si se llega a este punto es que todas las caras estan bien formadas
 		return true;
 	}
-}
 
-/**
- * Método para obtener el objeto 3D que representa al grupo de piezas encajadas en el puzzle
- * 
- * @return Object3D objeto 3D que representa al grupo de piezas encajadas en el puzzle.
- */
-this.getPuzzle = function() {
-	return group;
-}
+	/**
+	 * Método para saber si una posición esta en la zona del puzzle
+	 * 
+	 * @param Vector2:position
+	 *            Posición para la que realizara el cálculo.
+	 * @return Boolean true si se encuentra en la zona del puzzle y false si no.
+	 */
+	this.isPuzzleZone = function(position) {
+		if (position.x < -puzzleAreaSize / 2 || position.x > puzzleAreaSize / 2 || position.y < -puzzleAreaSize / 2
+				|| position.y > puzzleAreaSize / 2) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 
-/**
- * Método para obtener el array de objetos 3D de piezas del puzzle
- * 
- * @return Object3D[] array de objetos 3D de piezas del puzzle.
- */
-this.getPuzzleCubes = function() {
-	return cubes;
-}
+	/**
+	 * Método para obtener el objeto 3D que representa al grupo de piezas encajadas en el puzzle
+	 * 
+	 * @return Object3D objeto 3D que representa al grupo de piezas encajadas en el puzzle.
+	 */
+	this.getPuzzle = function() {
+		return group;
+	}
 
-/**
- * Método para obtener el tamaño de los cubos
- * 
- * @return Integer tamaño de los cubos en pixeles.
- */
-this.getCubeSize = function() {
-	return cubeSize;
-}
+	/**
+	 * Método para obtener el array de objetos 3D de piezas del puzzle
+	 * 
+	 * @return Object3D[] array de objetos 3D de piezas del puzzle.
+	 */
+	this.getPuzzleCubes = function() {
+		return cubes;
+	}
 
-/**
- * Método para obtener el tamaño del área del puzzle
- * 
- * @return Integer tamaño del área del puzzle.
- */
-this.getPuzzleAreaSize = function() {
-	return puzzleAreaSize;
-}
+	/**
+	 * Método para obtener el tamaño de los cubos
+	 * 
+	 * @return Integer tamaño de los cubos en pixeles.
+	 */
+	this.getCubeSize = function() {
+		return cubeSize;
+	}
 
-/**
- * Método para obtener el tamaño del área del puzzle
- * 
- * @return Integer tamaño del área del puzzle.
- */
-this.getNumberOfCubes = function() {
-	return numberOfCubes * numberOfCubes * numberOfCubes;
-}
+	/**
+	 * Método para obtener el tamaño del área del puzzle
+	 * 
+	 * @return Integer tamaño del área del puzzle.
+	 */
+	this.getPuzzleAreaSize = function() {
+		return puzzleAreaSize;
+	}
 
-/**
- * Método para sacar del puzzle el cubo indicado, solo cambia la rotación y traslación que tenia en el puzzle por las
- * del mundo 3D
- * 
- * @param Cube:c
- *            cubo que se sacará del puzzle.
- */
-this.putOutCube = function(c) {
-	// Calculamos las coordenadas en el mundo de la figura a partir de las que tenia en el puzzle
-	c.position.copy(worldCoordFromPuzzlePosition(c.position));
-	// Calculamos la rotacion en el mundo de la figura a partir de la que tenia en el puzzle
-	c.rotation.copy(worldRotationFromPuzzleRotation(c.rotation));
-}
+	/**
+	 * Método para obtener el tamaño del área del puzzle
+	 * 
+	 * @return Integer tamaño del área del puzzle.
+	 */
+	this.getNumberOfCubes = function() {
+		return numberOfCubes * numberOfCubes * numberOfCubes;
+	}
 
-/**
- * Método para introducir en el puzzle el cubo indicado, solo cambia la rotación y traslación que tenia en el mundo 3D
- * por las del puzzle
- * 
- * @param Cube:c
- *            cubo que se introducirá en el puzzle.
- */
-this.putInCube = function(c) {
-	// Calculamos las coordenadas en el puzzle de la figura a partir de las que tenia en el mundo
-	c.position.copy(positionPuzzle(c));
-	// Calculamos la rotacion en el puzzle de la figura a partir de la que tenia en el mundo
-	c.rotation.copy(rotationPuzzle(c));
-}
+	/**
+	 * Método para sacar del puzzle el cubo indicado, solo cambia la rotación y traslación que tenia en el puzzle por
+	 * las del mundo 3D
+	 * 
+	 * @param Cube:c
+	 *            cubo que se sacará del puzzle.
+	 */
+	this.putOutCube = function(c) {
+		// Calculamos las coordenadas en el mundo de la figura a partir de las que tenia en el puzzle
+		c.position.copy(worldCoordFromPuzzlePosition(c.position));
+		// Calculamos la rotacion en el mundo de la figura a partir de la que tenia en el puzzle
+		c.rotation.copy(worldRotationFromPuzzleRotation(c.rotation));
+	}
 
-/**
- * Método para obetener la solución al puzzle como se encuentre el momento de llamar a este método
- * 
- * @return Object3D objeto 3D que muestra la solución actual con un pequeña transparencia, o null si no se encuentra
- *         ninguna.
- */
-this.getSolution = function() {
-	// Si el puzzle no tiene ninguna pieza encajada
-	if (group.children.length == 0) {
-		// Mostramos la primera solucion
+	/**
+	 * Método para introducir en el puzzle el cubo indicado, solo cambia la rotación y traslación que tenia en el mundo
+	 * 3D por las del puzzle
+	 * 
+	 * @param Cube:c
+	 *            cubo que se introducirá en el puzzle.
+	 */
+	this.putInCube = function(c) {
+		// Calculamos las coordenadas en el puzzle de la figura a partir de las que tenia en el mundo
+		c.position.copy(positionPuzzle(c));
+		// Calculamos la rotacion en el puzzle de la figura a partir de la que tenia en el mundo
+		c.rotation.copy(rotationPuzzle(c));
+	}
+
+	/**
+	 * Método para obetener la solución al puzzle como se encuentre el momento de llamar a este método
+	 * 
+	 * @return Object3D objeto 3D que muestra la solución actual con un pequeña transparencia, o null si no se encuentra
+	 *         ninguna.
+	 */
+	this.getSolution = function() {
+		// Si el puzzle no tiene ninguna pieza encajada
+		if (group.children.length == 0) {
+			// Mostramos la primera solucion
+			// Guardamos los materiales
+			var mats = [];
+			for (var i = 0; i < 6; i++) {
+				var mat = materials[i].clone();
+				mat.transparent = true;
+				mat.opacity = 0.25;
+				mats.push(mat);
+			}
+			// Creamos el cubo de la solucion
+			var geom = new THREE.CubeGeometry(cubeSize * numberOfCubes - 2, cubeSize * numberOfCubes - 2, cubeSize
+					* numberOfCubes - 2, 1, 1, 1);
+			var cube = new THREE.Mesh(geom, new THREE.MeshFaceMaterial(mats));
+			// Creamos un objeto que contendra al cubo, para realizar el giro igual que el puzzle
+			var cont = new THREE.Object3D();
+			cont.rotation.copy(group.rotation);
+			cont.add(cube);
+
+			return cont;
+		}
+
+		// Buscamos los cubos de los extremos
+		var endCubes = searchEndCubes();
+
+		// Buscamos los grupos de cubos con la misma imagen y rotacion
+		var equalImgs = getImgGroups(endCubes);
+
+		// Buscamos la cara que tiene mas secciones con la imagen igual
+		var max = 0, maxi = 0, maxj = 0;
+		for (var i = 0; i < equalImgs.length; i++) {
+			for (var j = 0; j < equalImgs[i].length; j++) {
+				if (equalImgs[i][j][2].length > max) {
+					max = equalImgs[i][j][2].length;
+					maxi = i;
+					maxj = j;
+				}
+			}
+		}
+		// Guardamos la cara con mas imagenes iguales
+		max = equalImgs[maxi][maxj];
+
+		// Calculamos la rotacion y la solucion a la que pertenece
+		var cubeRotation = getRotationFromSections(maxi + 1, max[0] % 6 + 1, max[1], 0);
+		var sol = Math.floor(max[0] / 6);
+
+		// Buscamos el cubo que tenga mas cubos alredor
+		maxClose = max[2][0];
+		for (var i = 0; i < max[2].length; i++) {
+			max[2][i].close = 0;
+			for (var j = 0; j < max[2].length; j++) {
+				if (isNext(max[2][i].position, max[2][j].position, cubeSize)) {
+					max[2][i].close++;
+					if (maxClose.close < max[2][i].close)
+						maxClose = max[2][i];
+				}
+			}
+		}
+
+		// Calculamos las coordenadas de la seccion correspondiente
+		var index = getFaceIndex(maxClose, maxi + 1);
+		var sect = maxClose.getFace(index.x).getSection();
+		var rot = index.y;
+		var sectCoord = sectionToPuzzleCoord(sect, rot, maxi);
+
+		// Colocamos el cubo en funcion de que eje corresponda
+		var position = new THREE.Vector3();
+		// Calculamos la posicion segun las coordenadas
+		if (sectCoord.x == undefined) {
+			position.x = max[2][0].position.x + ((maxi % 2) * 2 - 1) * (numberOfCubes - 1) * cubeSize / 2;
+		} else {
+			position.x = maxClose.position.x - sectCoord.x * cubeSize * (numberOfCubes - 1) / 2;
+		}
+
+		if (sectCoord.y == undefined) {
+			position.y = max[2][0].position.y + ((maxi % 2) * 2 - 1) * (numberOfCubes - 1) * cubeSize / 2;
+		} else {
+			position.y = maxClose.position.y - sectCoord.y * cubeSize * (numberOfCubes - 1) / 2;
+		}
+
+		if (sectCoord.z == undefined) {
+			position.z = max[2][0].position.z + ((maxi % 2) * 2 - 1) * (numberOfCubes - 1) * cubeSize / 2;
+		} else {
+			position.z = maxClose.position.z - sectCoord.z * cubeSize * (numberOfCubes - 1) / 2;
+		}
+
 		// Guardamos los materiales
 		var mats = [];
 		for (var i = 0; i < 6; i++) {
-			var mat = materials[i].clone();
+			var mat = materials[i + sol * 6].clone();
 			mat.transparent = true;
-			mat.opacity = 0.25;
+			mat.opacity = 0.5;
 			mats.push(mat);
 		}
 		// Creamos el cubo de la solucion
 		var geom = new THREE.CubeGeometry(cubeSize * numberOfCubes - 2, cubeSize * numberOfCubes - 2, cubeSize
 				* numberOfCubes - 2, 1, 1, 1);
 		var cube = new THREE.Mesh(geom, new THREE.MeshFaceMaterial(mats));
+		// Lo colocamos donde y como corresponda
+		cube.rotation.copy(cubeRotation);
+		cube.position.copy(position);
+
 		// Creamos un objeto que contendra al cubo, para realizar el giro igual que el puzzle
 		var cont = new THREE.Object3D();
 		cont.rotation.copy(group.rotation);
@@ -1592,327 +1680,240 @@ this.getSolution = function() {
 		return cont;
 	}
 
-	// Buscamos los cubos de los extremos
-	var endCubes = searchEndCubes();
-
-	// Buscamos los grupos de cubos con la misma imagen y rotacion
-	var equalImgs = getImgGroups(endCubes);
-
-	// Buscamos la cara que tiene mas secciones con la imagen igual
-	var max = 0, maxi = 0, maxj = 0;
-	for (var i = 0; i < equalImgs.length; i++) {
-		for (var j = 0; j < equalImgs[i].length; j++) {
-			if (equalImgs[i][j][2].length > max) {
-				max = equalImgs[i][j][2].length;
-				maxi = i;
-				maxj = j;
-			}
+	/**
+	 * Método para colocar automáticamente un cubo en el puzzle de manera correcta
+	 * 
+	 * @return boolean booleano indicando si se ha colocado una pieza
+	 */
+	this.placeCube = function() {
+		// Si no hay ningun cubo en el puzzle
+		if (group.children.length == 0) {
+			// Cambiamos la rotacion y traslacion de la figura a la que tendra en el puzzle
+			this.putInCube(cubes[0]);
+			// Y añadimos la figura al puzzle
+			group.add(cubes[0]);
+			return true;
 		}
-	}
-	// Guardamos la cara con mas imagenes iguales
-	max = equalImgs[maxi][maxj];
 
-	// Calculamos la rotacion y la solucion a la que pertenece
-	var cubeRotation = getRotationFromSections(maxi + 1, max[0] % 6 + 1, max[1], 0);
-	var sol = Math.floor(max[0] / 6);
-
-	// Buscamos el cubo que tenga mas cubos alredor
-	maxClose = max[2][0];
-	for (var i = 0; i < max[2].length; i++) {
-		max[2][i].close = 0;
-		for (var j = 0; j < max[2].length; j++) {
-			if (isNext(max[2][i].position, max[2][j].position, cubeSize)) {
-				max[2][i].close++;
-				if (maxClose.close < max[2][i].close)
-					maxClose = max[2][i];
-			}
-		}
-	}
-
-	// Calculamos las coordenadas de la seccion correspondiente
-	var index = getFaceIndex(maxClose, maxi + 1);
-	var sect = maxClose.getFace(index.x).getSection();
-	var rot = index.y;
-	var sectCoord = sectionToPuzzleCoord(sect, rot, maxi);
-
-	// Colocamos el cubo en funcion de que eje corresponda
-	var position = new THREE.Vector3();
-	// Calculamos la posicion segun las coordenadas
-	if (sectCoord.x == undefined) {
-		position.x = max[2][0].position.x + ((maxi % 2) * 2 - 1) * (numberOfCubes - 1) * cubeSize / 2;
-	} else {
-		position.x = maxClose.position.x - sectCoord.x * cubeSize * (numberOfCubes - 1) / 2;
-	}
-
-	if (sectCoord.y == undefined) {
-		position.y = max[2][0].position.y + ((maxi % 2) * 2 - 1) * (numberOfCubes - 1) * cubeSize / 2;
-	} else {
-		position.y = maxClose.position.y - sectCoord.y * cubeSize * (numberOfCubes - 1) / 2;
-	}
-
-	if (sectCoord.z == undefined) {
-		position.z = max[2][0].position.z + ((maxi % 2) * 2 - 1) * (numberOfCubes - 1) * cubeSize / 2;
-	} else {
-		position.z = maxClose.position.z - sectCoord.z * cubeSize * (numberOfCubes - 1) / 2;
-	}
-
-	// Guardamos los materiales
-	var mats = [];
-	for (var i = 0; i < 6; i++) {
-		var mat = materials[i + sol * 6].clone();
-		mat.transparent = true;
-		mat.opacity = 0.5;
-		mats.push(mat);
-	}
-	// Creamos el cubo de la solucion
-	var geom = new THREE.CubeGeometry(cubeSize * numberOfCubes - 2, cubeSize * numberOfCubes - 2, cubeSize
-			* numberOfCubes - 2, 1, 1, 1);
-	var cube = new THREE.Mesh(geom, new THREE.MeshFaceMaterial(mats));
-	// Lo colocamos donde y como corresponda
-	cube.rotation.copy(cubeRotation);
-	cube.position.copy(position);
-
-	// Creamos un objeto que contendra al cubo, para realizar el giro igual que el puzzle
-	var cont = new THREE.Object3D();
-	cont.rotation.copy(group.rotation);
-	cont.add(cube);
-
-	return cont;
-}
-
-/**
- * Método para colocar automáticamente un cubo en el puzzle de manera correcta
- * 
- * @return boolean booleano indicando si se ha colocado una pieza
- */
-this.placeCube = function() {
-	// Si no hay ningun cubo en el puzzle
-	if (group.children.length == 0) {
-		// Cambiamos la rotacion y traslacion de la figura a la que tendra en el puzzle
-		this.putInCube(cubes[0]);
-		// Y añadimos la figura al puzzle
-		group.add(cubes[0]);
-		return true;
-	}
-
-	// Buscamos los cubos de los extremos
-	var endCubes = searchEndCubes();
-	// Buscamos los grupos de cubos con la misma imagen y rotacion
-	var equalImgs = getImgGroups(endCubes);
-	// Buscamos el grupo de cubos en cada cara que tiene mas secciones con la imagen igual
-	var max, maxGroups = [];
-	for (var i = 0; i < equalImgs.length; i++) {
-		max = 0;
-		var maxj = 0;
-		for (var j = 0; j < equalImgs[i].length; j++) {
-			if (equalImgs[i][j][2].length > max) {
-				max = equalImgs[i][j][2].length;
-				maxj = j;
-			}
-		}
-		maxGroups.push(equalImgs[i][maxj]);
-	}
-	// Guardamos la cara a la que corresponde el grupo
-	for (var i = 0; i < maxGroups.length; i++) {
-		maxGroups[i].push(i);
-	}
-	// Ordenamos el array de mayor a menor segun el numero de cubos que tenga cada grupo
-	maxGroups.sort(function(a, b) {
-		if (a[2].length < b[2].length) {
-			return 1;
-		}
-		if (a[2].length > b[2].length) {
-			return -1;
-		} else {
-			return 0;
-		}
-	});
-
-	// Creamos un flag para saber si hemos colocado el cubo
-	var placed = false;
-	// Recorremos los 6 extremos hasta colocar el cubo o llegar al final
-	for (var i = 0; i < 6 && !placed; i++) {
-		// Si no se han colocado ya todos los cubos de la cara
-		if (maxGroups[i][2].length < numberOfCubes * numberOfCubes) {
-			// Creamos un array con todas las posibles secciones
-			possibleSections = [];
-			for (var j = 0; j < numberOfCubes; j++) {
-				for (var k = 0; k < numberOfCubes; k++) {
-					possibleSections.push(new THREE.Vector2(j, k));
-				}
-			}
-			// Le quitamos las que ya estan en el grupo
-			for (var j = 0; j < maxGroups[i][2].length; j++) {
-				var index = getFaceIndex(maxGroups[i][2][j], maxGroups[i][3] + 1);
-				var sect = maxGroups[i][2][j].getFace(index.x).getSection();
-				for (var k = 0; k < possibleSections.length; k++) {
-					if (possibleSections[k].x == sect.x && possibleSections[k].y == sect.y) {
-						possibleSections.splice(k, 1);
-					}
-				}
-			}
-
-			// Recorremos las posibles secciones para intentar colocarlas
-			for (var k = 0; k < possibleSections.length && !placed; k++) {
-				// Buscamos el cubo con la imagen y la seccion indicadas
-				var cube = searchCube(maxGroups[i][0], possibleSections[k]);
-				// Si no existe o ya esta colocado en el puzzle seguimos buscando
-				if (cube == null || cube.parent == group) {
-					continue;
-				}
-
-				// Buscamos en que cara esta la imagen
-				for (var j = 1; j < 7; j++) {
-					if (cube.getFace(j).getImg() == maxGroups[i][0]) {
-						break;
-					}
-				}
-				// Calculamos la seccion del primer cubo del grupo
-				var index = getFaceIndex(maxGroups[i][2][0], maxGroups[i][3] + 1);
-				var sect0 = maxGroups[i][2][0].getFace(index.x).getSection();
-				var rot0 = index.y;
-				var sect0Coord = sectionToPuzzleCoord(sect0, rot0, maxGroups[i][3]);
-				// Calculamos las coordenadas de la seccion correspondiente
-				var sect = cube.getFace(j).getSection();
-				var rot = (rot0 + cube.getFace(j).getRot()) % 360;
-				var sectCoord = sectionToPuzzleCoord(sect, rot, maxGroups[i][3]);
-				// Calculamos la posicion segun las coordenadas de las seccion
-				var position = new THREE.Vector3();
-				if (sectCoord.x == undefined) {
-					position.x = maxGroups[i][2][0].position.x;
-				} else {
-					position.x = maxGroups[i][2][0].position.x + (sectCoord.x - sect0Coord.x) * cubeSize
-							* (numberOfCubes - 1) / 2;
-				}
-				;
-
-				if (sectCoord.y == undefined) {
-					position.y = maxGroups[i][2][0].position.y;
-				} else {
-					position.y = maxGroups[i][2][0].position.y + (sectCoord.y - sect0Coord.y) * cubeSize
-							* (numberOfCubes - 1) / 2;
-				}
-
-				if (sectCoord.z == undefined) {
-					position.z = maxGroups[i][2][0].position.z;
-				} else {
-					position.z = maxGroups[i][2][0].position.z + (sectCoord.z - sect0Coord.z) * cubeSize
-							* (numberOfCubes - 1) / 2;
-				}
-
-				// Si la posicion ya esta ocupada siguimos buscando
-				if (getCube(position) != null) {
-					continue;
-				}
-				// Colocamos el cubo en el puzzle y activamos el flag de colocado
-				cube.position.copy(position);
-				var rotation = getRotationFromSections(maxGroups[i][3] + 1, j, maxGroups[i][1], cube.getFace(j)
-						.getRot());
-				cube.rotation.copy(rotation);
-				group.add(cube);
-				placed = true;
-			}
-		}
-	}
-
-	// Si no se ha colocado una pieza y el puzzle tiene encajadas todos las piezas menos una
-	// puede que haya que colocar la ultima pieza en el centro
-	if (!placed && group.children.length == 26) {
-		// Comprobamos que todas las caras tengan 9 cubos con la misma solucion
+		// Buscamos los cubos de los extremos
+		var endCubes = searchEndCubes();
+		// Buscamos los grupos de cubos con la misma imagen y rotacion
+		var equalImgs = getImgGroups(endCubes);
+		// Buscamos el grupo de cubos en cada cara que tiene mas secciones con la imagen igual
+		var max, maxGroups = [];
 		for (var i = 0; i < equalImgs.length; i++) {
-			if (equalImgs[i][0][2].length != 9) {
-				return;
+			max = 0;
+			var maxj = 0;
+			for (var j = 0; j < equalImgs[i].length; j++) {
+				if (equalImgs[i][j][2].length > max) {
+					max = equalImgs[i][j][2].length;
+					maxj = j;
+				}
 			}
+			maxGroups.push(equalImgs[i][maxj]);
 		}
-		// Calculamos las coordenadas para colocar el cubo del centro
-		var pos = new THREE.Vector3();
-		pos.x = equalImgs[0][0][2][0].position.x - cubeSize;
-		pos.y = equalImgs[2][0][2][0].position.y - cubeSize;
-		pos.z = equalImgs[4][0][2][0].position.z - cubeSize;
-		// Buscamos el cubo que no esta en el puzzle
-		var c;
-		for (var i = 0; i < cubes.length; i++) {
-			if (cubes[i].parent != group) {
-				c = cubes[i];
+		// Guardamos la cara a la que corresponde el grupo
+		for (var i = 0; i < maxGroups.length; i++) {
+			maxGroups[i].push(i);
+		}
+		// Ordenamos el array de mayor a menor segun el numero de cubos que tenga cada grupo
+		maxGroups.sort(function(a, b) {
+			if (a[2].length < b[2].length) {
+				return 1;
+			}
+			if (a[2].length > b[2].length) {
+				return -1;
+			} else {
+				return 0;
+			}
+		});
+
+		// Creamos un flag para saber si hemos colocado el cubo
+		var placed = false;
+		// Recorremos los 6 extremos hasta colocar el cubo o llegar al final
+		for (var i = 0; i < 6 && !placed; i++) {
+			// Si no se han colocado ya todos los cubos de la cara
+			if (maxGroups[i][2].length < numberOfCubes * numberOfCubes) {
+				// Creamos un array con todas las posibles secciones
+				possibleSections = [];
+				for (var j = 0; j < numberOfCubes; j++) {
+					for (var k = 0; k < numberOfCubes; k++) {
+						possibleSections.push(new THREE.Vector2(j, k));
+					}
+				}
+				// Le quitamos las que ya estan en el grupo
+				for (var j = 0; j < maxGroups[i][2].length; j++) {
+					var index = getFaceIndex(maxGroups[i][2][j], maxGroups[i][3] + 1);
+					var sect = maxGroups[i][2][j].getFace(index.x).getSection();
+					for (var k = 0; k < possibleSections.length; k++) {
+						if (possibleSections[k].x == sect.x && possibleSections[k].y == sect.y) {
+							possibleSections.splice(k, 1);
+						}
+					}
+				}
+
+				// Recorremos las posibles secciones para intentar colocarlas
+				for (var k = 0; k < possibleSections.length && !placed; k++) {
+					// Buscamos el cubo con la imagen y la seccion indicadas
+					var cube = searchCube(maxGroups[i][0], possibleSections[k]);
+					// Si no existe o ya esta colocado en el puzzle seguimos buscando
+					if (cube == null || cube.parent == group) {
+						continue;
+					}
+
+					// Buscamos en que cara esta la imagen
+					for (var j = 1; j < 7; j++) {
+						if (cube.getFace(j).getImg() == maxGroups[i][0]) {
+							break;
+						}
+					}
+					// Calculamos la seccion del primer cubo del grupo
+					var index = getFaceIndex(maxGroups[i][2][0], maxGroups[i][3] + 1);
+					var sect0 = maxGroups[i][2][0].getFace(index.x).getSection();
+					var rot0 = index.y;
+					var sect0Coord = sectionToPuzzleCoord(sect0, rot0, maxGroups[i][3]);
+					// Calculamos las coordenadas de la seccion correspondiente
+					var sect = cube.getFace(j).getSection();
+					var rot = (rot0 + cube.getFace(j).getRot()) % 360;
+					var sectCoord = sectionToPuzzleCoord(sect, rot, maxGroups[i][3]);
+					// Calculamos la posicion segun las coordenadas de las seccion
+					var position = new THREE.Vector3();
+					if (sectCoord.x == undefined) {
+						position.x = maxGroups[i][2][0].position.x;
+					} else {
+						position.x = maxGroups[i][2][0].position.x + (sectCoord.x - sect0Coord.x) * cubeSize
+								* (numberOfCubes - 1) / 2;
+					}
+					;
+
+					if (sectCoord.y == undefined) {
+						position.y = maxGroups[i][2][0].position.y;
+					} else {
+						position.y = maxGroups[i][2][0].position.y + (sectCoord.y - sect0Coord.y) * cubeSize
+								* (numberOfCubes - 1) / 2;
+					}
+
+					if (sectCoord.z == undefined) {
+						position.z = maxGroups[i][2][0].position.z;
+					} else {
+						position.z = maxGroups[i][2][0].position.z + (sectCoord.z - sect0Coord.z) * cubeSize
+								* (numberOfCubes - 1) / 2;
+					}
+
+					// Si la posicion ya esta ocupada siguimos buscando
+					if (getCube(position) != null) {
+						continue;
+					}
+					// Colocamos el cubo en el puzzle y activamos el flag de colocado
+					cube.position.copy(position);
+					var rotation = getRotationFromSections(maxGroups[i][3] + 1, j, maxGroups[i][1], cube.getFace(j)
+							.getRot());
+					cube.rotation.copy(rotation);
+					group.add(cube);
+					placed = true;
+				}
 			}
 		}
 
-		c.position.copy(pos);
-		group.add(c);
-		placed = true;
+		// Si no se ha colocado una pieza y el puzzle tiene encajadas todos las piezas menos una
+		// puede que haya que colocar la ultima pieza en el centro
+		if (!placed && group.children.length == 26) {
+			// Comprobamos que todas las caras tengan 9 cubos con la misma solucion
+			for (var i = 0; i < equalImgs.length; i++) {
+				if (equalImgs[i][0][2].length != 9) {
+					return;
+				}
+			}
+			// Calculamos las coordenadas para colocar el cubo del centro
+			var pos = new THREE.Vector3();
+			pos.x = equalImgs[0][0][2][0].position.x - cubeSize;
+			pos.y = equalImgs[2][0][2][0].position.y - cubeSize;
+			pos.z = equalImgs[4][0][2][0].position.z - cubeSize;
+			// Buscamos el cubo que no esta en el puzzle
+			var c;
+			for (var i = 0; i < cubes.length; i++) {
+				if (cubes[i].parent != group) {
+					c = cubes[i];
+				}
+			}
+
+			c.position.copy(pos);
+			group.add(c);
+			placed = true;
+		}
+		return placed;
 	}
-	return placed;
+
+	/*
+	 * Nombre: isLastCubeRigthPlaced Sinopsis: Método para averiguar si el último cubo introducido en el puzzle esta
+	 * bien colocado, es decir, si alguna de las caras del cubo esta bien colocada respecto a algun cubo que ya esté en
+	 * el puzzle. Entradas: @return Boolean booleano que será true si alguna cara del último cubo colocado coincide con
+	 * alguna del puzzle, false si no.
+	 */
+	this.isLastCubeRigthPlaced = function() {
+		// Si solo hay un cubo o ninguno
+		if (group.children.length < 2) {
+			return true;
+		}
+		// Obtenemos el ultimo cubo introducido en el puzzle
+		var lastCube = group.children[group.children.length - 1];
+
+		// Recorremos las 6 caras del ultimo cubo
+		for (var i = 0; i < 6; i++) {
+			// Creamos un array para guardar los cubos con las cuatro posibles caras adyacentes
+			var nextFaces = [];
+			// Buscamos los cubos
+			for (var j = 0; j < 4; j++) {
+				var nextPos = new THREE.Vector3().copy(lastCube.position);
+				// Calculamos la posicion adyacente
+				// Cara en el eje X (izquierda o derecha)
+				if (Math.floor(i / 2) == 0) {
+					nextPos.y += Math.floor(j / 2) * (j * 2 - 5) * cubeSize;
+					nextPos.z += (1 - Math.floor(j / 2)) * (j * 2 - 1) * cubeSize;
+				}
+				// Cara en el eje Y (superior o inferior)
+				if (Math.floor(i / 2) == 1) {
+					nextPos.x += Math.floor(j / 2) * (j * 2 - 5) * cubeSize;
+					nextPos.z += (1 - Math.floor(j / 2)) * (j * 2 - 1) * cubeSize;
+				}
+				// Cara en el eje Z (delantera o trasera)
+				if (Math.floor(i / 2) == 2) {
+					nextPos.x += Math.floor(j / 2) * (j * 2 - 5) * cubeSize;
+					nextPos.y += (1 - Math.floor(j / 2)) * (j * 2 - 1) * cubeSize;
+				}
+				// Obtenemos el cubo de la posicion adyacente
+				var cube = getCube(nextPos);
+				if (cube != null) {
+					nextFaces.push(cube);
+				}
+			}
+
+			// Obtenemos la rotacion y la imagen de la cara correspondiente del ultimo cubo colocado
+			var index = getFaceIndex(lastCube, i + 1);
+			var img = lastCube.getFace(index.x).getImg();
+			var rot = index.y - lastCube.getFace(index.x).getRot();
+			var sect = lastCube.getFace(index.x).getSection();
+			// Recorremos las caras adyacentes para comprobar si coincide
+			for (var j = 0; j < nextFaces.length; j++) {
+				// Obtenemos la rotacion y la imagen de la cara adyacente
+				var index = getFaceIndex(nextFaces[j], i + 1);
+				var imgNext = nextFaces[j].getFace(index.x).getImg();
+				var rotNext = index.y - nextFaces[j].getFace(index.x).getRot();
+
+				// Si no tienen la misma imagen y rotacion seguimos con la siguiente seccion
+				if (img != imgNext || rot != rotNext) {
+					continue;
+				}
+				// Comprobamos que estan bien colocadas una respecto a otra
+				var sectNext = nextFaces[j].getFace(index.x).getSection();
+				var b = isSectionsProperlyPlaced(sect, sectNext, lastCube.position, nextFaces[j].position, rot, i);
+				// Si estan bien colocadas
+				if (b) {
+					// Indicamos que el cubo esta bien encajado respecto a una cara de una pieza por lo menos
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }
-
-/*
- * Nombre: isLastCubeRigthPlaced Sinopsis: Método para averiguar si el último cubo introducido en el puzzle esta bien
- * colocado, es decir, si alguna de las caras del cubo esta bien colocada respecto a algun cubo que ya esté en el
- * puzzle. Entradas: @return Boolean booleano que será true si alguna cara del último cubo colocado coincide con alguna
- * del puzzle, false si no.
- */
-this.isLastCubeRigthPlaced = function() {
-	// Si solo hay un cubo o ninguno
-	if (group.children.length < 2) {
-		return true;
-	}
-	// Obtenemos el ultimo cubo introducido en el puzzle
-	var lastCube = group.children[group.children.length - 1];
-
-	// Recorremos las 6 caras del ultimo cubo
-	for (var i = 0; i < 6; i++) {
-		// Creamos un array para guardar los cubos con las cuatro posibles caras adyacentes
-		var nextFaces = [];
-		// Buscamos los cubos
-		for (var j = 0; j < 4; j++) {
-			var nextPos = new THREE.Vector3().copy(lastCube.position);
-			// Calculamos la posicion adyacente
-			// Cara en el eje X (izquierda o derecha)
-			if (Math.floor(i / 2) == 0) {
-				nextPos.y += Math.floor(j / 2) * (j * 2 - 5) * cubeSize;
-				nextPos.z += (1 - Math.floor(j / 2)) * (j * 2 - 1) * cubeSize;
-			}
-			// Cara en el eje Y (superior o inferior)
-			if (Math.floor(i / 2) == 1) {
-				nextPos.x += Math.floor(j / 2) * (j * 2 - 5) * cubeSize;
-				nextPos.z += (1 - Math.floor(j / 2)) * (j * 2 - 1) * cubeSize;
-			}
-			// Cara en el eje Z (delantera o trasera)
-			if (Math.floor(i / 2) == 2) {
-				nextPos.x += Math.floor(j / 2) * (j * 2 - 5) * cubeSize;
-				nextPos.y += (1 - Math.floor(j / 2)) * (j * 2 - 1) * cubeSize;
-			}
-			// Obtenemos el cubo de la posicion adyacente
-			var cube = getCube(nextPos);
-			if (cube != null) {
-				nextFaces.push(cube);
-			}
-		}
-
-		// Obtenemos la rotacion y la imagen de la cara correspondiente del ultimo cubo colocado
-		var index = getFaceIndex(lastCube, i + 1);
-		var img = lastCube.getFace(index.x).getImg();
-		var rot = index.y - lastCube.getFace(index.x).getRot();
-		var sect = lastCube.getFace(index.x).getSection();
-		// Recorremos las caras adyacentes para comprobar si coincide
-		for (var j = 0; j < nextFaces.length; j++) {
-			// Obtenemos la rotacion y la imagen de la cara adyacente
-			var index = getFaceIndex(nextFaces[j], i + 1);
-			var imgNext = nextFaces[j].getFace(index.x).getImg();
-			var rotNext = index.y - nextFaces[j].getFace(index.x).getRot();
-
-			// Si no tienen la misma imagen y rotacion seguimos con la siguiente seccion
-			if (img != imgNext || rot != rotNext) {
-				continue;
-			}
-			// Comprobamos que estan bien colocadas una respecto a otra
-			var sectNext = nextFaces[j].getFace(index.x).getSection();
-			var b = isSectionsProperlyPlaced(sect, sectNext, lastCube.position, nextFaces[j].position, rot, i);
-			// Si estan bien colocadas
-			if (b) {
-				// Indicamos que el cubo esta bien encajado respecto a una cara de una pieza por lo menos
-				return true;
-			}
-		}
-	}
-	return false;
-}}

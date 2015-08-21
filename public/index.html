@@ -7,12 +7,6 @@
 <meta charset="utf-8">
 <meta name="viewport"
 	content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-<style>
-body {
-	margin: 0px;
-	overflow: hidden;
-}
-</style>
 <link href='css/StalinistOne-Regular.css' rel='stylesheet'
 	type='text/css'>
 <link href='css/style.css' rel='stylesheet' type='text/css'>
@@ -94,83 +88,25 @@ body {
 	<script>
 		//Comprobamos que WebGL esta disponible
 		if (!Detector.webgl) {
-			var element = document.createElement('div');
-			element.id = 'webgl-error-message';
-			element.style.fontFamily = 'monospace';
-			element.style.fontSize = '13px';
-			element.style.fontWeight = 'normal';
-			element.style.textAlign = 'center';
-			element.style.background = '#fff';
-			element.style.color = '#000';
-			element.style.padding = '1.5em';
-			//element.style.width = '400px';
-			element.style.margin = '5em auto 0';
-
-			element.innerHTML = '<p>Parece que todavia no soporta <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" style="color:#000">WebGL</a>.</p>';
-			element.innerHTML += '<p>Si esta utilizando un navegador no compatible con WebGL como Internet Explorer, por favor utilice un navegador compatible con WebGL, como <a href="http://www.mozilla.org/es-ES/firefox" style="color:#000">Mozilla Firefox</a> o <a href="http://www.google.com/chrome?hl=es" style="color:#000">Google Chrome</a>.</p>';
-			element.innerHTML += '<p>Si esta utilizando Firefox, no tiene activado WebGL. Para activarlo siga estos sencillos pasos:</p><ul style="text-align:left"><li>Primero para entrar en la configuración avanzada de Firefox escribimos en la barra de direcciones la siguiente dirección “about:config”.</li><li>Ingresamos en la configuración.</li><li>Buscamos en el campo de búsqueda la palabra “webgl”.</li><li>Cambiamos la propiedad “webgl.force-enabled” al valor “true” haciendo doble click en dicha propiedad.</li><li>Cerramos la pestaña o ventana, ya está activado WebGL.</li></ul>';
-			element.innerHTML += '<p>Si esta utilizando Chrome, no tiene activado WebGL. Para activarlo siga estos sencillos pasos:</p><ul style="text-align:left"><li>Primero para entrar en las opciones avanzadas de Chrome escribimos en la barra de direcciones la siguiente dirección “about:flags”.</li><li>Desplácese hacia abajo y busque "Composición acelerada por GPU" y habilitela.</li><li>Más abajo se encuentra la opcion "Habilitar WebGL", que también deberá habilitar.</li><li>Por último, pulse el botón Reiniciar en la parte inferior de la página.</li></ul>';
-
-			document.body.appendChild(element);
-
+			addDynamicComponent("html/webGLnotSupported.html", document.body);
 			var WebGLavaible = false
-		} else
+		} else {
 			var WebGLavaible = true;
+		}
+		//Cargamos dinamicamente el texto de los creditos
+		addDynamicComponent("html/credits.html", document.body);
 
 		//Datos para la creacion de un puzzle con 3 soluciones
 		var puzzle3Data;
-		//Flag para saber si se han cargado los datos del puzzle de 3 soluciones
-		var puzzle3Load = false;
 		//Datos para la creacion de un puzzle con 2 soluciones
 		var puzzle2Data;
-		//Flag para saber si se han cargado los datos del puzzle de 2 soluciones
-		var puzzle2Load = false;
 		//Datos para crear letras con cubos
 		var lettersData;
-		//Flag para saber si las letras estan cargadas
-		var lettersLoad = false;
 		//Datos para crear la informacion de los niveles con cubos
 		var levelsData;
-		//Flag para saber si la informacion de los niveles esta cargada
-		var levelsLoad = false;
-
-		//Realizamos la peticion de los datos para un puzzle de 3 soluciones
-		//Leemos los datos para crear los cubos de un fichero JSON
-		var request3 = new XMLHttpRequest();
-		request3.open("GET", "data/3SolPuzzle.json");
-		//Definimos la accion para cuando se cargue el fichero
-		request3.onreadystatechange = function() {
-			if (request3.readyState == 4) {
-				//Transformamos los datos del fichero a notacion JSON
-				puzzle3Data = JSON.parse(request3.responseText).data;
-				//Activamos el flag
-				puzzle3Load = true;
-
-			}
-		}
-		//Enviamos la peticion del fichero
-		request3.send();
-
-		//Realizamos la peticion de los datos para un puzzle de 3 soluciones
-		//Leemos los datos para crear los cubos de un fichero JSON
-		var request2 = new XMLHttpRequest();
-		request2.open("GET", "data/2SolPuzzle.json");
-		//Definimos la accion para cuando se cargue el fichero
-		request2.onreadystatechange = function() {
-			if (request2.readyState == 4) {
-				//Transformamos los datos del fichero a notacion JSON
-				puzzle2Data = JSON.parse(request2.responseText).data;
-				//Activamos el flag
-				puzzle2Load = true;
-
-			}
-		}
-		//Enviamos la peticion del fichero
-		request2.send();
 
 		//Elementos html
 		var container;
-		var backgroundColor = 0xf0f0f0;
 
 		//Objetos del engine
 		var camera, scene, renderer;
@@ -200,17 +136,6 @@ body {
 		var windowHeight;
 		var windowWidth;
 
-		var opForm = document.createElement('div');
-		opForm.innerHTML = '2013 © <a href="https://twitter.com/javi6d6">Javier Vaquero</a><br>Codigo en <a href="https://github.com/hangorn/MagneticPuzzleCubeV2">GitHub</a>';
-		opForm.style.position = 'absolute';
-		opForm.style.bottom = '0';
-		opForm.style.right = '0';
-		opForm.style.fontFamily = 'monospace';
-		opForm.style.fontSize = '12px';
-		opForm.style.fontWeight = 'normal';
-		opForm.style.textAlign = 'right';
-		document.body.appendChild(opForm);
-
 		//Si webGL esta disponible
 		if (WebGLavaible) {
 			//Iniciamos y lanzamos la aplicacion
@@ -222,10 +147,24 @@ body {
 		 *		Inicio del mundo 3D
 		 ************************************************/
 		function init() {
+			//Realizamos la peticion de los datos para un puzzle de 3 soluciones
+			//Leemos los datos para crear los cubos de un fichero JSON
+			ajaxRequest("data/3SolPuzzle.json", function(resp) {
+				//Transformamos los datos del fichero a notacion JSON
+				puzzle3Data = JSON.parse(resp).data;
+
+			});
+
+			//Realizamos la peticion de los datos para un puzzle de 2 soluciones
+			//Leemos los datos para crear los cubos de un fichero JSON
+			ajaxRequest("data/3SolPuzzle.json", function(resp) {
+				//Transformamos los datos del fichero a notacion JSON
+				puzzle2Data = JSON.parse(resp).data;
+			});
+
 			//Iniciamos el sonido
 			sound = new Sound();
 
-			document.body.style.background = '#' + backgroundColor.toString(16);
 			windowHeight = window.innerHeight;
 			windowWidth = window.innerWidth;
 
@@ -249,36 +188,19 @@ body {
 
 			//Iniciamos el menu principal
 			//Leemos los datos para crear las letras de un fichero JSON
-			var request = new XMLHttpRequest();
-			request.open("GET", "data/Letters.json");
-			//Definimos la accion para cuando se cargue el fichero
-			request.onreadystatechange = function() {
-				if (request.readyState == 4) {
+			ajaxRequest("data/Letters.json", function(lettersResp) {
+				//Transformamos los datos del fichero a notacion JSON
+				lettersData = JSON.parse(lettersResp);
+				//Realizamos la peticion de los datos para la informacion de los niveles
+				//Leemos los datos para crear los cubos de un fichero JSON
+				ajaxRequest("data/Levels.json", function(levelsResp) {
 					//Transformamos los datos del fichero a notacion JSON
-					lettersData = JSON.parse(request.responseText);
-					lettersLoad = true;
-					//Realizamos la peticion de los datos para la informacion de los niveles
-					//Leemos los datos para crear los cubos de un fichero JSON
-					var requestLevels = new XMLHttpRequest();
-					requestLevels.open("GET", "data/Levels.json");
-					//Definimos la accion para cuando se cargue el fichero
-					requestLevels.onreadystatechange = function() {
-						if (requestLevels.readyState == 4) {
-							//Transformamos los datos del fichero a notacion JSON
-							levelsData = JSON.parse(requestLevels.responseText).data;
-							//Activamos el flag
-							levelsLoad = true;
-							mv = new MenuView(scene);
-							//Creamos las opciones
-							ov = new OptionsView();
-						}
-					}
-					//Enviamos la peticion del fichero
-					requestLevels.send();
-				}
-			}
-			//Enviamos la peticion del fichero
-			request.send();
+					levelsData = JSON.parse(levelsResp).data;
+					mv = new MenuView(scene);
+					//Creamos las opciones
+					ov = new OptionsView();
+				})
+			});
 
 			//Creamos el render y fijamos su tamaño
 			renderer = new THREE.WebGLRenderer();
@@ -300,7 +222,6 @@ body {
 		function animate() {
 			//Hacemos una peticion para animacion
 			requestAnimationFrame(animate);
-
 			//Renderizamos la escena
 			renderer.render(scene, camera);
 		}

@@ -83,14 +83,14 @@ function Puzzle(numC, mats, col) {
 	// Creamos los cubos
 	var data;
 	if (numberOfCubes == 3) {
-		if (puzzle3Load) {
+		if (puzzle3Data) {
 			data = puzzle3Data;
 		} else {
 			console.error("puzzle:los datos del puzzle3 no estan cargados");
 		}
 	}
 	if (numberOfCubes == 2) {
-		if (puzzle2Load) {
+		if (puzzle2Data) {
 			data = puzzle2Data;
 		} else {
 			console.error("puzzle:los datos del puzzle2 no estan cargados");
