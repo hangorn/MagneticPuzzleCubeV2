@@ -1,4 +1,11 @@
 /*
+ *  Copyright (c) 2013-2015 Javier Vaquero <javi_salamanca@hotmail.com>
+ *
+ *  See the file license.txt for copying permission.
+ *
+ */
+
+/*
  *  Nombre: Constantes.js
  *  Sinopsis: clase que mantiene una serie de valores constantes
  *
