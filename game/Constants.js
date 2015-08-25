@@ -30,7 +30,7 @@ exports.SUBMODO_CONTRARELOJ_8 = 2;
 exports.SUBMODO_CONTRARELOJ_27 = 3;
 
 exports.isCooperativo = function(mode) {
-	if (mode == SUBMODO_COOPERATIVO_8 || mode == SUBMODO_COOPERATIVO_27) {
+	if (mode == exports.SUBMODO_COOPERATIVO_8 || mode == exports.SUBMODO_COOPERATIVO_27) {
 		return true;
 	}
 	return false;

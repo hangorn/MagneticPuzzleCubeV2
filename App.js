@@ -27,7 +27,6 @@ var http = require('http');
 var server = http.createServer(app);
 var path = require('path');
 
-var io = require('socket.io');
 var socketCtl = require('./controllers/SocketCtl');
 
 /***********************************************************************************************************************
@@ -55,18 +54,8 @@ app.use(express.static(path.join(__dirname, 'public')));
  **********************************************************************************************************************/
 
 // Creamos una instancia de socket.io usando el servidor
-var sio = io.listen(server);
-
-// Configuramos los sockets
-sio.configure(function() {
-	// Mensajes en log: 0-error 1-warn 2-info 3-debug
-	sio.set('log level', 2);
-	// Permitimos que se conecte cualquiera
-	sio.set('authorization', function(handshakeData, callback) {
-		callback(null, true);
-	});
-});
+var io = require('socket.io')(server);
 
 // Creamos el manejador del evento de conexion, es decir cuando se conecta un
 // cliente
-sio.sockets.on('connection', socketCtl.onConnect);
+io.on('connection', socketCtl.onConnect);

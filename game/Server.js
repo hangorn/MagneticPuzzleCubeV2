@@ -143,7 +143,7 @@ Server = function() {
 			iniRot : iniRot
 		};
 		// Le asiganmos un ID
-		game.ID = UUID();
+		game.ID = UUID.v4();
 		// Guardamos los jugadores de la partida
 		game.players = {};
 		// Guardamos el jugador que ha creado la partida como host
@@ -259,7 +259,7 @@ Server = function() {
 		if ((game.players.host == client && game.players.client.ready)
 				|| (game.players.client == client && game.players.host.ready)) {
 			// Indicamos a ambos jugadores que los dos estan listos para empezar la partida
-			game.players.host.emit('onAllReady', {});
+			game.players.host.socket.emit('onAllReady', {});
 			game.players.client.socket.emit('onAllReady', {});
 			// Miramos a ver si alguno de los dos jugadores tiene alguna puntuacion pendiente de guardar
 			this.saveLastScore(game.players.client);

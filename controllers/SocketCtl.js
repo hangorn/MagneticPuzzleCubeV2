@@ -24,7 +24,7 @@ var verbose = true;
 exports.onConnect =  function(socket) {
 	// Creamos un objeto cliente
 	var client = {
-		ID : UUID()
+		ID : UUID.v4()
 	};
 	// Asignamos el socket al cliente correspondiente
 	client.socket = socket;
