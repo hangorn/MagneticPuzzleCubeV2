@@ -114,6 +114,9 @@
 		//Array con los materiales de cada imagen
 		var IMAGES = [];
 
+		//Controlador del menu principal
+		var menuCtl;
+		
 		//Vistas de la aplicacion
 		var pv; //Puzzle
 		var lv; //Libreria
@@ -162,14 +165,12 @@
 				puzzle2Data = JSON.parse(resp).data;
 			});
 
-			//Iniciamos el sonido
-			sound = new Sound();
-
 			windowHeight = window.innerHeight;
 			windowWidth = window.innerWidth;
 
 			//Creamos y añadimos un contenedor para el render
 			container = document.createElement('div');
+			container.style.position = 'absolute';
 			document.body.appendChild(container);
 			//Creamos una escena
 			scene = new THREE.Scene();
@@ -196,7 +197,10 @@
 				ajaxRequest("data/Levels.json", function(levelsResp) {
 					//Transformamos los datos del fichero a notacion JSON
 					levelsData = JSON.parse(levelsResp).data;
-					mv = new MenuView(scene);
+					//Iniciamos el sonido
+					sound = new Sound();
+					//Cremos el controlador del menu y mostramos el menu principal (0)
+					menuCtl = new MenuController();
 					//Creamos las opciones
 					ov = new OptionsView();
 				})

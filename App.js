@@ -40,14 +40,18 @@ if (process.env.SUBDOMAIN == 'magneticube') {
 	gameport = 8080;
 }
 
-// Hacemos que el servidor escuche en el puerto indicado
-server.listen(gameport);
-console.log('\t :: Express :: Listening on port ' + gameport);
+//view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 // Para el resto de peticiones delegamos en el enrutador
 app.use('/', require('./Router'));
 // La mayoria de los recursos se obtendran estaticamente del directorio publico
 app.use(express.static(path.join(__dirname, 'public')));
+
+//Hacemos que el servidor escuche en el puerto indicado
+server.listen(gameport);
+console.log('\t :: Express :: Listening on port ' + gameport);
 
 /***********************************************************************************************************************
  * Ponemos en marcha los sockets

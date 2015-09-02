@@ -94,7 +94,7 @@ function TrialModeController(cont, numC, diff, mats, cl) {
 		window.mats = materials;
 		window.numC = numberOfCubes;
 		window.sensitivity = ov.getOptions().getSensitivity();
-		solWin = window.open("solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
+		solWin = window.open("Solutions/solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
 				+ ",left=" + (window.screen.availWidth - 300));
 	}
 
@@ -142,7 +142,7 @@ function TrialModeController(cont, numC, diff, mats, cl) {
 		// Confirmamos que se desea salir
 		if (confirm('Esta seguro que desea salir?')) {
 			tmv.hide();
-			mv.showMenu(0);
+			menuCtl.show(0);
 		}
 	}
 
@@ -175,7 +175,7 @@ function TrialModeController(cont, numC, diff, mats, cl) {
 		// que hacer cuando se oculten las opciones
 		ov.show(function() {
 			// Mostramos la vista del modo supervivencia
-			tmv.show()
+			tmv.show();
 			// Actualizamos la opcion de ayuda con sonidos segun corresponda
 			if (ov.getOptions().getAudioHelp()) {
 				sound.enableHelpSound();

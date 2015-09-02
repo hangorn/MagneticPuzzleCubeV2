@@ -1,0 +1,14 @@
+<div class="msgMenu">
+	<h1>Niveles</h1>
+	<p>Selecciona un nivel:</p>
+	<div class="menuContainer">
+		<% for (var i=0; i < levelsData.length; i++) { %>
+		<div class="clickable menuItem blockMenuItem">
+			<img name="img" alt="<%= levelsData[i].description %>" title="<%= levelsData[i].description %>"
+				src="<%= levelsData[i].img %>">
+			<p><%= levelsData[i].name %></p>
+		</div>
+		<% } %>
+	</div>
+	<p class="description rightContainer"></p>
+</div>

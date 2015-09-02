@@ -1,37 +1,31 @@
 {
 "data":
 [
-	{"type":"webgl",	"txt":"un jugador",				"data":""},
-	{"type":"webgl",	"txt":"varios jugadores",		"data":""},
-	{"type":"webgl",	"txt":"opciones",				"data":""},
-	{"type":"webgl",	"txt":"puntuaciones",			"data":""},
-	{"type":"webgl",	"txt":"ayuda",					"data":""},
+	[{"type":"webgl",	"txt":"un jugador",			"data":540},
+	{"type":"webgl",	"txt":"varios jugadores",	"data":280},
+	{"type":"webgl",	"txt":"opciones",			"data":10},
+	{"type":"webgl",	"txt":"puntuaciones",		"data":-280},
+	{"type":"webgl",	"txt":"ayuda",				"data":-590}],
 	
-	{"type":"webgl",	"txt":"modo clasico",			"data":""},
-	{"type":"webgl",	"txt":"niveles",				"data":""},
-	{"type":"webgl",	"txt":"contrareloj",			"data":""},
-	{"type":"webgl",	"txt":"supervivencia",			"data":""},
+	[{"type":"webgl",	"txt":"modo clasico",		"data":510},
+	{"type":"webgl",	"txt":"niveles",			"data":250},
+	{"type":"webgl",	"txt":"contrareloj",		"data":-20},
+	{"type":"webgl",	"txt":"supervivencia",		"data":-310},
+	{"type":"webgl",	"txt":"< atras",					"data":-600, "mode":"back"}],
 	
-	{"type":"webgl",	"txt":"crear partida",			"data":""},
-	{"type":"webgl",	"txt":"buscar partida",			"data":""},
+	[{"type":"webgl",	"txt":"crear partida",		"data":250},
+	{"type":"webgl",	"txt":"buscar partida",		"data":-20},
+	{"type":"webgl",	"txt":"< atras",					"data":-290, "mode":"back"}],
 	
+	[{"type":"options"}],
+	[{"type":"scores"}],
+	[{"type":"help"}],
 	
-    {"name" : "Empezando con 2 soluciones",       "img" : "img/levels/level1.gif",   "description" : "Puzzle de 8 cubos. Con lo cual existen dos posibles soluciones con 6 imagenes cada una y 12 imagenes en total."},
-    {"name" : "Empezando con 3 soluciones",       "img" : "img/levels/level2.gif",   "description" : "Puzzle de 27 cubos. Con lo cual existen tres posibles soluciones con 6 imagenes cada una y 18 imagenes en total."},
-    {"name" : "2 imagenes repetidas",       "img" : "img/levels/level3.gif",   "description" : "Puzzle de 8 cubos, con cada imagen repetida dos veces, asi que solo habra 6 imagenes distintas."},
-    {"name" : "2 imagenes repetidas",       "img" : "img/levels/level4.gif",   "description" : "Puzzle de 27 cubos, con cada imagen repetida dos veces, asi que solo habra 9 imagenes distintas."},
-    {"name" : "Colores",       "img" : "img/levels/level5.gif",   "description" : "Puzzle de 8 cubos de colores en lugar de imagenes."},
-    {"name" : "Colores",       "img" : "img/levels/level6.gif",   "description" : "Puzzle de 27 cubos de colores en lugar de imagenes."},
-    {"name" : "3 imagenes repetidas",       "img" : "img/levels/level7.gif",   "description" : "Puzzle de 8 cubos, con cada imagen repetida tres veces, asi que solo habra 4 imagenes distintas."},
-    {"name" : "3 imagenes repetidas",       "img" : "img/levels/level8.gif",   "description" : "Puzzle de 27 cubos, con cada imagen repetida tres veces, asi que solo habra 6 imagenes distintas."},
-    {"name" : "Sobran cubos",       "img" : "img/levels/level9.gif",   "description" : "Puzzle de 8 cubos con algunos cubos mas que no pertenecen a ninguna solucion."},
-    {"name" : "Sobran cubos",       "img" : "img/levels/level10.gif",   "description" : "Puzzle de 27 cubos con algunos cubos mas que no pertenecen a ninguna solucion."},
-    {"name" : "6 imagenes repetidas",       "img" : "img/levels/level7.gif",   "description" : "Puzzle de 8 cubos, con cada imagen repetida seis veces, asi que solo habra 2 imagenes distintas."},
-    {"name" : "6 imagenes repetidas",       "img" : "img/levels/level8.gif",   "description" : "Puzzle de 27 cubos, con cada imagen repetida seis veces, asi que solo habra 3 imagenes distintas."},
-    {"name" : "En movimiento",       "img" : "img/levels/level13.gif",   "description" : "Puzzle de 8 cubos donde las piezas que no esten encajadas en el puzzle permaneceran en movimiento."},
-    {"name" : "En movimiento",       "img" : "img/levels/level14.gif",   "description" : "Puzzle de 27 cubos donde las piezas que no esten encajadas en el puzzle permaneceran en movimiento."},
-    {"name" : "12 imagenes repetidas",       "img" : "img/levels/level7.gif",   "description" : "Puzzle de 27 cubos, con todas las imagenes repetidas, asi que solo habra una imagen."},
-    {"name" : "18 imagenes repetidas",       "img" : "img/levels/level8.gif",   "description" : "Puzzle de 27 cubos, con todas las imagenes repetidas, asi que solo habra una imagen."}
+	[{"type":"html",	"data":"menu/classicModeForm.html", "mode":"classic"}],
+	[{"type":"html",	"data":"menu/levelsModeForm.html", "mode":"levels"}],
+	[{"type":"html",	"data":"menu/trialModeForm.html", "mode":"trial"}],
+	[{"type":"html",	"data":"menu/survivalModeForm.html", "mode":"survival"}],
+	[{"type":"html",	"data":"menu/createServerForm.html", "mode":"multiplayer"}],
+	[{"type":"html",	"data":"menu/findServerForm.html", "mode":"findServer"}]
 ]
-    
 }

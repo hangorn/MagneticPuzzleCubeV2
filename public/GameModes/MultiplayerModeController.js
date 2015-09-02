@@ -74,7 +74,7 @@ function MultiplayerModeController(cont, numC, mats, cl, ty) {
 		// Confirmamos que se desea salir
 		if (confirm('Esta seguro que desea salir?')) {
 			mmv.hide();
-			mv.showMenu(0);
+			menuCtl.show(0);
 			// Si el puzzle esta resuelto
 			if (!mmv.isDone()) {
 				socket.finishedGame();

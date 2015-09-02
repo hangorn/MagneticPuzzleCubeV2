@@ -1,7 +1,11 @@
 Description
 =======================
 
-Puzzle game for web browsers. Developt with WebGL using [THREE.js](https://github.com/mrdoob/three.js) framework for 3D graphics and with node.js and socket.io for multiplayer.
+Puzzle game for web browsers.
+
+Developt with WebGL using [THREE.js](https://github.com/mrdoob/three.js) framework for 3D graphics.
+
+Using [node.js](http://nodejs.org/) in server-side, with [socket.io](http://socket.io/) for multiplayer, [Express](http://expressjs.com) as main framework with [EjS](http://www.embeddedjs.com/) as template engine, and [mongoDB](https://www.mongodb.org/) as database.
 
 The game is [here](http://magneticube.jit.su).
 
@@ -15,4 +19,10 @@ node App.js
 ```
 
 The server will listen in 8080 port unless the Environment variable 'SUBDOMAIN' is set with value 'magneticube', when the server listen in 80 port.
+
+Don't forget to install dependencies with:
+
+```
+npm install
+```
 

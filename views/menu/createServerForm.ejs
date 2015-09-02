@@ -1,0 +1,18 @@
+<div class="msgMenu">
+	<h1>Crear Partida</h1>
+	<p>Selecciona un tipo de partida</p>
+	<div class="menuContainer">
+		<% for (var i=0; i < levelsData.length; i++) { %>
+		<div class="clickable menuItem blockMenuItem">
+			<img name="img" alt="<%= levelsData[i].description %>" title="<%= levelsData[i].description %>"
+				src="<%= levelsData[i].img %>">
+			<p><%= levelsData[i].name %></p>
+		</div>
+		<% } %>
+	</div>
+	<div class="rightContainer">
+		<label for="gameName">Introduce el nombre de la partida:</label>
+		<input id="gameName" type="text" maxlength="20" name="gameName">
+		<p class="description"></p>
+	</div>
+</div>

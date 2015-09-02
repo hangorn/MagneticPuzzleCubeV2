@@ -25,16 +25,12 @@
 /*
  *  CLASE LIBRARYCONTROLLER
  *  */
-function LibraryController(cam, sce, pla, pag, pagIn, type, cub) {
+function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
 
-	// Cámara de la escena necesaria para realizar los cálculos de la interacción
-	var camera;
-	// Escena en la que se representará el mundo 3D
-	var scene;
 	// Objeto 3D sobre el que se realizarán las operaciones (rotación o traslación)
 	var SELECTED;
 	// Objeto 3D sobre el cual se realizarán operaciones (cambiar el color)
@@ -56,7 +52,8 @@ function LibraryController(cam, sce, pla, pag, pagIn, type, cub) {
 	var pagePlanes = [];
 	// Pagina actual
 	var currentPage;
-	// Tipo de vista con la que ha sido creado el controlador
+	// Tipo de vista con la que ha sido creado el controlador, 1 -> imágenes seleccionables, 2 -> formar dos cubos con
+	// imágenes, 3 -> formar tres cubos con imágenes
 	var typeView;
 	// Array con los cubos donde se insertarán las imágenes si corresponde
 	var cubes;
@@ -75,32 +72,35 @@ function LibraryController(cam, sce, pla, pag, pagIn, type, cub) {
 	// Sensibilidad de giro, relación entre el movimiento del ratón y la cantidad de giro de una figura
 	var sensitivity;
 
+	// Controlador padre, del que depende este
+	var parentCtl;
+
 	/*******************************************************************************************************************
 	 * Constructor
 	 ******************************************************************************************************************/
 	/**
 	 * Constructor de la clase LibraryController
 	 * 
-	 * @param Camera:cam
-	 *            cámara con la que se realizarán los cálculos de la interacción.
-	 * @param Scene:sce
-	 *            escena en la que se representará el mundo 3D.
 	 * @param Mesh[]:pla
 	 *            array de figuras que contendrá los planos de la imágenes.
 	 * @param Mesh[]:pag
 	 *            array de figuras que contendrá los números de página.
-	 * @param Integer[[]]
+	 * @param Integer:ty
+	 *            tipo de vista, 1 -> imágenes seleccionables, 2 -> formar dos cubos con imagánes, 3 formar tres cubos
+	 *            con imágenes.
+	 * @param Integer[[]]:cub
 	 *            array de arrays de enteros que contendrá los índices de las imágenes de cada página.
+	 * @param MenuController:parentCtl
+	 *            controlador padre, del que depende este
 	 */
 
 	// Guardamos los parametros obtenidos
-	camera = cam;
-	scene = sce;
 	planes = pla;
 	pages = pag;
 	pagesIndex = pagIn;
 	typeView = type;
 	cubes = cub;
+	parentCtl = ctl;
 
 	// Sensibilidad por defecto
 	sensitivity = ov.getOptions().getSensitivity() / 100;
@@ -127,6 +127,8 @@ function LibraryController(cam, sce, pla, pag, pagIn, type, cub) {
 	projector = new THREE.Projector();
 	// Creamos un rayo con origen en la posicion de la camara
 	ray = new THREE.Raycaster(camera.position);
+
+	container.appendChild(renderer.domElement);
 
 	// Añadimos receptores de eventos para el raton
 	// Si el tipo de vista necesita arrastra el raton registramos los eventos correspondientes
@@ -578,8 +580,8 @@ function LibraryController(cam, sce, pla, pag, pagIn, type, cub) {
 		// Ocultamos la vista de la biblioteca
 		lv.hide();
 		// Le pasamos los materiales al menu y lo mostramos
-		mv.setMaterials(mats);
-		mv.showMenu();
+		menuCtl.setMaterials(mats);
+		menuCtl.show();
 	}
 
 	/**
@@ -592,7 +594,7 @@ function LibraryController(cam, sce, pla, pag, pagIn, type, cub) {
 		// Ocultamos la vista de la biblioteca
 		lv.hide();
 		// Mostramos el menu
-		mv.showMenu();
+		menuCtl.show();
 	}
 
 	/**
@@ -648,6 +650,7 @@ function LibraryController(cam, sce, pla, pag, pagIn, type, cub) {
 
 		// Quitamos el plano del picking de la escena
 		scene.remove(plane);
+		container.removeChild(renderer.domElement);
 	}
 
 	/**
@@ -657,6 +660,7 @@ function LibraryController(cam, sce, pla, pag, pagIn, type, cub) {
 	 *            tipo de la vista con la que se activa el controlador.
 	 */
 	this.enable = function(type) {
+		container.appendChild(renderer.domElement);
 		// Añadimos receptores de eventos para el raton
 		// Si el tipo de vista necesita arrastra el raton registramos los eventos correspondientes
 		if (type != 1) {

@@ -139,15 +139,15 @@ DataAccessObject = function() {
 		// Obtenemos la coleccion (tabla) de las puntuaciones
 		getCollection('scores', function(collection) {
 			// Insertamos el documento (puntuacion) en la coleccion (tabla)
-			collection.insertOne([ {
+			collection.insertOne({
 				name : data.name,
 				score : data.score,
 				date : data.date,
 				mode : data.mode,
 				submode : data.submode
-			} ], function(error, result) {
+			}, function(error, result) {
 				if (error) {
-					console.log("cant save score");
+					console.error("cant save score", error);
 				} else {
 					console.log("score saved by " + data.name + " with " + data.score + "    ");
 				}

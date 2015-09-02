@@ -63,6 +63,7 @@ function Sound() {
 	// Creamos un contenedor y los situamos de manera que no interfiera con el resto de elementos
 	iconSound = document.createElement('div');
 	iconSound.style.position = 'absolute';
+	iconSound.style.top = '0';
 	iconSound.style.margin = '10px'
 	// Creamos la imagen con el icono de sonido
 	var img = document.createElement('img');

@@ -99,7 +99,7 @@ function SurvivalModeController(cont, numC, diff, allMats, mats, cl) {
 		window.mats = materials;
 		window.numC = numberOfCubes;
 		window.sensitivity = ov.getOptions().getSensitivity();
-		solWin = window.open("solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
+		solWin = window.open("Solutions/solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
 				+ ",left=" + (window.screen.availWidth - 300));
 	}
 
@@ -151,7 +151,7 @@ function SurvivalModeController(cont, numC, diff, allMats, mats, cl) {
 				smv.finishMode("");
 			}
 			smv.hide();
-			mv.showMenu(0);
+			menuCtl.show(0);
 		}
 	}
 

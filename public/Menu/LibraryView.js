@@ -25,14 +25,12 @@
 /*
  *  CLASE LIBRARYVIEW
  *  */
-function LibraryView(sce, mat, ty) {
+function LibraryView(mat, ty) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
 
-	// Escena en la que se mostrarán la vista
-	var scene;
 	// Array de materiales para cada imagen
 	var materials;
 
@@ -74,23 +72,22 @@ function LibraryView(sce, mat, ty) {
 	// Botón de añadir imagen
 	var addImgButton;
 
+	var backgroundColor = 0xf0f0f0;
+
 	/*******************************************************************************************************************
 	 * Constructor
 	 ******************************************************************************************************************/
 	/**
 	 * Constructor de la clase LibraryView
 	 * 
-	 * @param Scene:sce
-	 *            escena en la que se representará el mundo 3D.
 	 * @param Material[]:mat
 	 *            array con todos los materiales.
-	 * @param Integer:ty ->
+	 * @param Integer:ty
 	 *            tipo de vista, 1 -> imágenes seleccionables, 2 -> formar dos cubos con imagánes, 3 formar tres cubos
 	 *            con imágenes.
 	 */
 
 	// Guardamos la escena y los materiales
-	scene = sce;
 	materials = mat;
 	// Guardamos el tipo de vista, comrpobando que sea correcto
 	type = (ty >= 1 && ty <= 3) ? ty : 1;
@@ -359,7 +356,7 @@ function LibraryView(sce, mat, ty) {
 	addBackButton();
 	addAddImgButton();
 	// Creamos el controlador de la biblioteca de imagenes
-	libC = new LibraryController(camera, scene, planes, pages, pagesIndex, type, cubes);
+	libC = new LibraryController(planes, pages, pagesIndex, type, cubes);
 
 	/*******************************************************************************************************************
 	 * Métodos Privados
@@ -527,7 +524,7 @@ function LibraryView(sce, mat, ty) {
 	/**
 	 * Método para mostrar la pagina solicitada
 	 * 
-	 * @param Integer:index->
+	 * @param Integer:index
 	 *            indice de la pagina a mostrar.
 	 */
 	this.showPage = function(index) {

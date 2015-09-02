@@ -92,7 +92,7 @@ function ClassicModeController(cont, numC, mats, cl) {
 		window.mats = materials;
 		window.numC = numberOfCubes;
 		window.sensitivity = ov.getOptions().getSensitivity();
-		solWin = window.open("solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
+		solWin = window.open("Solutions/solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
 				+ ",left=" + (window.screen.availWidth - 300));
 	}
 
@@ -136,7 +136,7 @@ function ClassicModeController(cont, numC, mats, cl) {
 		// Confirmamos que se desea salir
 		if (confirm('Esta seguro que desea salir?')) {
 			cmv.hide();
-			mv.showMenu(0);
+			menuCtl.show(0);
 		}
 	}
 

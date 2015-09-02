@@ -23,7 +23,7 @@
 /*
  *  CLASE MENUVIEW
  *  */
-function MenuView(sce) {
+function MenuView(menuData) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
@@ -32,55 +32,12 @@ function MenuView(sce) {
 	// Tamaño de los cubos que formarán las letras
 	var cubesSize;
 
-	// Materiales con los que se creará el puzzle
-	var materials = [];
-
 	// Entradas del menu
 	var currentMenu;
 	var entrys;
-	// Menu principal
-	// Entrada de un jugador
-	var onePlayerEntry;
-	// Entrada de varios jugadores
-	var multiPlayerEntry;
-	// Entrada de opciones
-	var optionsEntry;
-	// Entrada de puntuaciones
-	var ratingEntry;
-	// Entrada de ayuda
-	var helpEntry;
 
-	// Un jugador
-	// Entrada de modo clasico
-	var classicModeEntry;
-	// Entrada de modo por niveles
-	var levelsEntry;
-	// Entrada de modo contrareloj
-	var trialModeEntry;
-	// Entrada de modo supervivencia
-	var survivalModeEntry;
-
-	// Varios jugadores
-	// Entrada de crear partida
-	var createGameEntry;
-	// Entrada de buscar partida
-	var searchGameEntry;
-
-	// Botón de anterior
-	var backButton;
-
-	// Formulario del modo clasico
-	var classicForm;
-	// Formulario del modo niveles
-	var levelsForm;
-	// Formulario del modo contrareloj
-	var trialForm;
-	// Formulario del modo supervivencia
-	var survivalForm;
-	// Formulario de crear partida multijugador
-	var createServerForm;
-	// Formulario de buscar partida multijugador
-	var findServerForm;
+	// Datos de las partidas multijugador
+	var multiplayerLevelsData;
 
 	// Dialogo que se mostrará cuando se espere por un jugador
 	var waitingDialog;
@@ -94,70 +51,50 @@ function MenuView(sce) {
 	/**
 	 * Constructor de la clase MenuView
 	 * 
-	 * @param Scene:sce
-	 *            escena en la que se representará el mundo 3D.
+	 * @param Object[][]:menuData
+	 *            datos con los que se generara el menu. Cada elemento del array exterior es un menu, y cada elemento
+	 *            del array interior es una entrada del menu.
 	 */
 
 	// Iniciamos los cubos al tamaño por defecto
 	var cubesSize = 40;
 
-	// Menu Principal
-	onePlayerEntry = createMenuEntry("un jugador", new THREE.Vector3(0, 540, 0));
-	multiPlayerEntry = createMenuEntry("varios jugadores", new THREE.Vector3(0, 280, 0));
-	optionsEntry = createMenuEntry("opciones", new THREE.Vector3(0, 10, 0));
-	ratingEntry = createMenuEntry("puntuaciones", new THREE.Vector3(0, -280, 0));
-	helpEntry = createMenuEntry("ayuda", new THREE.Vector3(0, -590, 0));
-
-	// Menu un jugador
-	classicModeEntry = createMenuEntry("modo clasico", new THREE.Vector3(0, 510, 0));
-	levelsEntry = createMenuEntry("niveles", new THREE.Vector3(0, 250, 0));
-	trialModeEntry = createMenuEntry("contrareloj", new THREE.Vector3(0, -20, 0));
-	survivalModeEntry = createMenuEntry("supervivencia", new THREE.Vector3(0, -310, 0));
-	// Menu varios jugadores
-	createGameEntry = createMenuEntry("crear partida", new THREE.Vector3(0, 250, 0));
-	searchGameEntry = createMenuEntry("buscar partida", new THREE.Vector3(0, -20, 0));
-
-	// Creamos los formularios de los distintos modos
-	classicForm = createClassicModeForm();
-	levelsForm = createLevelsModeForm();
-	trialForm = createTrialModeForm();
-	survivalForm = createSurvivalModeForm();
-	// Creamos los formularios para el modo multijugador
-	createServerForm = createCreateServerForm();
-	findServerForm = createFindServerForm();
-
-	// Guardamos las entradas de todos los menus
-	entrys = [ [ onePlayerEntry, multiPlayerEntry, optionsEntry, ratingEntry, helpEntry ], // Menu inicial
-	[ classicModeEntry, levelsEntry, trialModeEntry, survivalModeEntry ], // Un jugador
-	[ createGameEntry, searchGameEntry ], // Varios jugadores
-	[], // Opciones
-	[], // Puntuaciones
-	[], // Ayuda
-	[ classicForm ], // Modo clasico
-	[ levelsForm ], // Modo niveles
-	[ trialForm ], // Modo contrareloj
-	[ survivalForm ], // Modo supervivencia
-	[ createServerForm ], // Crear partida
-	[ findServerForm ] // Buscar partida
-	];
+	entrys = [];
+	for (var i = 0; i < menuData.length; i++) {
+		entrys[i] = [];
+		for (var j = 0; j < menuData[i].length; j++) {
+			var data = menuData[i][j];
+			entrys[i].dataType = data.type;
+			entrys[i].mode = data.mode;
+			if (data.type == "webgl") {
+				entrys[i][j] = createMenuEntry(data.txt, new THREE.Vector3(0, data.data, 0));
+				// Marcamos las entradas de atras, ya que tienen un comportamiento diferente
+				if (data.mode == "back") {
+					entrys[i][j].menuIndex = -1;
+				}
+			} else if (data.type == "html") {
+				entrys[i][j] = document.createElement('div');
+				addDynamicComponent(data.data, entrys[i][j]);
+			}
+		}
+	}
 
 	// Iniciamos los indices de los menus
 	var ind = 0;
 	for (var i = 0; i < entrys.length; i++) {
 		for (var j = 0; j < entrys[i].length; j++) {
-			entrys[i][j].menuIndex = ++ind;
+			// La entradadas de atras (marcadas con un -1) no las tenemos en cuenta
+			if (entrys[i][j].menuIndex != -1) {
+				entrys[i][j].menuIndex = ++ind;
+			}
 		}
 	}
 
-	// Inicamos el menu actual
-	currentMenu = 0;
-	for (var i = 0; i < entrys[currentMenu].length; i++) {
-		scene.add(entrys[currentMenu][i]);
-	}
+	ajaxRequest("data/MultiplayerLevels.json", function(resp) {
+		// Transformamos los datos del fichero a notacion JSON
+		multiplayerLevelsData = JSON.parse(resp).data;
 
-	addBackButton();
-
-	menC = new MenuController(camera, sce, entrys, materials);
+	});
 
 	/*******************************************************************************************************************
 	 * Métodos Privados
@@ -174,7 +111,7 @@ function MenuView(sce) {
 	 *            material con el cual se creará la cara del frente de la letra.
 	 * @param Material:backMat->
 	 *            material con el cual se creará la cara de atrás de la letra.
-	 * @return Mesh objeto 3D creado con la letra o null si no es una letra conocida (un espacio, ...).
+	 * @returns Mesh objeto 3D creado con la letra o null si no es una letra conocida (un espacio, ...).
 	 */
 	function createLetter(letter, pos, frontMat, backMat) {
 		// Creamos una variable estatica al metodo para el material de los lados y si no esta definido la iniciamos, asi
@@ -233,7 +170,7 @@ function MenuView(sce) {
 	 *            cadena de texto con la frase que contendrá la entrada del menú.
 	 * @param Vector3:pos
 	 *            posicion inicial en la que se colocará el boton, esquina inferior izquierda.
-	 * @return Mesh objeto 3D creado con la frase.
+	 * @returns Mesh objeto 3D creado con la frase.
 	 */
 	function createMenuEntry(sentence, pos) {
 		// Creamos un array para guardar todas la letras de la frase
@@ -309,820 +246,6 @@ function MenuView(sce) {
 	}
 
 	/**
-	 * Método que crea y muestra el boton de anterior
-	 */
-	function addBackButton() {
-		// Creamos un boton
-		backButton = document.createElement('input');
-		backButton.type = 'button';
-		backButton.id = 'menuBackButton';
-		backButton.value = 'atras';
-		// Lo añadimos al contenedor principal
-		container.appendChild(backButton);
-		// Movemos el contenedor, con el boton dentro
-		backButton.style.position = 'absolute';
-		backButton.style.bottom = '10px';
-		backButton.style.left = '10px';
-		// Lo escondemos ya que en el menu principal no hara falta
-		backButton.style.display = 'none';
-	}
-
-	/**
-	 * Método que crea el formulario de configuracion del modo clasico
-	 * 
-	 * @return HtmlObject objeto html con el formulario del modo clasico.
-	 */
-	function createClassicModeForm() {
-		// Creamos el contenedor que contendra el formulario
-		var formCont = document.createElement('div');
-		// Le aplicamos su estilo
-		formCont.style.backgroundColor = '#dddddd';
-		formCont.style.margin = '3% 7%';
-		formCont.style.width = '85%';
-		formCont.style.height = '76%';
-		formCont.style.borderRadius = '30px';
-		formCont.style.textAlign = 'center';
-		formCont.style.position = 'absolute';
-		formCont.style.top = '0';
-		formCont.style.display = 'none';
-		document.body.appendChild(formCont);
-
-		// Creamos el formulario
-		var form = document.createElement('form');
-		form.id = 'classicForm';
-		formCont.appendChild(form);
-
-		// Creamos un titulo
-		var title = document.createElement('h1');
-		// Añadimos el contenido
-		title.innerHTML = 'Modo Clásico';
-		// Añadimos el titulo al contenedor
-		form.appendChild(title);
-
-		// Creamos una descripcion del modo de juego
-		var descrip = document.createElement('p');
-		// Añadimos el contenido
-		descrip.innerHTML = 'Se debera resolver el puzzle, cronometrandose cuanto tiempo se emplea en ello. Se pueden elegir las imagenes del puzzle haciendo click en \'personalizar imagenes\'.';
-		// Añadimos la descripcion al contenedor
-		form.appendChild(descrip);
-
-		// Creamos un contenedor para la opcion numero de cubos
-		var contNumC = document.createElement('div');
-		form.appendChild(contNumC);
-		// Mostramos un texto de la opcion correspondiente
-		contNumC.innerHTML += 'Elige el número de piezas del puzzle:' + '<br>';
-
-		// Creamos un delimitador para la opcion de numero de cubos
-		var fieldSet = document.createElement('fieldset');
-		// Aplicamos su estilo
-		fieldSet.style.borderRadius = '10px';
-		fieldSet.style.margin = '10px 0';
-		fieldSet.style.padding = '10px';
-		fieldSet.style.display = 'inline';
-		contNumC.appendChild(fieldSet);
-
-		// Creamos los radio-buttons para elegir el numero de cubos
-		// 27 cubos
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'cubes27classic';
-		radio.name = 'cubesNumber';
-		radio.checked = 'checked';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = '27 cubos';
-		radioLabel.htmlFor = 'cubes27classic';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-		// 8 cubos
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'cubes8classic';
-		radio.name = 'cubesNumber';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = '8 cubos';
-		radioLabel.htmlFor = 'cubes8classic';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-
-		// Añadimos los botones
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'start';
-		button.value = 'empezar';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.left = '60%';
-		form.appendChild(button);
-
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'library';
-		button.value = 'personalizar imagenes';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.right = '60%';
-		form.appendChild(button);
-
-		return formCont;
-	}
-
-	/**
-	 * Método que crea el formulario de configuracion del modo niveles
-	 * 
-	 * @return HtmlObject objeto html con el formulario del modo niveles.
-	 */
-	function createLevelsModeForm() {
-		// Creamos el contenedor que contendra el formulario
-		var formCont = document.createElement('div');
-		// Le aplicamos su estilo
-		formCont.style.backgroundColor = '#dddddd';
-		formCont.style.margin = '3% 7%';
-		formCont.style.width = '85%';
-		formCont.style.height = '76%';
-		formCont.style.borderRadius = '30px';
-		formCont.style.textAlign = 'center';
-		formCont.style.position = 'absolute';
-		formCont.style.top = '0';
-		formCont.style.display = 'none';
-		document.body.appendChild(formCont);
-
-		// Creamos el formulario
-		var form = document.createElement('form');
-		form.id = 'levelsForm';
-		form.style.height = '100%'; // Colocamos la altura al 100% para que los hijos puedan calcular su altura con
-		// porcentajes
-		formCont.appendChild(form);
-
-		// Creamos un titulo
-		var title = document.createElement('h1');
-		// Añadimos el contenido
-		title.innerHTML = 'Niveles';
-		// Añadimos el titulo al contenedor
-		form.appendChild(title);
-
-		// Creamos una descripcion del modo de juego
-		var descrip = document.createElement('p');
-		// Añadimos el contenido
-		descrip.innerHTML = 'Selecciona un nivel:';
-		descrip.style.marginBottom = '2px';
-		// Añadimos la descripcion al contenedor
-		form.appendChild(descrip);
-
-		// Creamos un contendor para los niveles
-		var levelsCont = document.createElement('div');
-		form.appendChild(levelsCont);
-		levelsCont.style.width = '70%';
-		levelsCont.style.height = '64%';
-		levelsCont.style.padding = '5px';
-		levelsCont.style.margin = '0 2%';
-		levelsCont.style.overflow = 'auto';
-		levelsCont.style.backgroundColor = '#ffffff';
-		levelsCont.style.cssFloat = 'left';
-
-		// Creamos una descripcion del modo de juego
-		var descrip = document.createElement('p');
-		descrip.className = 'description';
-		descrip.style.width = '20%';
-		descrip.style.cssFloat = 'right';
-		descrip.style.padding = '10px';
-		descrip.style.marginRight = '2%';
-		descrip.style.textAlign = 'right';
-		// Añadimos la descripcion al contenedor
-		form.appendChild(descrip);
-
-		// Comprobamos que se ha cargado la informacion de los niveles
-		if (levelsData) {
-			// Creamos los niveles y los guardamos en un array
-			var levels = [];
-			for (var i = 0; i < levelsData.length; i++) {
-				var l = createLevelEntry(levelsData[i].name, levelsData[i].img, levelsData[i].description);
-				levelsCont.appendChild(l);
-				l.index = i;
-				levels.push(l);
-			}
-			formCont.entrys = levels;
-		} else {
-			console.error("menu:los datos de la informacion de los niveles no estan cargados");
-		}
-
-		// Añadimos los botones
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'start';
-		button.value = 'empezar';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.left = '60%';
-		form.appendChild(button);
-
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'library';
-		button.value = 'personalizar imagenes';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.right = '60%';
-		form.appendChild(button);
-
-		return formCont;
-	}
-
-	/**
-	 * Método que crea el formulario de configuracion del modo contrareloj
-	 * 
-	 * @return HtmlObject objeto html con el formulario del modo contrareloj.
-	 */
-	function createTrialModeForm() {
-		// Creamos el contenedor que contendra el formulario
-		var formCont = document.createElement('div');
-		// Le aplicamos su estilo
-		formCont.style.backgroundColor = '#dddddd';
-		formCont.style.margin = '3% 7%';
-		formCont.style.width = '85%';
-		formCont.style.height = '76%';
-		formCont.style.borderRadius = '30px';
-		formCont.style.textAlign = 'center';
-		formCont.style.position = 'absolute';
-		formCont.style.top = '0';
-		formCont.style.display = 'none';
-		document.body.appendChild(formCont);
-
-		// Creamos el formulario
-		var form = document.createElement('form');
-		form.id = 'trialForm';
-		formCont.appendChild(form);
-
-		// Creamos un titulo
-		var title = document.createElement('h1');
-		// Añadimos el contenido
-		title.innerHTML = 'Modo Contrareloj';
-		// Añadimos el titulo al contenedor
-		form.appendChild(title);
-
-		// Creamos una descripcion del modo de juego
-		var descrip = document.createElement('p');
-		// Añadimos el contenido
-		descrip.innerHTML = 'Se debera resolver el puzzle antes de que se agote el tiempo, determinado en funcion de la dificultad seleccionada. Se pueden elegir las imagenes del puzzle haciendo click en \'personalizar imagenes\'.';
-		// Añadimos la descripcion al contenedor
-		form.appendChild(descrip);
-
-		// Creamos un contenedor para la opcion numero de cubos
-		var contNumC = document.createElement('div');
-		form.appendChild(contNumC);
-		// Mostramos un texto de la opcion correspondiente
-		contNumC.innerHTML += 'Elige el número de piezas del puzzle:' + '<br>';
-
-		// Creamos un delimitador para la opcion de numero de cubos
-		var fieldSet = document.createElement('fieldset');
-		// Aplicamos su estilo
-		fieldSet.style.borderRadius = '10px';
-		fieldSet.style.margin = '10px 0';
-		fieldSet.style.padding = '10px';
-		fieldSet.style.display = 'inline';
-		contNumC.appendChild(fieldSet);
-
-		// Creamos los radio-buttons para elegir el numero de cubos
-		// 27 cubos
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'cubes27trial';
-		radio.name = 'cubesNumber';
-		radio.checked = 'checked';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = '27 cubos';
-		radioLabel.htmlFor = 'cubes27trial';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-		// 8 cubos
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'cubes8trial';
-		radio.name = 'cubesNumber';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = '8 cubos';
-		radioLabel.htmlFor = 'cubes8trial';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-
-		// Creamos un contenedor para la opcion de la dificultad
-		var contDiff = document.createElement('div');
-		form.appendChild(contDiff);
-		// Mostramos un texto de la opcion correspondiente
-		contDiff.innerHTML += 'Elige la dificultad del puzzle:' + '<br>';
-
-		// Creamos un delimitador para la opcion de la dificultad
-		var fieldSet = document.createElement('fieldset');
-		// Aplicamos su estilo
-		fieldSet.style.borderRadius = '10px';
-		fieldSet.style.margin = '10px 0';
-		fieldSet.style.padding = '10px';
-		fieldSet.style.display = 'inline';
-		contDiff.appendChild(fieldSet);
-
-		// Creamos los radio-buttons para elegir la dificultad
-		// Facil
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'easyTrial';
-		radio.name = 'difficulty';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = 'facil';
-		radioLabel.htmlFor = 'easyTrial';
-		radioLabel.style.padding = '5px 10px 5px 0';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-		// Medio
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'mediumTrial';
-		radio.name = 'difficulty';
-		radio.checked = 'checked';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = 'medio';
-		radioLabel.htmlFor = 'mediumTrial';
-		radioLabel.style.padding = '5px 10px 5px 0';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-		// Dificil
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'hardTrial';
-		radio.name = 'difficulty';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = 'dificil';
-		radioLabel.htmlFor = 'hardTrial';
-		radioLabel.style.padding = '5px 10px 5px 0';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-		// Imposible
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'hopelessTrial';
-		radio.name = 'difficulty';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = 'imposible';
-		radioLabel.htmlFor = 'hopelessTrial';
-		radioLabel.style.padding = '5px 10px 5px 0';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-
-		// Añadimos los botones
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'start';
-		button.value = 'empezar';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.left = '60%';
-		form.appendChild(button);
-
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'library';
-		button.value = 'personalizar imagenes';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.right = '60%';
-		form.appendChild(button);
-
-		return formCont;
-	}
-
-	/**
-	 * Método que crea el formulario de configuracion del modo supervivencia
-	 * 
-	 * @return HtmlObject objeto html con el formulario del modo supervivencia.
-	 */
-	function createSurvivalModeForm() {
-		// Creamos el contenedor que contendra el formulario
-		var formCont = document.createElement('div');
-		// Le aplicamos su estilo
-		formCont.style.backgroundColor = '#dddddd';
-		formCont.style.margin = '3% 7%';
-		formCont.style.width = '85%';
-		formCont.style.height = '76%';
-		formCont.style.borderRadius = '30px';
-		formCont.style.textAlign = 'center';
-		formCont.style.position = 'absolute';
-		formCont.style.top = '0';
-		formCont.style.display = 'none';
-		document.body.appendChild(formCont);
-
-		// Creamos el formulario
-		var form = document.createElement('form');
-		form.id = 'survivalForm';
-		formCont.appendChild(form);
-
-		// Creamos un titulo
-		var title = document.createElement('h1');
-		// Añadimos el contenido
-		title.innerHTML = 'Modo Supervivencia';
-		// Añadimos el titulo al contenedor
-		form.appendChild(title);
-
-		// Creamos una descripcion del modo de juego
-		var descrip = document.createElement('p');
-		// Añadimos el contenido
-		descrip.innerHTML = 'Se debera resolver el mayor numero de puzzles posibles. Se dispone de un determinado tiempo en funcion de la dificultad para resolver cada puzzle. Cada vez que se resuelva un puzzle se añadira una cantidad de tiempo. Se pueden elegir las imagenes del puzzle haciendo click en \'personalizar imagenes\', se recomienda elegir al menos 12 imagenes con 8 cubos y 18  con 27 cubos, para que no haya ninguna imagen repetida, si hay mas de estas se mostraran en los siguientes puzzles.';
-		// Añadimos la descripcion al contenedor
-		form.appendChild(descrip);
-
-		// Creamos un contenedor para la opcion numero de cubos
-		var contNumC = document.createElement('div');
-		form.appendChild(contNumC);
-		// Mostramos un texto de la opcion correspondiente
-		contNumC.innerHTML += 'Elige el número de piezas del puzzle:' + '<br>';
-
-		// Creamos un delimitador para la opcion de numero de cubos
-		var fieldSet = document.createElement('fieldset');
-		// Aplicamos su estilo
-		fieldSet.style.borderRadius = '10px';
-		fieldSet.style.margin = '10px 0';
-		fieldSet.style.padding = '10px';
-		fieldSet.style.display = 'inline';
-		contNumC.appendChild(fieldSet);
-
-		// Creamos los radio-buttons para elegir el numero de cubos
-		// 27 cubos
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'cubes27survival';
-		radio.name = 'cubesNumber';
-		radio.checked = 'checked';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = '27 cubos';
-		radioLabel.htmlFor = 'cubes27survival';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-		// 8 cubos
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'cubes8survival';
-		radio.name = 'cubesNumber';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = '8 cubos';
-		radioLabel.htmlFor = 'cubes8survival';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-
-		// Creamos un contenedor para la opcion de la dificultad
-		var contDiff = document.createElement('div');
-		form.appendChild(contDiff);
-		// Mostramos un texto de la opcion correspondiente
-		contDiff.innerHTML += 'Elige la dificultad del puzzle:' + '<br>';
-
-		// Creamos un delimitador para la opcion de la dificultad
-		var fieldSet = document.createElement('fieldset');
-		// Aplicamos su estilo
-		fieldSet.style.borderRadius = '10px';
-		fieldSet.style.margin = '10px 0';
-		fieldSet.style.padding = '10px';
-		fieldSet.style.display = 'inline';
-		contDiff.appendChild(fieldSet);
-
-		// Creamos los radio-buttons para elegir la dificultad
-		// Facil
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'easySurvival';
-		radio.name = 'difficulty';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = 'facil';
-		radioLabel.htmlFor = 'easySurvival';
-		radioLabel.style.padding = '5px 10px 5px 0';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-		// Medio
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'mediumSurvival';
-		radio.name = 'difficulty';
-		radio.checked = 'checked';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = 'medio';
-		radioLabel.htmlFor = 'mediumSurvival';
-		radioLabel.style.padding = '5px 10px 5px 0';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-		// Dificil
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'hardSurvival';
-		radio.name = 'difficulty';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = 'dificil';
-		radioLabel.htmlFor = 'hardSurvival';
-		radioLabel.style.padding = '5px 10px 5px 0';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-		// Imposible
-		var radio = document.createElement('input');
-		radio.type = 'radio';
-		radio.id = 'hopelessSurvival';
-		radio.name = 'difficulty';
-		var radioLabel = document.createElement('label');
-		radioLabel.innerHTML = 'imposible';
-		radioLabel.htmlFor = 'hopelessSurvival';
-		radioLabel.style.padding = '5px 10px 5px 0';
-		fieldSet.appendChild(radio);
-		fieldSet.appendChild(radioLabel);
-
-		// Añadimos los botones
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'start';
-		button.value = 'empezar';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.left = '60%';
-		form.appendChild(button);
-
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'library';
-		button.value = 'personalizar imagenes';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.right = '60%';
-		form.appendChild(button);
-
-		return formCont;
-	}
-
-	/**
-	 * Método para añadir al diálogo de configuración del modo niveles una entrada para un nivel
-	 * 
-	 * @param String:name
-	 *            nombre del nivel a crear.
-	 * @param String:img
-	 *            ruta con la imagen del nivel.
-	 * @param String:description
-	 *            descripcion del nivel.
-	 * @return DOMobject contenedor con la imagen del nivel y su titulo, y con las caracteristicas correspondientes.
-	 *         Ademas tiene un atributo .description en el que se almacena la descripcion del nivel.
-	 */
-	function createLevelEntry(name, img, description) {
-		// Creamos un contenedor para el nivel
-		var cont = document.createElement('div');
-		cont.style.textAlign = 'center';
-		cont.style.width = '150px';
-		cont.style.height = '150px';
-		cont.style.borderStyle = 'solid';
-		cont.style.borderColor = '#ff0000';
-		cont.style.cssFloat = 'left';
-		cont.style.margin = '5px';
-		cont.className = 'clickable';
-		// Creamos una imagen para describir el nivel
-		var i = document.createElement('img');
-		i.src = img;
-		i.style.height = '100px';
-		cont.appendChild(i);
-		// Añadimos el titulo/nombre del nivel
-		var t = document.createElement('p');
-		t.style.margin = '0';
-		t.innerHTML = name;
-		cont.appendChild(t);
-		// Guardamos la descripcion
-		cont.description = description;
-
-		return cont;
-	}
-
-	/**
-	 * Método que crea el formulario de configuracion de crear una partida multijugador
-	 * 
-	 * @return HtmlObject objeto html con el formulario para crear una partida multijugador.
-	 */
-	function createCreateServerForm() {
-		// Creamos el contenedor que contendra el formulario
-		var formCont = document.createElement('div');
-		// Le aplicamos su estilo
-		formCont.style.backgroundColor = '#dddddd';
-		formCont.style.margin = '3% 7%';
-		formCont.style.width = '85%';
-		formCont.style.height = '76%';
-		formCont.style.borderRadius = '30px';
-		formCont.style.textAlign = 'center';
-		formCont.style.position = 'absolute';
-		formCont.style.top = '0';
-		formCont.style.display = 'none';
-		document.body.appendChild(formCont);
-
-		// Creamos el formulario
-		var form = document.createElement('form');
-		form.id = 'createServerForm';
-		form.style.height = '100%'; // Colocamos la altura al 100% para que los hijos puedan calcular su altura con
-		// porcentajes
-		formCont.appendChild(form);
-
-		// Creamos un titulo
-		var title = document.createElement('h1');
-		// Añadimos el contenido
-		title.innerHTML = 'Crear Partida';
-		// Añadimos el titulo al contenedor
-		form.appendChild(title);
-
-		// Creamos una descripcion del modo de juego
-		var descrip = document.createElement('p');
-		// Añadimos el contenido
-		descrip.innerHTML = 'Selecciona un tipo de partida:';
-		descrip.style.marginBottom = '2px';
-		// Añadimos la descripcion al contenedor
-		form.appendChild(descrip);
-
-		// Creamos un contendor para los tipos de partida
-		var typesCont = document.createElement('div');
-		form.appendChild(typesCont);
-		typesCont.style.width = '70%';
-		typesCont.style.height = '64%';
-		typesCont.style.padding = '5px';
-		typesCont.style.margin = '0 2%';
-		typesCont.style.overflow = 'auto';
-		typesCont.style.backgroundColor = '#ffffff';
-		typesCont.style.cssFloat = 'left';
-
-		// Creamos una entrada de texto para el nombre de la partida
-		// Creamos un texto para describir la entrada
-		var t = document.createElement('p');
-		t.style.width = '20%';
-		t.style.cssFloat = 'right';
-		t.style.marginRight = '2%';
-		t.style.marginBottom = '0';
-		t.style.textAlign = 'right';
-		t.innerHTML = 'Introduce el nombre de la partida:';
-		form.appendChild(t);
-		var gameName = document.createElement('input');
-		gameName.name = 'gameName';
-		gameName.maxLength = '20';
-		gameName.style.cssFloat = 'right';
-		gameName.style.padding = '10px';
-		gameName.style.marginRight = '2%';
-		gameName.style.textAlign = 'right';
-		// Añadimos la descripcion al contenedor
-		form.appendChild(gameName);
-
-		// Creamos una descripcion del modo de juego
-		var descrip = document.createElement('p');
-		descrip.className = 'description';
-		descrip.style.width = '20%';
-		descrip.style.cssFloat = 'right';
-		descrip.style.padding = '10px';
-		descrip.style.marginRight = '2%';
-		descrip.style.textAlign = 'right';
-		// Añadimos la descripcion al contenedor
-		form.appendChild(descrip);
-
-		// Creamos los tipos de partida y los guardamos en un array
-		var types = [];
-		var t = createLevelEntry(
-				"Cooperativo con 8 cubos",
-				"img/levels/mult1.png",
-				"Ambos jugadores deberan cooperar para resolver el puzzle. Se resaltaran en azul los cubos que estan siendo usados por el otro jugador.");
-		typesCont.appendChild(t);
-		t.index = 0;
-		types.push(t);
-		var t = createLevelEntry(
-				"Cooperativo con 27 cubos",
-				"img/levels/mult1.png",
-				"Ambos jugadores deberan cooperar para resolver el puzzle. Se resaltaran en azul los cubos que estan siendo usados por el otro jugador.");
-		typesCont.appendChild(t);
-		t.index = 1;
-		types.push(t);
-		var t = createLevelEntry("Contrareloj con 8", "img/levels/mult2.png",
-				"Ambos jugadores deberan competir para ver quien acaba antes el puzzle.");
-		typesCont.appendChild(t);
-		t.index = 2;
-		types.push(t);
-		var t = createLevelEntry("Contrareloj con 27", "img/levels/mult2.png",
-				"Ambos jugadores deberan competir para ver quien acaba antes el puzzle.");
-		typesCont.appendChild(t);
-		t.index = 3;
-		types.push(t);
-		formCont.entrys = types;
-
-		// Añadimos los botones
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'start';
-		button.value = 'empezar';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.left = '60%';
-		form.appendChild(button);
-
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'library';
-		button.value = 'personalizar imagenes';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.right = '60%';
-		form.appendChild(button);
-
-		return formCont;
-	}
-
-	/**
-	 * Método que crea el formulario de configuracion de buscar una partida multijugador
-	 * 
-	 * @return HtmlObject objeto html con el formulario para crear una partida multijugador.
-	 */
-	function createFindServerForm() {
-		// Creamos el contenedor que contendra el formulario
-		var formCont = document.createElement('div');
-		// Le aplicamos su estilo
-		formCont.style.backgroundColor = '#dddddd';
-		formCont.style.margin = '3% 7%';
-		formCont.style.width = '85%';
-		formCont.style.height = '76%';
-		formCont.style.borderRadius = '30px';
-		formCont.style.textAlign = 'center';
-		formCont.style.position = 'absolute';
-		formCont.style.top = '0';
-		formCont.style.display = 'none';
-		document.body.appendChild(formCont);
-
-		// Creamos el formulario
-		var form = document.createElement('form');
-		form.id = 'findServerForm';
-		form.style.height = '100%'; // Colocamos la altura al 100% para que los hijos puedan calcular su altura con
-		// porcentajes
-		formCont.appendChild(form);
-
-		// Creamos un titulo
-		var title = document.createElement('h1');
-		// Añadimos el contenido
-		title.innerHTML = 'Buscar Partida';
-		// Añadimos el titulo al contenedor
-		form.appendChild(title);
-
-		// Creamos una descripcion del modo de juego
-		var descrip = document.createElement('p');
-		// Añadimos el contenido
-		descrip.innerHTML = 'Selecciona una de las partidas que ya estan creadas:';
-		descrip.style.marginBottom = '2px';
-		// Añadimos la descripcion al contenedor
-		form.appendChild(descrip);
-
-		// Creamos un contendor para las partidas
-		var gamesCont = document.createElement('div');
-		form.appendChild(gamesCont);
-		gamesCont.style.width = '70%';
-		gamesCont.style.height = '64%';
-		gamesCont.style.margin = '0 2%';
-		gamesCont.style.overflow = 'auto';
-		gamesCont.style.backgroundColor = '#ffffff';
-		gamesCont.style.cssFloat = 'left';
-		// Creamos una tabla donde meteremos las partidas
-		var gamesTable = document.createElement('table');
-		gamesTable.border = "1";
-		gamesTable.style.width = '100%';
-		gamesTable.style.margin = '0';
-		gamesCont.appendChild(gamesTable);
-		// Creamos la cabecera para indicar el significado de cada campo de informacion de la partida
-		var row = document.createElement('tr');
-		row.style.backgroundColor = '#dddddd';
-		gamesTable.appendChild(row);
-		var header = document.createElement('th');
-		header.innerHTML = "Nombre";
-		row.appendChild(header);
-		var header = document.createElement('th');
-		header.innerHTML = "Tipo";
-		row.appendChild(header);
-
-		// Guardamos un array con las partidas inicialmente vacio
-		formCont.entrys = [];
-		// Guardamos el contenedor donde se mostraran las partidas disponibles
-		formCont.gamesCont = gamesTable;
-
-		// Creamos un boton para actulizar la lista de partidas
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'refresh';
-		button.value = 'VOLVER A BUSCAR PARTIDAS';
-		button.style.width = '20%';
-		button.style.cssFloat = 'right';
-		button.style.padding = '10px';
-		button.style.marginRight = '2%';
-		button.style.textAlign = 'center';
-		button.style.fontWeight = 'bold';
-		// Añadimos la descripcion al contenedor
-		form.appendChild(button);
-
-		// Añadimos el boton de empezar
-		var button = document.createElement('input');
-		button.type = 'button';
-		button.name = 'start';
-		button.value = 'empezar';
-		button.style.position = 'absolute';
-		button.style.bottom = '-13%';
-		button.style.left = '60%';
-		form.appendChild(button);
-
-		return formCont;
-	}
-
-	/**
 	 * Método para añadir al diálogo de configuración de buscar partidas multijugador una partida
 	 * 
 	 * @param String:name
@@ -1131,9 +254,9 @@ function MenuView(sce) {
 	 *            identificador de la partida.
 	 * @param Integer:type
 	 *            tipo de partida multijugador.
-	 * @return DOMobject fila con los datos de la partida.
+	 * @returns DOMobject fila con los datos de la partida.
 	 */
-	function addGameEntry(name, ID, type) {
+	function buildGameEntry(name, ID, type) {
 		// Creamos una fila para la entrada
 		var row = document.createElement('tr');
 
@@ -1146,35 +269,13 @@ function MenuView(sce) {
 
 		// Añadimos el nombre de la partida
 		row.appendChild(makeData(name));
-		// Añadimos el tipo de la partida
-		var typeString = [ "Cooperativo con 8 cubos", "Cooperativo con 27 cubos", "Contrareloj con 8 cubos",
-				"Contrareloj con 27 cubos" ];
-		row.appendChild(makeData(typeString[type]));
-		row.className = 'clickable';
+		row.appendChild(makeData(multiplayerLevelsData[type].name));
+		// Fijamos la clases CSS para el estilo y para luego obtener la lista
+		row.classList.add('clickable', 'menuItem');
 
 		// Guardamos el ID
 		row.ID = ID;
-		// Obtenemos el indice de la partida
-		row.index = findServerForm.entrys.length;
-
-		// Guardamos la partida en el array de partidas
-		findServerForm.entrys.push(row);
-		// Añadimos la partida al contenedor de partidas del formulario de buscar partida
-		findServerForm.gamesCont.appendChild(row);
-
 		return row;
-	}
-
-	/**
-	 * Método para borrar todoas las partidas multijugador del dialogo de buscar partida multijugador.
-	 */
-	function clearGameEntrys() {
-		// Borramos del contenedor de partidas del formulario de buscar partida todas las partidas
-		for (var i = 0; i < findServerForm.entrys.length; i++) {
-			findServerForm.gamesCont.removeChild(findServerForm.entrys[i]);
-		}
-		// Vaciamos el array de partidas
-		findServerForm.entrys = [];
 	}
 
 	/**
@@ -1239,7 +340,6 @@ function MenuView(sce) {
 	 *            funcion callback que será llamada cuando acabe la animación.
 	 */
 	this.explode = function(entry, callback) {
-		menC.remove();
 		// Recorremos todos los cubos, creando para cada uno un vector aleatorio normalizado
 		// y posteriormente escalado que indicara la direccion del cubo en la animacion de explosion
 		for (var i = 0; i < entry.children.length; i++) {
@@ -1290,163 +390,53 @@ function MenuView(sce) {
 	}
 
 	/**
-	 * Método para fijar los materiales con los que se creara el puzzle
-	 * 
-	 * @param Materials[]:mats
-	 *            array con los materiales con los que se creará el puzzle.
-	 */
-	this.setMaterials = function(mats) {
-		materials = mats;
-		menC.setMaterials(mats);
-	}
-
-	/**
 	 * Método para eliminar de la interfaz todos los elementos de la vista, ocultarlos
 	 */
 	this.hide = function() {
 		// Si el menu a ocultar es de los que tienen entradas de menu
-		if (currentMenu < 3) {
+		if (entrys[currentMenu].dataType == "webgl") {
+			container.removeChild(renderer.domElement);
 			// Eliminamos de la escena todas las entradas del menu actual
 			for (var i = 0; i < entrys[currentMenu].length; i++) {
 				scene.remove(entrys[currentMenu][i]);
 			}
+		} else if (entrys[currentMenu].dataType == "html") {
+			// Si el menu a ocultar es un formulario lo ocultamos
+			if (entrys[currentMenu][0].parentNode == document.body) {
+				document.body.removeChild(entrys[currentMenu][0]);
+			}
 		}
-
-		// Si el menu a ocultar es el del modo clasico
-		if (currentMenu == 6) {
-			classicForm.style.display = 'none';
-		}
-		// Si el menu a ocultar es el del modo niveles
-		if (currentMenu == 7) {
-			levelsForm.style.display = 'none';
-		}
-		// Si el menu a ocultar es el del modo contrareloj
-		if (currentMenu == 8) {
-			trialForm.style.display = 'none';
-		}
-		// Si el menu a ocultar es el del modo supervivencia
-		if (currentMenu == 9) {
-			survivalForm.style.display = 'none';
-		}
-		// Si el menu a ocultar es el de crear partida multijugador
-		if (currentMenu == 10) {
-			createServerForm.style.display = 'none';
-		}
-		// Si el menu a ocultar es el de buscar partida multijugador
-		if (currentMenu == 11) {
-			findServerForm.style.display = 'none';
-		}
-		// Escondemos el boton de atras
-		backButton.style.display = 'none';
-
-		// Paramos el controlador asociado
-		menC.remove();
 	}
 
 	/**
 	 * Método para mostrar el submenu solicitado
 	 * 
-	 * @param Integer:menuInd->
-	 *            indice del menu a mostrar.
+	 * @param Integer:menuInd
+	 *            indice del menu a mostrar, si no se le pasa nada se mostrara le menu actual.
 	 */
 	this.showMenu = function(menuIndex) {
 		// Primero quitamos la vista actual del menu
-		this.hide();
+		if (currentMenu != undefined) {
+			this.hide();
+		}
 
 		// Guardamos el menu actual
 		if (menuIndex != undefined) {
 			currentMenu = menuIndex;
 		}
-
-		// Si el menu actual no es el menu principal o las opciones
-		if (currentMenu != 0 && currentMenu != 3) {
-			// Mostramos el boton de anterior
-			backButton.style.display = 'block';
-		}
+		
 		// Si el menu seleccionado es de los que tienen entradas de menu
-		if (currentMenu < 3) {
-			// Vaciamos los materiales, por si estaba lleno de otro menu
-			// materials = [];
+		if (entrys[currentMenu].dataType == "webgl") {
+			container.appendChild(renderer.domElement);
 			// Mostramos las entradas del menu correspondiente
 			for (var i = 0; i < entrys[currentMenu].length; i++) {
 				scene.add(entrys[currentMenu][i]);
 			}
+		} else if (entrys[currentMenu].dataType == "html") {
+			// Si el menu a mostrar es un formulario lo ocultamos
+			var child = entrys[currentMenu][0];
+			document.body.appendChild(child);
 		}
-		// Si el menu seleccionado es el menu de opciones
-		else if (currentMenu == 3) {
-			// Mostramos el dialogo de opciones pasandole la funcion que se ejecutara al para mostrar la vista
-			// correspondiente
-			ov.show(function() {
-				currentMenu = 0;
-				// Mostramos las entradas del menu correspondiente
-				for (var i = 0; i < entrys[currentMenu].length; i++) {
-					scene.add(entrys[currentMenu][i]);
-				}
-				// Activamos el controlador para el submenu adecuado
-				menC.enable(currentMenu);
-			});
-		}
-		// Si el menu seleccionado es el menu de puntuaciones
-		else if (currentMenu == 4) {
-			if (sv == undefined) {
-				sv = new ScoresView();
-				sv.showMode(0);
-			} else {
-				sv.show();
-			}
-		}
-		// Si el menu seleccionado es el menu de ayuda
-		else if (currentMenu == 5) {
-			if (hv == undefined) {
-				hv = new HelpView();
-			} else {
-				hv.show();
-			}
-		}
-		// Si el menu seleccionado es el menu del modo clasico
-		else if (currentMenu == 6) {
-			// Mostramos el formulario
-			classicForm.style.display = 'block';
-		}
-		// Si el menu seleccionado es el menu del modo niveles
-		else if (currentMenu == 7) {
-			// Mostramos el formulario
-			levelsForm.style.display = 'block';
-		}
-		// Si el menu seleccionado es el menu del modo contrareloj
-		else if (currentMenu == 8) {
-			// Mostramos el formulario
-			trialForm.style.display = 'block';
-		}
-		// Si el menu seleccionado es el menu del modo supervivencia
-		else if (currentMenu == 9) {
-			// Mostramos el formulario
-			survivalForm.style.display = 'block';
-		}
-		// Si el menu seleccionado es el de crear partida multijugador
-		else if (currentMenu == 10) {
-			// Si no tenemos conexion con el servidor la creamos
-			if (socket == undefined) {
-				socket = new Socket();
-			}
-			createServerForm.style.display = 'block';
-		}
-		// Si el menu seleccionado es el de buscar partida multijugador
-		else if (currentMenu == 11) {
-			// Si no tenemos conexion con el servidor la creamos
-			if (socket == undefined) {
-				socket = new Socket();
-			}
-			findServerForm.style.display = 'block';
-			socket.getGames();
-		}
-
-		else {
-			alert("En construccion");
-		}
-
-		// Activamos el controlador para el submenu adecuado
-		menC.enable(currentMenu);
 	}
 
 	/**
@@ -1515,28 +505,57 @@ function MenuView(sce) {
 	/**
 	 * Método para rellenar el dialogo de buscar partidas multijugador con las entradas suministradas.
 	 * 
-	 * @param Array:entrys
+	 * @param Array:items
 	 *            array con los datos de todas las entradas que se desean introducir, cada entrada del array debera
 	 *            tener las siguientes propiedades: -name con el nombre de la partida -ID con el ID de la partida -type
 	 *            con el tipo de la partida.
 	 */
-	this.fillGameEntrys = function(entrys) {
+	this.fillGameEntrys = function(items) {
+		var table = entrys[currentMenu][0].getElementsByTagName('tBody')[0];
 		// Primero quitamos todas las partidas que hubiera antes
-		clearGameEntrys();
-
+		while (table.firstChild) {
+			table.removeChild(table.firstChild);
+		}
 		// Si no hay partidas
-		if (entrys.length == 0) {
+		if (items.length == 0) {
 			alert("No se ha encontrado ninguna partida. Pruebe a crear una.");
 			return;
 		}
-
 		// Rellenamos el dialogo con las entradas suministras
-		for (var i = 0; i < entrys.length; i++) {
-			addGameEntry(entrys[i].name, entrys[i].ID, entrys[i].type);
+		for (var i = 0; i < items.length; i++) {
+			var row = buildGameEntry(items[i].name, items[i].ID, items[i].type);
+			table.appendChild(row);
 		}
-
-		// Actualizamos los receptores para las entradas de las partidas con los nuevos datos
-		menC.updateGamesListeners();
 	}
 
+	/**
+	 * Calcula el numero de cubos seleccionados en el formulario para empezar un juego. Si el menu actual no es uno de
+	 * estos formularios o no consta de seleccion de numero de cubos, devolvera 0
+	 * 
+	 * @returns 2 (para 8 cubos) o 3 (para 27 cubos) segun el numero de cubos seleccionados, 0 en caso de que no sea
+	 *          posible realizar la operacion
+	 */
+	this.getSelectedNumberOfCubes = function() {
+		// Si el formulario actual no es html -> 0
+		if (!entrys[currentMenu][0].getElementsByTagName) {
+			return 0;
+		}
+		// 27 cubos
+		if (entrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[0].checked) {
+			return 3;
+		}
+		// 8 cubos
+		if (entrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[1].checked) {
+			return 2;
+		}
+		return 0;
+	}
+
+	/**
+	 * Obtiene los datos de las entradas de los menus. De que tipo y modo es cada una, y las entradas correspodientes al
+	 * tipo si corresponde (para el tipo webgl un array de figuras, y para el tipo html un elemento del DOM
+	 */
+	this.getEntrys = function() {
+		return entrys;
+	}
 }

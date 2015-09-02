@@ -85,7 +85,7 @@ function LevelsModeController(cont, l, mats, cl) {
 		window.mats = materials;
 		window.numC = Math.floor(materials.length / 6);
 		window.sensitivity = ov.getOptions().getSensitivity();
-		solWin = window.open("solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
+		solWin = window.open("Solutions/solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
 				+ ",left=" + (window.screen.availWidth - 300));
 	}
 
@@ -125,7 +125,7 @@ function LevelsModeController(cont, l, mats, cl) {
 		// Confirmamos que se desea salir
 		if (confirm('Esta seguro que desea salir?')) {
 			lmv.hide();
-			mv.showMenu(0);
+			menuCtl.show(0);
 		}
 	}
 

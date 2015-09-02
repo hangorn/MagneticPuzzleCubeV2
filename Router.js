@@ -17,6 +17,7 @@
 var router = require('express').Router();
 
 var jsonCtl = require('./controllers/JsonCtl');
+var menuCtl = require('./controllers/MenuCtl');
 
 /***********************************************************************************************************************
  * Peticiones de datos JSON
@@ -24,5 +25,6 @@ var jsonCtl = require('./controllers/JsonCtl');
 
 // JSON con los datos de los niveles
 router.get('/data/Levels.json', jsonCtl.getJson);
+router.get('/menu/*.html', menuCtl.getMenu);
 
 module.exports = router;

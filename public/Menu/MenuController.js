@@ -21,17 +21,11 @@
 /*
  *  CLASE PUZZLECONTROLLER
  *  */
-function MenuController(cam, sce, entrys, mats) {
+function MenuController() {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
-
-	// Cámara de la escena necesaria para realizar los cálculos de la interacción
-	var camera;
-	// Escena en la que se representará el mundo 3D
-	var scene;
-
 	// Plano para hacer calculos
 	var plane;
 	// Proyector para realizar operaciones
@@ -40,46 +34,28 @@ function MenuController(cam, sce, entrys, mats) {
 	var ray;
 	// Objeto 3D sobre el cual se realizarán operaciones (cambiar el color)
 	var INTERSECTED;
+	// Vector de 2 coordenadas que almacena la posición actual del ratón
+	var mouse = new THREE.Vector2();
 
 	// Entradas del menu
 	var menuEntrys;
 	// Identificador del submenu actual
 	var currentMenu;
 	// Materiales con los que se creará el puzzle
-	var materials;
+	var materials = [];
 
 	// Ultimo nivel seleccionado
 	var lastEntrySelected;
-	// Color que se utilizara para seleccionar el nivel
-	var colorLevelSelected = '#7777aa';
 
-	// Vector de 2 coordenadas que alamacena la posición actual del ratón
-	var mouse = new THREE.Vector2();
+	// Vista del menu
+	var mv;
 
 	/*******************************************************************************************************************
 	 * Constructor
 	 ******************************************************************************************************************/
 	/**
-	 * Constructor de la clase MenuController
-	 * 
-	 * @param Camera:cam
-	 *            cámara con la que se realizarán los cálculos de la interacción.
-	 * @param Scene:sce
-	 *            escena en la que se representará el mundo 3D.
-	 * @param Objects[]:entrys
-	 *            array de figuras que contendrá las entradas del menú.
-	 * @param Materials[]:mats
-	 *            array de materiales con los que se creará el puzzle.
+	 * Constructor de la clase MenuController. Cuando este cargado mostrara la vista del menu principal
 	 */
-
-	// Guardamos los parametros obtenidos
-	camera = cam;
-	scene = sce;
-	materials = mats;
-	// Guardamos las entradas del menu
-	menuEntrys = entrys;
-	// Iniciamos el submenu actual como el principal
-	currentMenu = 0;
 
 	// Creamos un plano para el picking
 	plane = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000, 8, 8), new THREE.MeshBasicMaterial({
@@ -90,26 +66,26 @@ function MenuController(cam, sce, entrys, mats) {
 	}));
 	// Hacemos que no sea visible, es para funcionamiento interno, no para mostrarlo
 	plane.visible = false;
-	// Añadimos el plano a la escena
-	scene.add(plane);
 
 	// Creamos un proyector para realizar el picking
 	projector = new THREE.Projector();
 	// Creamos un rayo con origen en la posicion de la camara
 	ray = new THREE.Raycaster(camera.position);
 
-	// Registramos el evento de click del raton
-	document.getElementById('canvas').addEventListener('click', onMenuClick, false);
-	// Registramos el evento de movimiento del raton
-	document.getElementById('canvas').addEventListener('mousemove', onMenuMouseMove, false);
-
 	// Desactivamos el menu contextual del boton derecho
 	document.getElementById('canvas').oncontextmenu = function() {
 		return false
 	};
 
-	// Registramos el evento para el boton de atras
-	document.getElementById('menuBackButton').addEventListener('click', onMenuBack, false);
+	// Obtenemos los datos para generar el mnenu
+	ajaxRequest("data/Menu.json", function(menuResp) {
+		var menuData = JSON.parse(menuResp).data;
+
+		mv = new MenuView(menuData);
+		menuEntrys = mv.getEntrys();
+		// Mostramos la vista del menu principal
+		show(0);
+	});
 
 	/*******************************************************************************************************************
 	 * Métodos Privados
@@ -126,7 +102,7 @@ function MenuController(cam, sce, entrys, mats) {
 		event.preventDefault();
 
 		// Si el menu actual no tiene entradas de menu
-		if (currentMenu > 2) {
+		if (menuEntrys[currentMenu].dataType != "webgl") {
 			return;
 		}
 
@@ -142,9 +118,15 @@ function MenuController(cam, sce, entrys, mats) {
 		var intersects = ray.intersectObjects(menuEntrys[currentMenu]);
 		// Si hay algun objeto
 		if (intersects.length > 0) {
+			remove();
 			// Realizamos la animacion de explosion de la entrada seleccionada
 			mv.explode(intersects[0].object, function() {
-				mv.showMenu(intersects[0].object.menuIndex);
+				// Las entradas que no tengan indice se comportaran como boton de atras
+				if (intersects[0].object.menuIndex == -1) {
+					onMenuBack();
+				} else {
+					show(intersects[0].object.menuIndex);
+				}
 			});
 		} else {
 			mv.changeAllEntrysColor();
@@ -162,7 +144,7 @@ function MenuController(cam, sce, entrys, mats) {
 		event.preventDefault();
 
 		// Si el menu actual no tiene entradas de menu
-		if (currentMenu > 2) {
+		if (menuEntrys[currentMenu].dataType != "webgl") {
 			return;
 		}
 
@@ -213,22 +195,27 @@ function MenuController(cam, sce, entrys, mats) {
 	 */
 	function onMenuBack(event) {
 		// Si son las puntuaciones las ocultamos
-		if (currentMenu == 4) {
+		if (menuEntrys[currentMenu].dataType == "scores") {
 			sv.hide();
 		}
 		// Si es la ayuda la ocultamos
-		if (currentMenu == 5) {
+		if (menuEntrys[currentMenu].dataType == "help") {
 			hv.hide();
 		}
-		// Si el menu en el que estamos tiene como anterior el menu principal
-		if (currentMenu <= menuEntrys[0].length) {
-			mv.showMenu(0);
-			// Si el menu en el que estamos tiene como anterior el primer submenu
-		} else if (currentMenu <= menuEntrys[0].length + menuEntrys[1].length) {
-			mv.showMenu(1);
-			// Si el menu en el que estamos tiene como anterior el segundo submenu
-		} else if (currentMenu <= menuEntrys[0].length + menuEntrys[1].length + menuEntrys[2].length) {
-			mv.showMenu(2);
+		// Calculamos cual es el menu anterior
+		var add = 0;
+		// Recorremos todos los menus
+		for (var i = 0; i < menuEntrys.length; i++) {
+			// El menu de atras no lo tenemos en cuenta
+			for (var j = 0; j < menuEntrys[i].length; j++) {
+				if (menuEntrys[i][j].menuIndex != -1) {
+					add++
+				}
+			}
+			if (currentMenu <= add) {
+				show(i);
+				break;
+			}
 		}
 	}
 
@@ -242,15 +229,11 @@ function MenuController(cam, sce, entrys, mats) {
 		// Obtenemos el tipo de biblioteca que se ha de mostrar
 		var libType;
 		// Si la cantidad de imagenes depende del numero de cubos, segun el modo de juego
-		if (currentMenu == 6 || currentMenu == 8) {
-			if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[0].checked) {
-				libType = 3; // 27 cubos => 3 soluciones
-			} else if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[1].checked) {
-				libType = 2; // 8 cubos => 2 soluciones
-			}
+		if (menuEntrys[currentMenu].mode == "classic" || menuEntrys[currentMenu].mode == "trial") {
+			libType = mv.getSelectedNumberOfCubes();
 		}
 		// Si se trata del modo multijugador
-		else if (currentMenu == 10) {
+		else if (menuEntrys[currentMenu].mode == "multiplayer") {
 			// Si el ultimo tipo de partida seleccionada es par
 			if ((lastEntrySelected % 2) == 0) {
 				libType = 2; // Es un tipo con 8 cubos
@@ -265,7 +248,7 @@ function MenuController(cam, sce, entrys, mats) {
 
 		// Si no esta creada la vista de la biblioteca la creamos
 		if (lv == undefined) {
-			lv = new LibraryView(scene, IMAGES, libType);
+			lv = new LibraryView(IMAGES, libType);
 			// Si esta creada solo la mostramos
 		} else {
 			lv.show(libType);
@@ -280,90 +263,41 @@ function MenuController(cam, sce, entrys, mats) {
 	 */
 	function onMenuStartClick(event) {
 		// Si se trata del menu de buscar partida multijugador y no hay partidas
-		if (currentMenu == 11 && menuEntrys[currentMenu][0].entrys.length == 0) {
+		if (menuEntrys[currentMenu].mode == "findServer"
+				&& menuEntrys[currentMenu][0].getElementsByTagName('tBody')[0].children.length == 0) {
 			// No hacemos nada
 			return;
 		}
-		// Si no se han escogido las imagenes con las que se hara el puzzle
-		// y el menu actual es distinto de buscar partida multijugador
-		if (materials.length == 0 && currentMenu != 11) {
+		// Si menu actual es distinto de buscar partida multijugador
+		if (menuEntrys[currentMenu].mode != "findServer") {
+			var imgsNeeded = 0;
+			var selectedMaterials = materials.length;
 			// Si la cantidad de imagenes depende del numero de cubos, segun el modo de juego
-			if (currentMenu == 6 || currentMenu == 8) {
-				// Si esta elegida la opcion de 27 cubos
-				if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[0].checked) {
-					// Guardamos los primeros 18 materiales de todos los que se tienen
-					for (var i = 0; i < 18; i++) {
-						materials.push(IMAGES[i]);
-					}
-				} else if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[1].checked) {
-					// Guardamos los primeros 12 materiales de todos los que se tienen
-					for (var i = 0; i < 12; i++) {
-						materials.push(IMAGES[i]);
-					}
-				}
+			if (menuEntrys[currentMenu].mode == "classic" || menuEntrys[currentMenu].mode == "trial") {
+				imgsNeeded = 6 * mv.getSelectedNumberOfCubes();
 			}
 			// Si se trata del modo multijugador
 			else if (currentMenu == 10) {
 				// Si el ultimo tipo de partida seleccionada es par
 				if ((lastEntrySelected % 2) == 0) {
-					// Guardamos los primeros 12 materiales de todos los que se tienen
-					for (var i = 0; i < 12; i++) {
-						materials.push(IMAGES[i]);
-					}
+					imgsNeeded = 12;
 				} else {
-					// Guardamos los primeros 18 materiales de todos los que se tienen
-					for (var i = 0; i < 18; i++) {
-						materials.push(IMAGES[i]);
-					}
+					imgsNeeded = 18;
 				}
-			} else {
+				// Si se puede seleccionar cualquier numero de imagenes y no hay ninguna
+			} else if (materials.length == 0) {
 				// Guardamos todos los materiales que se tienen
 				for (var i = 0; i < IMAGES.length; i++) {
 					materials.push(IMAGES[i]);
 				}
 			}
-		}
 
-		// Si la cantidad de imagenes depende del numero de cubos, segun el modo de juego
-		else if (currentMenu == 6 || currentMenu == 8) {
-			var imgsNeeded;
-			// Si esta elegida la opcion de 27 cubos
-			if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[0].checked) {
-				imgsNeeded = 18;
-			} else if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[1].checked) {
-				imgsNeeded = 12;
-			}
 			// Si no se tienen suficientes imagenes buscamos aquellas que no se hayan elegido ya
 			// Recorremos todas las imagenes
 			for (var i = 0; materials.length < imgsNeeded; i++) {
 				var found = false
 				// Comprobamos si la imagen la tenemos almacenada ya
-				for (var j = 0; j < materials.length; j++) {
-					if (materials[j] == IMAGES[i]) {
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					materials.push(IMAGES[i]);
-				}
-			}
-		}
-		// Si se trata del modo multijugador
-		else if (currentMenu == 10) {
-			var imgsNeeded;
-			// Si el ultimo tipo de partida seleccionada es par
-			if ((lastEntrySelected % 2) == 0) {
-				imgsNeeded = 12;
-			} else {
-				imgsNeeded = 18;
-			}
-			// Si no se tienen suficientes imagenes buscamos aquellas que no se hayan elegido ya
-			// Recorremos todas las imagenes
-			for (var i = 0; materials.length < imgsNeeded; i++) {
-				var found = false
-				// Comprobamos si la imagen la tenemos almacenada ya
-				for (var j = 0; j < materials.length; j++) {
+				for (var j = 0; j < selectedMaterials; j++) {
 					if (materials[j] == IMAGES[i]) {
 						found = true;
 						break;
@@ -377,33 +311,20 @@ function MenuController(cam, sce, entrys, mats) {
 
 		// Ocultamos los elementos del menu
 		mv.hide();
+		container.appendChild(renderer.domElement);
 
 		// Si se trata del modo clasico
-		if (currentMenu == 6) {
-			// Comprobamos que numero de cubos esta seleccionado
-			if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[0].checked) { // 27 cubos
-				cmv = new ClassicModeView(scene, 3, materials);
-			}
-			if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[1].checked) { // 8 cubos
-				cmv = new ClassicModeView(scene, 2, materials);
-			}
+		if (menuEntrys[currentMenu].mode == "classic") {
+			cmv = new ClassicModeView(scene, mv.getSelectedNumberOfCubes(), materials);
 		}
 
 		// Si se trata del modo niveles
-		if (currentMenu == 7) {
+		if (menuEntrys[currentMenu].mode == "levels") {
 			lmv = new LevelsModeView(scene, lastEntrySelected, materials);
 		}
 
 		// Si se trata del modo contrareloj
-		if (currentMenu == 8) {
-			// Obtenemos el numero de cubos que tendra el puzzle
-			var cubesNumber;
-			if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[0].checked) {// 27 cubos
-				cubesNumber = 3;
-			}
-			if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[1].checked) {// 8 cubos
-				cubesNumber = 2;
-			}
+		if (menuEntrys[currentMenu].mode == "trial") {
 			// Obtenemos la dificultad
 			var difficulty;
 			for (var i = 0; i < menuEntrys[currentMenu][0].getElementsByTagName('form')[0].difficulty.length; i++) {
@@ -411,19 +332,11 @@ function MenuController(cam, sce, entrys, mats) {
 					difficulty = i;
 				}
 			}
-			tmv = new TrialModeView(scene, cubesNumber, difficulty, materials);
+			tmv = new TrialModeView(scene, mv.getSelectedNumberOfCubes(), difficulty, materials);
 		}
 
 		// Si se trata del modo supervivencia
-		if (currentMenu == 9) {
-			// Obtenemos el numero de cubos que tendra el puzzle
-			var cubesNumber;
-			if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[0].checked) { // 27 cubos
-				cubesNumber = 3;
-			}
-			if (menuEntrys[currentMenu][0].getElementsByTagName('form')[0].cubesNumber[1].checked) { // 8 cubos
-				cubesNumber = 2;
-			}
+		if (menuEntrys[currentMenu].mode == "survival") {
 			// Obtenemos la dificultad
 			var difficulty;
 			for (var i = 0; i < menuEntrys[currentMenu][0].getElementsByTagName('form')[0].difficulty.length; i++) {
@@ -431,18 +344,22 @@ function MenuController(cam, sce, entrys, mats) {
 					difficulty = i;
 				}
 			}
-			smv = new SurvivalModeView(scene, cubesNumber, difficulty, materials);
+			smv = new SurvivalModeView(scene, mv.getSelectedNumberOfCubes(), difficulty, materials);
 		}
 
 		// Si se trata de crear una partida multijugador
-		if (currentMenu == 10) {
+		if (menuEntrys[currentMenu].mode == "multiplayer") {
+			// Si no tenemos conexion con el servidor la creamos
+			if (socket == undefined) {
+				socket = new Socket();
+			}
 			// Obtenemos el nombre y el tipo de la partida
 			var name = menuEntrys[currentMenu][0].getElementsByTagName('form')[0].gameName.value || "Sin Nombre";
 			var type = lastEntrySelected;
 
 			// Mostramos un dialogo mientras se espera a que se codifiquen las imagenes para enviarlas al servidor
 			mv.showWaitingDialog("CARGANDO ...", function() {
-				mv.showMenu(10);
+				mv.showMenu(currentMenu);
 				socket.finishedGame();
 			});
 
@@ -452,28 +369,27 @@ function MenuController(cam, sce, entrys, mats) {
 
 			// Esperamos un pequeño tiempo(1 milisegundo) para que de tiempo a mostrar el dialogo de espera
 			setTimeout(function() {
-				// Obtenemos todas las imagenes de los materiales codificadas
-				// en base 64 para enviarselas al servidor
+				// Obtenemos todas las imagenes de los materiales codificadas en base 64 para enviarselas al servidor
 				var images = [];
 				var imgsNeeded = (lastEntrySelected % 2) == 0 ? 12 : 18;
 				for (var i = 0; i < imgsNeeded; i++) {
 					images.push(imageToBase64(materials[i].map.image));
 				}
 
-				// Le decimos al servidor que hemos creado una partida y indicamos la accion
-				// que se realizara cuando empieze esta (se conecte alguien), la accion si
-				// se desconecta el otro jugador, y la accion para cuando se cree la partida
+				// Le decimos al servidor que hemos creado una partida y indicamos la accion que se realizara cuando
+				// empieze esta (se conecte alguien), la accion si se desconecta el otro jugador, y la accion para
+				// cuando se cree la partida
 				socket.createdGame(name, type, images, iniPos, iniRot, function() {
 					mv.hideWaitingDialog();
 
 					// Mostramos un dialogo mientras se espera a que se el otro jugador este listo
 					mv.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
-						mv.showMenu(11);
+						mv.showMenu(currentMenu);
 						socket.finishedGame();
 					});
 
-					// Le decimos al servidor que estamos listos para jugar y indicamos la funcion
-					// que se ejecutará cuando todos los jugadores de la partida esten listos
+					// Le decimos al servidor que estamos listos para jugar y indicamos la funcion que se ejecutará
+					// cuando todos los jugadores de la partida esten listos
 					socket.readyToPlay(function() {
 						// Ocultamos el dialogo de espera de carga
 						mv.hideWaitingDialog();
@@ -486,13 +402,13 @@ function MenuController(cam, sce, entrys, mats) {
 					mmv.hide();
 					mv.hideWaitingDialog();
 					// Mostramos el menu del modo multijugador
-					mv.showMenu(2);
+					mv.showMenu(currentMenu);
 				}, function() {
 					// Ocultamos el dialogo de espera de carga
 					mv.hideWaitingDialog();
 					// Mostramos un dialogo mientras se espera a otro jugador
 					mv.showWaitingDialog("ESPERANDO A OTRO JUGADOR", function() {
-						mv.showMenu(10);
+						mv.showMenu(currentMenu);
 						socket.finishedGame();
 					});
 				});
@@ -500,72 +416,72 @@ function MenuController(cam, sce, entrys, mats) {
 		}
 
 		// Si se trata de buscar una partida multijugador
-		if (currentMenu == 11) {
-			// Obtenemos el formulario activo
-			form = menuEntrys[currentMenu][0];
+		if (menuEntrys[currentMenu].mode == "findServer") {
+			// Si no tenemos conexion con el servidor la creamos
+			if (socket == undefined) {
+				socket = new Socket();
+			}
 			// Obtenemos el ID del juego seleccionado
-			var gameID = form.entrys[lastEntrySelected].ID;
+			var gameID = menuEntrys[currentMenu][0].getElementsByTagName('tBody')[0].children[lastEntrySelected].ID;
 			// Mostramos un dialogo mientras se espera a que se codifiquen las imagenes para enviarlas al servidor
 			mv.showWaitingDialog("CARGANDO ...", function() {
-				mv.showMenu(11);
+				mv.showMenu(currentMenu);
 				socket.finishedGame();
 			});
-			// Nos unimos a la partida con el ID obtenido y indicamos la accion
-			// que se realizara cuando se conecte a dicha partida, la accion
-			// que se realizara cuando no se consiga conectarse a la partida y
-			// la accion si se desconecta el otro jugador
-			socket
-					.joinGame(
-							gameID,
-							function(imgs, type, iniPos, iniRot) {
-								// Esperamos un pequeño tiempo(1 milisegundo) para que de tiempo a mostrar el dialogo de
-								// espera
-								setTimeout(function() {
-									// Creamos los materiales con las imagenes suministradas decodificandolas, ya que
-									// las obtenemos en base
-									// 64
-									var materials = [];
-									for (var i = 0; i < imgs.length; i++) {
-										var texture = new THREE.Texture(base64ToImage(imgs[i]));
-										texture.needsUpdate = true;
-										materials.push(new THREE.MeshBasicMaterial({
-											map : texture
-										}));
-									}
+			// Definimos la accion de conexion
+			var connAction = function(imgs, type, iniPos, iniRot) {
+				// Esperamos un pequeño tiempo(1 milisegundo) para que de tiempo a mostrar el dialogo de espera
+				setTimeout(function() {
+					// Creamos los materiales con las imagenes suministradas decodificandolas, ya que las obtenemos en
+					// base 64
+					var materials = [];
+					for (var i = 0; i < imgs.length; i++) {
+						var texture = new THREE.Texture(base64ToImage(imgs[i]));
+						texture.needsUpdate = true;
+						materials.push(new THREE.MeshBasicMaterial({
+							map : texture
+						}));
+					}
 
-									// Creamos el puzzle
-									mmv = new MultiplayerModeView(scene, type, materials, iniPos, iniRot);
+					// Creamos el puzzle
+					mmv = new MultiplayerModeView(scene, type, materials, iniPos, iniRot);
 
-									// Ocultamos el dialogo de espera de carga
-									mv.hideWaitingDialog();
+					// Ocultamos el dialogo de espera de carga
+					mv.hideWaitingDialog();
 
-									// Mostramos un dialogo mientras se espera a que se el otro jugador este listo
-									mv.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
-										mv.showMenu(11);
-										socket.finishedGame();
-									});
+					// Mostramos un dialogo mientras se espera a que se el otro jugador este listo
+					mv.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
+						mv.showMenu(currentMenu);
+						socket.finishedGame();
+					});
 
-									// Le decimos la servidor que estamos listos para jugar y indicamos la funcion
-									// que se ejecutará cuando todos los jugadores de la partida esten listos
-									socket.readyToPlay(function() {
-										// Ocultamos el dialogo de espera de carga
-										mv.hideWaitingDialog();
-										// Mostramos la vista del modo multijugador
-										mmv.show();
-									});
-								}, 1);
-							},
-							function() {
-								alert("La partida que ha seleccionado no esta disponible. Intentelo de nuevo o conectese a otra partida.");
-								mv.showMenu(11);
-							}, function() {
-								alert("El otro jugador ha abandonado la partida. Se finalizara la partida.");
-								// Ocultamos la vista de la partida
-								mmv.hide();
-								mv.hideWaitingDialog();
-								// Mostramos el menu del modo multijugador
-								mv.showMenu(2);
-							});
+					// Le decimos al servidor que estamos listos para jugar y indicamos la funcion
+					// que se ejecutará cuando todos los jugadores de la partida esten listos
+					socket.readyToPlay(function() {
+						// Ocultamos el dialogo de espera de carga
+						mv.hideWaitingDialog();
+						// Mostramos la vista del modo multijugador
+						mmv.show();
+					});
+				}, 1);
+			};
+			var wrongAction = function() {
+				alert("La partida que ha seleccionado no esta disponible. Intentelo de nuevo o conectese a otra partida.");
+				mv.showMenu(currentMenu);
+			};
+			var discAction = function() {
+				alert("El otro jugador ha abandonado la partida. Se finalizara la partida.");
+				// Ocultamos la vista de la partida
+				mmv.hide();
+				mv.hideWaitingDialog();
+				// Mostramos el menu del modo multijugador
+				mv.showMenu(currentMenu);
+			};
+
+			// Nos unimos a la partida con el ID obtenido y indicamos la accion que se realizara cuando se conecte a
+			// dicha partida, la accion que se realizara cuando no se consiga conectarse a la partida y la accion si se
+			// desconecta el otro jugador
+			socket.joinGame(gameID, connAction, wrongAction, discAction);
 		}
 	}
 
@@ -576,34 +492,42 @@ function MenuController(cam, sce, entrys, mats) {
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onEntryClick(event) {
-		var i = event.currentTarget.index;
+		var entrys = menuEntrys[currentMenu][0].getElementsByClassName('menuItem');
+		for (var i = 0; i < entrys.length; i++) {
+			if (entrys[i] == event.currentTarget) {
+				break;
+			}
+		}
 		selectEntry(i);
 	}
 
 	/**
-	 * Método que realizará las acciones necesarias para seleccionar la entrada indicado
+	 * Método que realizará las acciones necesarias para seleccionar la entrada indicada
 	 * 
 	 * @param Integer:l->
 	 *            índice del nivel a seleccionar.
 	 */
 	function selectEntry(l) {
 		// Obtenemos el formulario activo
-		form = menuEntrys[currentMenu][0];
+		var form = menuEntrys[currentMenu][0];
+		var entrys = menuEntrys[currentMenu][0].getElementsByClassName('menuItem');
 		// Si no estamos en un modo con entradas o la entrada indicado no existe
-		if ((currentMenu != 7 && currentMenu != 10 && currentMenu != 11) || l >= form.entrys.length) {
+		if ((menuEntrys[currentMenu].mode != "levels" && menuEntrys[currentMenu].mode != "multiplayer" && menuEntrys[currentMenu].mode != "findServer")
+				|| l >= entrys.length) {
 			return;
 		}
-		// Si el menu tiene descripciones
-		if (currentMenu != 11) {
+		// Si el menu tiene descripciones (niveles o multijugador)
+		if (menuEntrys[currentMenu].mode != "findServer") {
 			// Mostramos la descripcion de la entrada
-			form.getElementsByTagName('form')[0].getElementsByClassName('description')[0].innerHTML = form.entrys[l].description;
+			form.getElementsByTagName('form')[0].getElementsByClassName('description')[0].innerHTML = entrys[l]
+					.getElementsByTagName('img')[0].alt;
 		}
 		// Deseleccionamos la entrada seleccionado hasta ahora
 		if (lastEntrySelected != undefined) {
-			form.entrys[lastEntrySelected].style.backgroundColor = 'inherit';
+			entrys[lastEntrySelected].classList.remove('menuItemSelected');
 		}
-		// Seleccionamos la indicado
-		form.entrys[l].style.backgroundColor = colorLevelSelected;
+		// Seleccionamos la indicada
+		entrys[l].classList.add('menuItemSelected');
 		lastEntrySelected = l;
 	}
 
@@ -614,47 +538,61 @@ function MenuController(cam, sce, entrys, mats) {
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onMenuRefreshClick(event) {
-		socket.getGames();
+		// Si no tenemos conexion con el servidor la creamos
+		if (socket == undefined) {
+			socket = new Socket();
+		}
+		socket.getGames(function(items) {
+			var table = menuEntrys[currentMenu][0].getElementsByTagName('tBody')[0];
+			// Quitamos los eventos de las entradas antiguas
+			for (var i = 0; i < table.children.length; i++) {
+				table.children[i].removeEventListener('click', onEntryClick, false);
+			}
+			// Mostramos las partidas actuales
+			mv.fillGameEntrys(items);
+			// Registramos los eventos para las partidas actuales
+			for (var i = 0; i < table.children.length; i++) {
+				table.children[i].addEventListener('click', onEntryClick, false);
+			}
+		});
 	}
-
-	/*******************************************************************************************************************
-	 * Métodos Públicos
-	 ******************************************************************************************************************/
 
 	/**
 	 * Método que elimina el controlador. Lo único que hace es eliminar los manejadores de eventos que tiene registrados
 	 */
-	this.remove = function() {
-		// Borramos receptores de eventos para el raton
-		document.getElementById('canvas').removeEventListener('click', onMenuClick, false);
-		document.getElementById('canvas').removeEventListener('mousemove', onMenuMouseMove, false);
-		// Si esta definido un formulario de configuracion de modo borramos los receptores del formulario
+	function remove() {
+		if (menuEntrys[currentMenu].dataType == "webgl") {
+			// Borramos receptores de eventos para el raton
+			document.getElementById('canvas').removeEventListener('click', onMenuClick, false);
+			document.getElementById('canvas').removeEventListener('mousemove', onMenuMouseMove, false);
+			// Quitamos el plano del picking de la escena
+			scene.remove(plane);
+			return;
+		}
+
 		var form = menuEntrys[currentMenu][0];
+		// Si esta definido un formulario de configuracion de modo borramos los receptores del formulario
 		if (form != undefined && form.getElementsByTagName != undefined) {
-			if (currentMenu != 11) {
+			if (menuEntrys[currentMenu].mode == "findServer") {
+				form.getElementsByTagName('form')[0].refresh.removeEventListener('click', onMenuRefreshClick, false);
+			} else {
 				form.getElementsByTagName('form')[0].library.removeEventListener('click', onMenuLibraryClick, false);
 			}
 			form.getElementsByTagName('form')[0].start.removeEventListener('click', onMenuStartClick, false);
-		}
-		// Si se trata del modo niveles borramos los receptores de eventos para la seleccion de nivel
-		if (currentMenu == 7 || currentMenu == 10 || currentMenu == 11) {
-			for (var i = 0; i < form.entrys.length; i++) {
-				form.entrys[i].removeEventListener('click', onEntryClick, false);
+			form.getElementsByTagName('form')[0].back.removeEventListener('click', onMenuBack, false);
+			// Si se trata del modo niveles borramos los receptores de eventos para la seleccion de nivel
+			if (menuEntrys[currentMenu].mode == "levels" || menuEntrys[currentMenu].mode == "multiplayer"
+					|| menuEntrys[currentMenu].mode == "findServer") {
+				var entrys = form.getElementsByClassName('menuItem');
+				for (var i = 0; i < entrys.length; i++) {
+					entrys[i].removeEventListener('click', onEntryClick, false);
+					entrys[i].classList.remove('menuItemSelected');
+				}
 			}
-			// Deseleccionamos la entrada seleccionado hasta ahora
-			if (lastEntrySelected != undefined && lastEntrySelected < form.entrys.length) {
-				form.entrys[lastEntrySelected].style.backgroundColor = 'inherit';
-			}
-		}
-		if (currentMenu == 11) {
-			form.getElementsByTagName('form')[0].refresh.removeEventListener('click', onMenuRefreshClick, false);
 		}
 
 		// Usamos el cursor por defecto
 		container.style.cursor = 'auto';
-
-		// Quitamos el plano del picking de la escena
-		scene.remove(plane);
 	}
 
 	/**
@@ -663,11 +601,13 @@ function MenuController(cam, sce, entrys, mats) {
 	 * @param Integer:menu
 	 *            submenu para el que se activa el controlador.
 	 */
-	this.enable = function(menu) {
+	function enable(menu) {
 		// Guardamos el nuevo tipo de vista
-		currentMenu = menu;
+		if (menu != undefined) {
+			currentMenu = menu;
+		}
 		// Si el menu seleccionado es de los que tienen entradas de menu
-		if (menu < 3) {
+		if (menuEntrys[currentMenu].dataType == "webgl") {
 			// Añadimos receptores de eventos para el raton
 			document.getElementById('canvas').addEventListener('click', onMenuClick, false);
 			document.getElementById('canvas').addEventListener('mousemove', onMenuMouseMove, false);
@@ -675,35 +615,88 @@ function MenuController(cam, sce, entrys, mats) {
 			scene.add(plane);
 		}
 		// Si es el menu de un modo de un jugador o el de crear partida multijugador
-		else if (menu >= 6 && menu <= 10) {
+		else if (menuEntrys[currentMenu].dataType == "html") {
 			// Obtenemos el formulario del menu actual
-			var form = menuEntrys[menu][0];
-			// Registramos el evento de la pulsacion del boton de la libreria
-			form.getElementsByTagName('form')[0].library.addEventListener('click', onMenuLibraryClick, false);
-			// Registramos el evento de la pulsacion del boton de empezar
-			form.getElementsByTagName('form')[0].start.addEventListener('click', onMenuStartClick, false);
+			var form = menuEntrys[currentMenu][0];
 			// Si es el menu del modo niveles
-			if (menu == 7 || menu == 10) {
+			if (menuEntrys[currentMenu].mode == "levels" || menuEntrys[currentMenu].mode == "multiplayer"
+					|| menuEntrys[currentMenu].mode == "findServer") {
 				// Indicamos que no habia una entrada seleccionada antes
 				lastEntrySelected = undefined;
 				// Seleccionamos la primera entrada
 				selectEntry(0);
+				var entrys = form.getElementsByClassName('menuItem');
 				// Registramos los eventos de seleccion de entradas para todos las entradas
-				for (var i = 0; i < form.entrys.length; i++) {
-					form.entrys[i].addEventListener('click', onEntryClick, false);
+				for (var i = 0; i < entrys.length; i++) {
+					entrys[i].addEventListener('click', onEntryClick, false);
 				}
 			}
-		}
-		// Si es el menu de un modo de un jugador o el de crear partida multijugador
-		else if (menu == 11) {
-			// Obtenemos el formulario del menu actual
-			var form = menuEntrys[menu][0];
-			// Registramos el evento de la pulsacion del boton de la refrescar las partidas
-			form.getElementsByTagName('form')[0].refresh.addEventListener('click', onMenuRefreshClick, false);
 			// Registramos el evento de la pulsacion del boton de empezar
 			form.getElementsByTagName('form')[0].start.addEventListener('click', onMenuStartClick, false);
+			// Registramos el evento de la pulsacion del boton de atras
+			form.getElementsByTagName('form')[0].back.addEventListener('click', onMenuBack, false);
+			// Si es el menu de un modo de un jugador o el de crear partida multijugador
+			if (menuEntrys[currentMenu].mode == "findServer") {
+				// Registramos el evento de la pulsacion del boton de la refrescar las partidas
+				form.getElementsByTagName('form')[0].refresh.addEventListener('click', onMenuRefreshClick, false);
+			} else {
+				// Registramos el evento de la pulsacion del boton de la libreria
+				form.getElementsByTagName('form')[0].library.addEventListener('click', onMenuLibraryClick, false);
+			}
 		}
 	}
+
+	function show(menu) {
+		// Desactivamos el controlador para el menu anterior
+		if (currentMenu) {
+			remove();
+		}
+		// Mostramos la vista
+		mv.showMenu(menu);
+		// Activamos el controlador
+		enable(menu);
+
+		// Si el menu seleccionado es el menu de opciones
+		if (menuEntrys[currentMenu].dataType == "options") {
+			// Mostramos el dialogo de opciones pasandole la funcion que se ejecutara al para mostrar la vista
+			// correspondiente
+			ov.show(onMenuBack);
+		}
+		// Si el menu seleccionado es el menu de puntuaciones
+		else if (menuEntrys[currentMenu].dataType == "scores") {
+			if (sv == undefined) {
+				sv = new ScoresView();
+				sv.showMode(0);
+			} else {
+				sv.show();
+			}
+		}
+		// Si el menu seleccionado es el menu de ayuda
+		else if (menuEntrys[currentMenu].dataType == "help") {
+			if (hv == undefined) {
+				hv = new HelpView();
+			} else {
+				hv.show();
+			}
+		}
+		// Si el menu seleccionado es el de buscar partida multijugador buscamos partidas
+		else if (menuEntrys[currentMenu].mode == "findServer") {
+			onMenuRefreshClick();
+		}
+	}
+
+	/*******************************************************************************************************************
+	 * Métodos Públicos
+	 ******************************************************************************************************************/
+
+	this.hide = function() {
+		// Desactivamos el controlador
+		remove();
+		// Ocultamos la vista
+		mv.hide();
+	}
+
+	this.show = show;
 
 	/**
 	 * Método para fijar los materiales con los que se creara el puzzle
@@ -713,25 +706,6 @@ function MenuController(cam, sce, entrys, mats) {
 	 */
 	this.setMaterials = function(mats) {
 		materials = mats;
-	}
-
-	/**
-	 * Método para actualizar los receptores de eventos de las partidas multijugador en el menu de buscar partidas
-	 * multijugador.
-	 */
-	this.updateGamesListeners = function() {
-
-		var form = menuEntrys[currentMenu][0];
-		// Indicamos que no habia una entrada seleccionada antes
-		lastEntrySelected = undefined;
-		// Si hay partidas
-		if (form.entrys.length != 0) {
-			selectEntry(0);
-		}
-		// Registramos los eventos de seleccion de entradas para todos las entradas
-		for (var i = 0; i < form.entrys.length; i++) {
-			form.entrys[i].addEventListener('click', onEntryClick, false);
-		}
 	}
 
 }

@@ -8,7 +8,6 @@
 body {
 	background-color: #f0f0f0;
 	margin: 0px;
-	overflow: hidden;
 }
 
 * {
@@ -61,4 +60,76 @@ body {
 	font-size: 12px;
 	font-weight: normal;
 	text-align: right;
+}
+
+/*****************************************
+ *  menus
+ *****************************************/
+.menu {
+	width: 70%;
+	margin: 50px 10%;
+	padding: 50px 5%;
+	background-color: #dddddd;
+	border-radius: 30px;
+	text-align: center;
+}
+
+.menu .buttonsMenu {
+	width: 100%;
+	clear: both;
+}
+
+.menu .buttonsMenu input {
+	margin-top: 50px;
+}
+
+.menu fieldset {
+	border-radius: 10px;
+	margin: 20px;
+	padding: 10px 20px;
+	display: inline;
+}
+
+.menu .menuContainer {
+	background-color: white;
+	height: 400px;
+	overflow: auto;
+	float: left;
+	width: 70%;
+}
+
+.menu .rightContainer {
+	width: 20%;
+	float: right;
+	text-align: right;
+}
+
+.menu .blockMenuItem {
+	width: 150px;
+	height: 150px;
+	border: 1px solid red;
+	float: left;
+	margin: 5px;
+}
+
+.menu .menuItem img {
+	height: 100px;
+}
+
+.menu .menuItemSelected {
+	background-color: #7777aa;
+}
+
+.menu table {
+	border: 1px solid black;
+	width: 100%;
+	margin: 0;
+}
+
+.menu th {
+	background-color: lightgrey;
+}
+
+.menu td {
+	border: 1px solid black;
 }

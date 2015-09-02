@@ -242,14 +242,18 @@ function Socket() {
 
 	/**
 	 * Método para pedir al servidor las partidas disponibles
+	 * 
+	 * @param callback:callback
+	 *            funcion de rellamada que se ejecutara cuando se reciban las partidas displonibles. A esta funcion se
+	 *            le pasara un array de objetos, uno por partida, que contendra el nombre, el tipo y el ID
 	 */
-	this.getGames = function() {
+	this.getGames = function(callback) {
 		// Le indicamos al servidor que deseamos obtener los juegos disponibles
 		socket.emit('onGetGames', {});
 		// Esperamos por la respuesta del servidor con los datos
 		socket.on("onSentGames", onSentGames = function(data) {
 			// Rellenamos el dialogo con las partidas obtenidas
-			mv.fillGameEntrys(data.games);
+			callback(data.games);
 			// Borramos la recepcion del evento para que no se reciba mas de una vez
 			socket.removeListener('onSentGames', onSentGames);
 		});
