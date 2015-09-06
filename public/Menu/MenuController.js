@@ -19,7 +19,7 @@
  *  */
 
 /*
- *  CLASE PUZZLECONTROLLER
+ *  CLASE MENUCONTROLLER
  *  */
 function MenuController() {
 
@@ -48,7 +48,10 @@ function MenuController() {
 	var lastEntrySelected;
 
 	// Vista del menu
-	var mv;
+	var view;
+
+	// Controlador de la ayuda
+	var helpCtl;
 
 	/*******************************************************************************************************************
 	 * Constructor
@@ -77,12 +80,12 @@ function MenuController() {
 		return false
 	};
 
-	// Obtenemos los datos para generar el mnenu
+	// Obtenemos los datos para generar el menu
 	ajaxRequest("data/Menu.json", function(menuResp) {
 		var menuData = JSON.parse(menuResp).data;
 
-		mv = new MenuView(menuData);
-		menuEntrys = mv.getEntrys();
+		view = new MenuView(menuData);
+		menuEntrys = view.getEntrys();
 		// Mostramos la vista del menu principal
 		show(0);
 	});
@@ -94,7 +97,7 @@ function MenuController() {
 	/**
 	 * Manejador del evento de click
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onMenuClick(event) {
@@ -120,7 +123,7 @@ function MenuController() {
 		if (intersects.length > 0) {
 			remove();
 			// Realizamos la animacion de explosion de la entrada seleccionada
-			mv.explode(intersects[0].object, function() {
+			view.explode(intersects[0].object, function() {
 				// Las entradas que no tengan indice se comportaran como boton de atras
 				if (intersects[0].object.menuIndex == -1) {
 					onMenuBack();
@@ -129,14 +132,14 @@ function MenuController() {
 				}
 			});
 		} else {
-			mv.changeAllEntrysColor();
+			view.changeAllEntrysColor();
 		}
 	}
 
 	/**
 	 * Manejador del evento del movimiento del ratón
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onMenuMouseMove(event) {
@@ -166,12 +169,12 @@ function MenuController() {
 			if (intersects[0].object != INTERSECTED) {
 				// Si hay algun objeto con el color cambiado
 				if (INTERSECTED) {
-					mv.restoreEntryColor(INTERSECTED);
+					view.restoreEntryColor(INTERSECTED);
 				}
 
 				INTERSECTED = intersects[0].object;
 				// Cambiamos el color de la figura
-				mv.changeEntryColor(INTERSECTED);
+				view.changeEntryColor(INTERSECTED);
 				sound.playMoved();
 			}
 		}
@@ -181,7 +184,7 @@ function MenuController() {
 			container.style.cursor = 'auto';
 			// Si hay algun objeto con el color cambiado
 			if (INTERSECTED) {
-				mv.restoreEntryColor(INTERSECTED);
+				view.restoreEntryColor(INTERSECTED);
 				INTERSECTED = null;
 			}
 		}
@@ -190,17 +193,13 @@ function MenuController() {
 	/**
 	 * Manejador del evento de pulsacion del boton anterior
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onMenuBack(event) {
 		// Si son las puntuaciones las ocultamos
 		if (menuEntrys[currentMenu].dataType == "scores") {
 			sv.hide();
-		}
-		// Si es la ayuda la ocultamos
-		if (menuEntrys[currentMenu].dataType == "help") {
-			hv.hide();
 		}
 		// Calculamos cual es el menu anterior
 		var add = 0;
@@ -222,7 +221,7 @@ function MenuController() {
 	/**
 	 * Manejador del evento de pulsacion del boton de biblioteca de imagenes
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onMenuLibraryClick(event) {
@@ -230,7 +229,7 @@ function MenuController() {
 		var libType;
 		// Si la cantidad de imagenes depende del numero de cubos, segun el modo de juego
 		if (menuEntrys[currentMenu].mode == "classic" || menuEntrys[currentMenu].mode == "trial") {
-			libType = mv.getSelectedNumberOfCubes();
+			libType = view.getSelectedNumberOfCubes();
 		}
 		// Si se trata del modo multijugador
 		else if (menuEntrys[currentMenu].mode == "multiplayer") {
@@ -244,7 +243,7 @@ function MenuController() {
 			libType = 1;
 		}
 		// Ocultamos la vista del menu
-		mv.hide();
+		view.hide();
 
 		// Si no esta creada la vista de la biblioteca la creamos
 		if (lv == undefined) {
@@ -258,7 +257,7 @@ function MenuController() {
 	/**
 	 * Manejador del evento de pulsacion del boton de empezar
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onMenuStartClick(event) {
@@ -274,7 +273,7 @@ function MenuController() {
 			var selectedMaterials = materials.length;
 			// Si la cantidad de imagenes depende del numero de cubos, segun el modo de juego
 			if (menuEntrys[currentMenu].mode == "classic" || menuEntrys[currentMenu].mode == "trial") {
-				imgsNeeded = 6 * mv.getSelectedNumberOfCubes();
+				imgsNeeded = 6 * view.getSelectedNumberOfCubes();
 			}
 			// Si se trata del modo multijugador
 			else if (currentMenu == 10) {
@@ -310,12 +309,12 @@ function MenuController() {
 		}
 
 		// Ocultamos los elementos del menu
-		mv.hide();
+		view.hide();
 		container.appendChild(renderer.domElement);
 
 		// Si se trata del modo clasico
 		if (menuEntrys[currentMenu].mode == "classic") {
-			cmv = new ClassicModeView(scene, mv.getSelectedNumberOfCubes(), materials);
+			cmv = new ClassicModeView(scene, view.getSelectedNumberOfCubes(), materials);
 		}
 
 		// Si se trata del modo niveles
@@ -332,7 +331,7 @@ function MenuController() {
 					difficulty = i;
 				}
 			}
-			tmv = new TrialModeView(scene, mv.getSelectedNumberOfCubes(), difficulty, materials);
+			tmv = new TrialModeView(scene, view.getSelectedNumberOfCubes(), difficulty, materials);
 		}
 
 		// Si se trata del modo supervivencia
@@ -344,7 +343,7 @@ function MenuController() {
 					difficulty = i;
 				}
 			}
-			smv = new SurvivalModeView(scene, mv.getSelectedNumberOfCubes(), difficulty, materials);
+			smv = new SurvivalModeView(scene, view.getSelectedNumberOfCubes(), difficulty, materials);
 		}
 
 		// Si se trata de crear una partida multijugador
@@ -358,8 +357,8 @@ function MenuController() {
 			var type = lastEntrySelected;
 
 			// Mostramos un dialogo mientras se espera a que se codifiquen las imagenes para enviarlas al servidor
-			mv.showWaitingDialog("CARGANDO ...", function() {
-				mv.showMenu(currentMenu);
+			view.showWaitingDialog("CARGANDO ...", function() {
+				view.showMenu(currentMenu);
 				socket.finishedGame();
 			});
 
@@ -380,11 +379,11 @@ function MenuController() {
 				// empieze esta (se conecte alguien), la accion si se desconecta el otro jugador, y la accion para
 				// cuando se cree la partida
 				socket.createdGame(name, type, images, iniPos, iniRot, function() {
-					mv.hideWaitingDialog();
+					view.hideWaitingDialog();
 
 					// Mostramos un dialogo mientras se espera a que se el otro jugador este listo
-					mv.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
-						mv.showMenu(currentMenu);
+					view.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
+						view.showMenu(currentMenu);
 						socket.finishedGame();
 					});
 
@@ -392,7 +391,7 @@ function MenuController() {
 					// cuando todos los jugadores de la partida esten listos
 					socket.readyToPlay(function() {
 						// Ocultamos el dialogo de espera de carga
-						mv.hideWaitingDialog();
+						view.hideWaitingDialog();
 						// Mostramos la vista del modo multijugador
 						mmv.show();
 					});
@@ -400,15 +399,15 @@ function MenuController() {
 					alert("El otro jugador ha abandonado la partida. Se finalizara la partida.");
 					// Ocultamos la vista de la partida
 					mmv.hide();
-					mv.hideWaitingDialog();
+					view.hideWaitingDialog();
 					// Mostramos el menu del modo multijugador
-					mv.showMenu(currentMenu);
+					show(currentMenu);
 				}, function() {
 					// Ocultamos el dialogo de espera de carga
-					mv.hideWaitingDialog();
+					view.hideWaitingDialog();
 					// Mostramos un dialogo mientras se espera a otro jugador
-					mv.showWaitingDialog("ESPERANDO A OTRO JUGADOR", function() {
-						mv.showMenu(currentMenu);
+					view.showWaitingDialog("ESPERANDO A OTRO JUGADOR", function() {
+						show(currentMenu);
 						socket.finishedGame();
 					});
 				});
@@ -424,8 +423,8 @@ function MenuController() {
 			// Obtenemos el ID del juego seleccionado
 			var gameID = menuEntrys[currentMenu][0].getElementsByTagName('tBody')[0].children[lastEntrySelected].ID;
 			// Mostramos un dialogo mientras se espera a que se codifiquen las imagenes para enviarlas al servidor
-			mv.showWaitingDialog("CARGANDO ...", function() {
-				mv.showMenu(currentMenu);
+			view.showWaitingDialog("CARGANDO ...", function() {
+				view.showMenu(currentMenu);
 				socket.finishedGame();
 			});
 			// Definimos la accion de conexion
@@ -447,11 +446,11 @@ function MenuController() {
 					mmv = new MultiplayerModeView(scene, type, materials, iniPos, iniRot);
 
 					// Ocultamos el dialogo de espera de carga
-					mv.hideWaitingDialog();
+					view.hideWaitingDialog();
 
 					// Mostramos un dialogo mientras se espera a que se el otro jugador este listo
-					mv.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
-						mv.showMenu(currentMenu);
+					view.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
+						view.showMenu(currentMenu);
 						socket.finishedGame();
 					});
 
@@ -459,7 +458,7 @@ function MenuController() {
 					// que se ejecutará cuando todos los jugadores de la partida esten listos
 					socket.readyToPlay(function() {
 						// Ocultamos el dialogo de espera de carga
-						mv.hideWaitingDialog();
+						view.hideWaitingDialog();
 						// Mostramos la vista del modo multijugador
 						mmv.show();
 					});
@@ -467,15 +466,15 @@ function MenuController() {
 			};
 			var wrongAction = function() {
 				alert("La partida que ha seleccionado no esta disponible. Intentelo de nuevo o conectese a otra partida.");
-				mv.showMenu(currentMenu);
+				show(currentMenu);
 			};
 			var discAction = function() {
 				alert("El otro jugador ha abandonado la partida. Se finalizara la partida.");
 				// Ocultamos la vista de la partida
 				mmv.hide();
-				mv.hideWaitingDialog();
+				view.hideWaitingDialog();
 				// Mostramos el menu del modo multijugador
-				mv.showMenu(currentMenu);
+				show(currentMenu);
 			};
 
 			// Nos unimos a la partida con el ID obtenido y indicamos la accion que se realizara cuando se conecte a
@@ -488,7 +487,7 @@ function MenuController() {
 	/**
 	 * Manejador del evento de pulsacion de una entrada: nivel, tipo de partida o partida multijugador
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onEntryClick(event) {
@@ -504,7 +503,7 @@ function MenuController() {
 	/**
 	 * Método que realizará las acciones necesarias para seleccionar la entrada indicada
 	 * 
-	 * @param Integer:l->
+	 * @param Integer:l
 	 *            índice del nivel a seleccionar.
 	 */
 	function selectEntry(l) {
@@ -534,7 +533,7 @@ function MenuController() {
 	/**
 	 * Manejador del evento de pulsacion del boton de actualizar partidas multijugador
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onMenuRefreshClick(event) {
@@ -549,7 +548,7 @@ function MenuController() {
 				table.children[i].removeEventListener('click', onEntryClick, false);
 			}
 			// Mostramos las partidas actuales
-			mv.fillGameEntrys(items);
+			view.fillGameEntrys(items);
 			// Registramos los eventos para las partidas actuales
 			for (var i = 0; i < table.children.length; i++) {
 				table.children[i].addEventListener('click', onEntryClick, false);
@@ -652,7 +651,7 @@ function MenuController() {
 			remove();
 		}
 		// Mostramos la vista
-		mv.showMenu(menu);
+		view.showMenu(menu);
 		// Activamos el controlador
 		enable(menu);
 
@@ -673,10 +672,10 @@ function MenuController() {
 		}
 		// Si el menu seleccionado es el menu de ayuda
 		else if (menuEntrys[currentMenu].dataType == "help") {
-			if (hv == undefined) {
-				hv = new HelpView();
+			if (helpCtl == undefined) {
+				helpCtl = new HelpController(onMenuBack);
 			} else {
-				hv.show();
+				helpCtl.show();
 			}
 		}
 		// Si el menu seleccionado es el de buscar partida multijugador buscamos partidas
@@ -693,7 +692,7 @@ function MenuController() {
 		// Desactivamos el controlador
 		remove();
 		// Ocultamos la vista
-		mv.hide();
+		view.hide();
 	}
 
 	this.show = show;

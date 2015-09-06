@@ -393,9 +393,12 @@ function MenuView(menuData) {
 	 * Método para eliminar de la interfaz todos los elementos de la vista, ocultarlos
 	 */
 	this.hide = function() {
+		if (renderer.domElement.parentNode == container) {
+			container.removeChild(renderer.domElement);
+		}
+
 		// Si el menu a ocultar es de los que tienen entradas de menu
 		if (entrys[currentMenu].dataType == "webgl") {
-			container.removeChild(renderer.domElement);
 			// Eliminamos de la escena todas las entradas del menu actual
 			for (var i = 0; i < entrys[currentMenu].length; i++) {
 				scene.remove(entrys[currentMenu][i]);
@@ -424,7 +427,7 @@ function MenuView(menuData) {
 		if (menuIndex != undefined) {
 			currentMenu = menuIndex;
 		}
-		
+
 		// Si el menu seleccionado es de los que tienen entradas de menu
 		if (entrys[currentMenu].dataType == "webgl") {
 			container.appendChild(renderer.domElement);

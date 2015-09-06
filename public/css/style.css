@@ -2,6 +2,10 @@
 	cursor: pointer;
 }
 
+.hide {
+	display: none;
+}
+
 /*****************************************
  *  estilos globales
  *****************************************/
@@ -104,6 +108,12 @@ body {
 	text-align: right;
 }
 
+.menu .rightContainer * {
+	float: right;
+	clear: both;
+	margin: 5px;
+}
+
 .menu .blockMenuItem {
 	width: 150px;
 	height: 150px;
@@ -120,16 +130,20 @@ body {
 	background-color: #7777aa;
 }
 
-.menu table {
+.menu .list table {
 	border: 1px solid black;
 	width: 100%;
 	margin: 0;
 }
 
-.menu th {
+.menu .list th {
 	background-color: lightgrey;
 }
 
-.menu td {
+.menu .list td {
 	border: 1px solid black;
+}
+
+.menu .controls img {
+	height: 80px;
 }

@@ -11,11 +11,11 @@
 	{"type":"webgl",	"txt":"niveles",			"data":250},
 	{"type":"webgl",	"txt":"contrareloj",		"data":-20},
 	{"type":"webgl",	"txt":"supervivencia",		"data":-310},
-	{"type":"webgl",	"txt":"< atras",					"data":-600, "mode":"back"}],
+	{"type":"webgl",	"txt":"< atras",			"data":-600, "mode":"back"}],
 	
 	[{"type":"webgl",	"txt":"crear partida",		"data":250},
 	{"type":"webgl",	"txt":"buscar partida",		"data":-20},
-	{"type":"webgl",	"txt":"< atras",					"data":-290, "mode":"back"}],
+	{"type":"webgl",	"txt":"< atras",			"data":-290, "mode":"back"}],
 	
 	[{"type":"options"}],
 	[{"type":"scores"}],

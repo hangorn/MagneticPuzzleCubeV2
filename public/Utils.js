@@ -234,9 +234,9 @@ function spanishDate(d) {
  * Función para realizar una peticion GET asincrona AJAX. Se le debe proporcionar tanto la URL donde realizar la
  * peticion, como una función de rellamada con un parametro que se ejecutara cuando se reciba la respuesta
  * 
- * @param url
+ * @param String:url
  *            URL donde realizar la peticion
- * @param callback
+ * @param Callback:callback
  *            función de rellamada que se ejecutara cuando se reciba la respuesta, recibe como un parametro el texto de
  *            la respuesta
  */
@@ -257,12 +257,15 @@ function ajaxRequest(url, callback) {
  * asincrona AJAX para obtener el codigo del hijo y añadirlo en un contenedor (DIV) al elemento indicado. No se borra el
  * contenido del elemento, simplemente se añade un "div" al final.
  * 
- * @param url
+ * @param String:url
  *            URL donde realizar la peticion
- * @param domElement
+ * @param DOMobject:domElement
  *            elemento al que se le añadira el elemento
+ * @param Callback:callback
+ *            función de rellamada opcional que se ejecutara cuando se cargue el componente
+ * 
  */
-function addDynamicComponent(url, domElement) {
+function addDynamicComponent(url, domElement, callback) {
 	// Si no es un elemento DOM, salimos
 	if (!domElement.appendChild) {
 		return;
@@ -271,5 +274,8 @@ function addDynamicComponent(url, domElement) {
 		var div = document.createElement('div');
 		div.innerHTML = resp;
 		domElement.appendChild(div);
+		if (callback) {
+			callback();
+		}
 	});
 }

@@ -25,8 +25,8 @@ exports.getMenu = function(req, res) {
 	} else if (req.url.indexOf("createServerForm") != -1) {
 		data.levelsData = require("../public/data/MultiplayerLevels.json").data;
 	}
-	// Si es la vista de buscar partidas multijugador, no podemos usar la plantilla comun
-	if (req.url.indexOf("findServerForm") != -1) {
+	// Si es la vista de buscar partidas multijugador o la de ayuda, no podemos usar la plantilla comun
+	if (req.url.indexOf("findServerForm") != -1 || req.url.indexOf("helpForm") != -1) {
 		template = req.url.replace(".html", ".ejs").replace("/menu", "menu");
 	}
 	res.render(template, data);
