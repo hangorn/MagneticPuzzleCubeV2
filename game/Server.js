@@ -321,28 +321,6 @@ Server = function() {
 	}
 
 	/**
-	 * Método para enviar al cliente la información de las puntuaciones del modo solicitado.
-	 * 
-	 * @param Client:client
-	 *            objeto de la clase cliente con los datos del cliente que quiere recibir las puntuaciones.
-	 * @param Integer:mode
-	 *            modo del que se quieren obtener las puntuaciones.
-	 * @param Integer:submode
-	 *            submodo del que se quieren obtener las puntuaciones.
-	 */
-	this.sendScores = function(client, mode, submode) {
-		// Si no tenemos un DAO lo inicamos
-		dao = dao || require('../dal/DataAccessObject.js');
-		// Obtenemos las puntuaciones solicitadas
-		dao.getScores(mode, submode, function(scores) {
-			// Enviamos la respuesta con los datos al cliente
-			client.socket.emit("onSentScores", {
-				scores : scores
-			});
-		});
-	}
-
-	/**
 	 * Método para guardar una puntuación. Entradas:
 	 * 
 	 * @param Client:client

@@ -33,8 +33,8 @@ function HelpController(backAction) {
 	/**
 	 * Constructor de la clase HelpController. Cuando este cargado mostrara la vista de la ayuda
 	 * 
-	 * @param callback:backAction
-	 *            accion que se ejecutara al pulsa el boton de atras
+	 * @param Callback:backAction
+	 *            accion que se ejecutara al pulsar el boton de atras
 	 */
 
 	// Creamos un contenedor
@@ -130,7 +130,7 @@ function HelpController(backAction) {
 			buttons[i].index = i;
 			buttons[i].addEventListener('click', onMenuClick, false);
 		}
-		// Desactivamos el evento del boton de atras
+		// Activamos el evento del boton de atras
 		view.getElementsByTagName('form')[0].back.addEventListener('click', onMenuBack, false);
 	}
 

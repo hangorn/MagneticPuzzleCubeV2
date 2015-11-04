@@ -212,14 +212,9 @@ function TrialModeView(sce, numC, diff, mats) {
 			text += hour + " horas, ";
 		}
 		text += min + " minutos y " + sec + " segundos";
-		// Si no tenemos creada una vista para las puntuaciones la creamos
-		if (sv == undefined) {
-			sv = new ScoresView();
-			sv.hide();
-		}
 		// Mostramos el dialogo para guardar la puntuacion
 		var submode = difficulty * 2 + (3 - numberOfCubes);
-		sv.saveScoreDialog(text, time, 2, submode);
+		ScoresController.saveScoreDialog(text, time, 2, submode);
 	}
 
 	/**

@@ -300,13 +300,8 @@ function LevelsModeView(sce, l, mats) {
 			finishedDialog.style.display = 'block';
 		}
 		var text = "Enhorabuena!!! Puzzle solucionado ! en " + timeString;
-		// Si no tenemos creada una vista para las puntuaciones la creamos
-		if (sv == undefined) {
-			sv = new ScoresView();
-			sv.hide();
-		}
 		// Mostramos el dialogo para guardar la puntuacion
-		sv.saveScoreDialog(text, time, 1, level);
+		ScoresController.saveScoreDialog(text, time, 1, level);
 	}
 
 	/**

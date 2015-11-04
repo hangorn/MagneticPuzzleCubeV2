@@ -454,31 +454,6 @@ function Socket() {
 	}
 
 	/**
-	 * Método para pedir al servidor las puntuaciones disponibles de los modos indicados.
-	 * 
-	 * @param Integer:mode
-	 *            modo del que se quieren obtener las puntuaciones.
-	 * @param Integer:submode
-	 *            submodo del que se quieren obtener las puntuaciones.
-	 * @param Callback:callback
-	 *            funcion de rellamada que se ejecutará cuando se reciban las puntuaciones.
-	 */
-	this.getScores = function(mode, submode, callback) {
-		// Le indicamos al servidor que deseamos obtener las puntuaciones disponibles
-		socket.emit('onGetScores', {
-			mode : mode,
-			submode : submode
-		});
-		// Esperamos por la respuesta del servidor con los datos
-		socket.on("onSentScores", onSentScores[onSentScores.push(function(data) {
-			// Ejecutamos la funcion de rellamada pasandole las puntuaciones
-			callback(data.scores);
-			// Borramos la recepcion del evento para que no se reciba mas de una vez
-			removeHandlers('onSentScores', onSentScores);
-		}) - 1]);
-	}
-
-	/**
 	 * Método para pedir al servidor que guarde la puntuacion suministrada con los datos suministrados.
 	 * 
 	 * @param String:name

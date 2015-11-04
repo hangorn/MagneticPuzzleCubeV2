@@ -82,13 +82,6 @@ exports.onConnect =  function(socket) {
 		}
 	});
 
-	// TODO hacer esto con AJAX
-	// Registramos el evento de enviar todos las puntuaciones del modo
-	// solicitado al cliente
-	socket.on('onGetScores', function(data) {
-		server.sendScores(client, data.mode, data.submode);
-	});
-
 	// Registramos el evento guardar una puntuacion
 	socket.on('onSaveScore', function(data) {
 		server.saveScore(client, data);

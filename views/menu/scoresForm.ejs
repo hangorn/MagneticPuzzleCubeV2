@@ -1,0 +1,67 @@
+<div class="menu">
+	<form>
+		<h1>Puntuaciones</h1>
+		<div class="modesContainer tabContainer">
+			<div class="clickable tab">Clasico</div>
+			<div class="clickable tab">Niveles</div>
+			<div class="clickable tab">Contrareloj</div>
+			<div class="clickable tab">Supervivencia</div>
+			<div class="clickable tab">Multijugador</div>
+		</div>
+		<div class="submodesContainer tabContainer">
+			<div class="hide">
+				<div class="clickable tab">27 Cubos</div>
+				<div class="clickable tab">8 Cubos</div>
+			</div>
+			<div class="hide">
+				<% for (var i = 1; i <= 16; i++) { %>
+				<div class="clickable tab">Nivel <%=i%></div>
+				<% } %>
+			</div>
+			<div class="hide">
+				<div class="clickable tab">Facil 27 Cubos</div>
+				<div class="clickable tab">Facil 8 Cubos</div>
+				<div class="clickable tab">Medio 27 Cubos</div>
+				<div class="clickable tab">Medio 8 Cubos</div>
+				<div class="clickable tab">Dificil 27 Cubos</div>
+				<div class="clickable tab">Dificil 8 Cubos</div>
+				<div class="clickable tab">Imposible 27 Cubos</div>
+				<div class="clickable tab">Imposible 8 Cubos</div>
+			</div>
+			<div class="hide">
+				<div class="clickable tab">Facil 27 Cubos</div>
+				<div class="clickable tab">Facil 8 Cubos</div>
+				<div class="clickable tab">Medio 27 Cubos</div>
+				<div class="clickable tab">Medio 8 Cubos</div>
+				<div class="clickable tab">Dificil 27 Cubos</div>
+				<div class="clickable tab">Dificil 8 Cubos</div>
+				<div class="clickable tab">Imposible 27 Cubos</div>
+				<div class="clickable tab">Imposible 8 Cubos</div>
+			</div>
+			<div class="hide">
+				<div class="clickable tab">Cooperativo 8 Cubos</div>
+				<div class="clickable tab">Cooperativo 27 Cubos</div>
+				<div class="clickable tab">Contrareloj 8 Cubos</div>
+				<div class="clickable tab">Contrareloj 27 Cubos</div>
+			</div>
+		</div>
+
+		<div class="menuContainer list">
+			<table>
+				<thead>
+					<tr>
+						<th>Nombre</th>
+						<th>Puntuacion</th>
+						<th>Fecha</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<img class="hide" alt="Cargando" src="img/loading.gif">
+		</div>
+		<div class="buttonsMenu">
+			<input type="button" name="back" value="atras">
+		</div>
+	</form>
+</div>

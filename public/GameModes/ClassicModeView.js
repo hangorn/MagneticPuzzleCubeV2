@@ -196,13 +196,8 @@ function ClassicModeView(sce, numC, mats) {
 			text += hour + " horas, ";
 		}
 		text += min + " minutos y " + sec + " segundos";
-		// Si no tenemos creada una vista para las puntuaciones la creamos
-		if (sv == undefined) {
-			sv = new ScoresView();
-			sv.hide();
-		}
 		// Mostramos el dialogo para guardar la puntuacion
-		sv.saveScoreDialog(text, time, 0, 3 - numberOfCubes);
+		ScoresController.saveScoreDialog(text, time, 0, 3 - numberOfCubes);
 	}
 
 	/*******************************************************************************************************************

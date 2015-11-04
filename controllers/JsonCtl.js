@@ -47,3 +47,24 @@ exports.getJson = function(req, res) {
 function __(str) {
 	return str.toUpperCase(str);
 }
+
+/**
+ * Método para enviar al cliente la información de las puntuaciones del modo solicitado. Se han de recibir dos
+ * parametros indicando el modo y el submodo.
+ */
+exports.getScores = function(req, res) {
+	// Obtenemos los parametros de la consulta
+	var mode = req.query.mode;
+	var submode = req.query.submode;
+	// Si no se reciben los parametros, no devolvemos puntuaciones
+	if(!mode || !submode) {
+		res.json({});
+	}
+	// inicamos el DAO 
+	var dao = require('../dal/DataAccessObject.js');
+	// Obtenemos las puntuaciones solicitadas
+	dao.getScores(mode, submode, function(scores) {
+		// Enviamos la respuesta con los datos al cliente
+		res.json(scores);
+	});
+}

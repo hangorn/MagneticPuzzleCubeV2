@@ -202,13 +202,8 @@ function MultiplayerModeView(sce, ty, mats, iniPos, iniRot) {
 				text += min + " minutos y " + sec + " segundos";
 			}
 		}
-		// Si no tenemos creada una vista para las puntuaciones la creamos
-		if (sv == undefined) {
-			sv = new ScoresView();
-			sv.hide();
-		}
 		// Mostramos el dialogo para guardar la puntuacion
-		sv.saveScoreDialog(text, time, 4, type);
+		ScoresController.saveScoreDialog(text, time, 4, type);
 	}
 
 	/**

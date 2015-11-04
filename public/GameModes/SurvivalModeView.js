@@ -278,14 +278,9 @@ function SurvivalModeView(sce, numC, diff, mats) {
 		var text = "";
 		text += str;
 		text += " Has conseguido solucionar " + solvedPuzzles + " puzzles. Enhorabuena!!!";
-		// Si no tenemos creada una vista para las puntuaciones la creamos
-		if (sv == undefined) {
-			sv = new ScoresView();
-			sv.hide();
-		}
 		// Mostramos el dialogo para guardar la puntuacion
 		var submode = difficulty * 2 + (3 - numberOfCubes);
-		sv.saveScoreDialog(text, solvedPuzzles, 3, submode);
+		ScoresController.saveScoreDialog(text, solvedPuzzles, 3, submode);
 	}
 
 	/*******************************************************************************************************************

@@ -25,6 +25,7 @@ var menuCtl = require('./controllers/MenuCtl');
 
 // JSON con los datos de los niveles
 router.get('/data/Levels.json', jsonCtl.getJson);
+router.get('/data/Scores.json', jsonCtl.getScores);
 router.get('/menu/*.html', menuCtl.getMenu);
 
 module.exports = router;

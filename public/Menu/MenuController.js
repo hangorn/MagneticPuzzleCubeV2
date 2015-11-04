@@ -52,6 +52,8 @@ function MenuController() {
 
 	// Controlador de la ayuda
 	var helpCtl;
+	// Controlador de las puntuaciones
+	var scoresCtl;
 
 	/*******************************************************************************************************************
 	 * Constructor
@@ -197,10 +199,6 @@ function MenuController() {
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onMenuBack(event) {
-		// Si son las puntuaciones las ocultamos
-		if (menuEntrys[currentMenu].dataType == "scores") {
-			sv.hide();
-		}
 		// Calculamos cual es el menu anterior
 		var add = 0;
 		// Recorremos todos los menus
@@ -663,11 +661,10 @@ function MenuController() {
 		}
 		// Si el menu seleccionado es el menu de puntuaciones
 		else if (menuEntrys[currentMenu].dataType == "scores") {
-			if (sv == undefined) {
-				sv = new ScoresView();
-				sv.showMode(0);
+			if (scoresCtl == undefined) {
+				scoresCtl = new ScoresController(onMenuBack);
 			} else {
-				sv.show();
+				scoresCtl.show();
 			}
 		}
 		// Si el menu seleccionado es el menu de ayuda
