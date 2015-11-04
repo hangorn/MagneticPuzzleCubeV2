@@ -58,7 +58,7 @@ body {
 }
 
 #credits {
-	position: absolute;
+	position: fixed;
 	bottom: 0px;
 	right: 0px;
 	font-size: 12px;
