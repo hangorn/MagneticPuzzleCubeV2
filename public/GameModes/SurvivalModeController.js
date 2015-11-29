@@ -98,7 +98,7 @@ function SurvivalModeController(cont, numC, diff, allMats, mats, cl) {
 	function onShowSolutionsClick(event) {
 		window.mats = materials;
 		window.numC = numberOfCubes;
-		window.sensitivity = ov.getOptions().getSensitivity();
+		window.sensitivity = getOptions().sensitivity;
 		solWin = window.open("Solutions/solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
 				+ ",left=" + (window.screen.availWidth - 300));
 	}
@@ -185,15 +185,9 @@ function SurvivalModeController(cont, numC, diff, allMats, mats, cl) {
 		// Eliminamos de la vista el actual modo de juego
 		smv.hide();
 		// Mostramos el dialogo de opciones, indicandole la accion que tendra que hacer cuando se oculten las opciones
-		ov.show(function() {
+		OptionsController.show(function() {
 			// Mostramos la vista del modo supervivencia
-			smv.show()
-			// Actualizamos la opcion de ayuda con sonidos segun corresponda
-			if (ov.getOptions().getAudioHelp()) {
-				sound.enableHelpSound();
-			} else {
-				sound.disableHelpSound();
-			}
+			smv.show();
 		});
 	}
 

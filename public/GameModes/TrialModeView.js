@@ -180,13 +180,6 @@ function TrialModeView(sce, numC, diff, mats) {
 
 	document.body.appendChild(formCont);
 
-	// Guardamos la opcion de ayuda con sonidos segun corresponda
-	if (ov.getOptions().getAudioHelp()) {
-		sound.enableHelpSound();
-	} else {
-		sound.disableHelpSound();
-	}
-
 	triC = new TrialModeController(formCont, numberOfCubes, difficulty, materials, cl);
 
 	/*******************************************************************************************************************
@@ -240,6 +233,7 @@ function TrialModeView(sce, numC, diff, mats) {
 		if (!finished) {
 			cl.start();
 		}
+		container.appendChild(renderer.domElement);
 		// Mostramos el puzzle
 		pv.show();
 		// Mostramos la interfaz del modo contrareloj
@@ -264,6 +258,9 @@ function TrialModeView(sce, numC, diff, mats) {
 		document.body.removeChild(formCont);
 		// Deshabilitamos el controlador asociado
 		triC.remove();
+		if (renderer.domElement.parentNode == container) {
+			container.removeChild(renderer.domElement);
+		}
 	}
 
 	/**

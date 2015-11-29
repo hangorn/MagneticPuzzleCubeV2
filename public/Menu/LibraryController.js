@@ -103,7 +103,7 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	parentCtl = ctl;
 
 	// Sensibilidad por defecto
-	sensitivity = ov.getOptions().getSensitivity() / 100;
+	sensitivity = getOptions().sensitivity / 100;
 
 	// Guardamos los planos de la primera pagina
 	currentPage = 0;
@@ -682,7 +682,7 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 		typeView = type;
 
 		// Guardamos la sensibilidad actual
-		sensitivity = ov.getOptions().getSensitivity() / 100;
+		sensitivity = getOptions().sensitivity / 100;
 
 		// Colocamos como pagina actual la primera
 		currentPage = 0;

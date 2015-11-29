@@ -84,7 +84,7 @@ function LevelsModeController(cont, l, mats, cl) {
 	function onShowSolutionsClick(event) {
 		window.mats = materials;
 		window.numC = Math.floor(materials.length / 6);
-		window.sensitivity = ov.getOptions().getSensitivity();
+		window.sensitivity = getOptions().sensitivity;
 		solWin = window.open("Solutions/solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
 				+ ",left=" + (window.screen.availWidth - 300));
 	}
@@ -152,15 +152,9 @@ function LevelsModeController(cont, l, mats, cl) {
 		// Eliminamos de la vista el actual modo de juego
 		lmv.hide();
 		// Mostramos el dialogo de opciones, indicandole la accion que tendra que hacer cuando se oculten las opciones
-		ov.show(function() {
+		OptionsController.show(function() {
 			// Mostramos la vista del modo supervivencia
-			lmv.show()
-			// Actualizamos la opcion de ayuda con sonidos segun corresponda
-			if (ov.getOptions().getAudioHelp()) {
-				sound.enableHelpSound();
-			} else {
-				sound.disableHelpSound();
-			}
+			lmv.show();
 		});
 	}
 

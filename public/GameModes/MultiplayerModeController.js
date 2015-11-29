@@ -92,15 +92,9 @@ function MultiplayerModeController(cont, numC, mats, cl, ty) {
 		// Eliminamos de la vista el actual modo de juego
 		mmv.hide();
 		// Mostramos el dialogo de opciones
-		ov.show(function() {
+		OptionsController.show(function() {
 			// Mostramos la vista del modo clasico
-			mmv.show()
-			// Actualizamos la opcion de ayuda con sonidos segun corresponda
-			if (ov.getOptions().getAudioHelp()) {
-				sound.enableHelpSound();
-			} else {
-				sound.disableHelpSound();
-			}
+			mmv.show();
 		});
 	}
 

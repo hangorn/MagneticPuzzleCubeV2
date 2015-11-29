@@ -27,9 +27,7 @@ function Sound() {
 	 ******************************************************************************************************************/
 
 	// Flag para saber si el sonido esta activado
-	var enabled = true;
-	// Flag para saber si esta activado el sonido de ayuda al colocar una pieza
-	var helpSoundEnabled = false;
+	var enabled = localStorage.magPuzCubSound === "false" ? false : true;
 	// Canales para sonido
 	var numChannels = 5;
 	var channels = [];
@@ -158,6 +156,7 @@ function Sound() {
 			notSoundIcon.style.display = 'none';
 		}
 		enabled = !enabled;
+		localStorage.magPuzCubSound = enabled;
 	}
 
 	/**
@@ -173,7 +172,10 @@ function Sound() {
 	}
 
 	/**
-	 * Método para reproducir el sonido indicado Audio:sound objeto de la clase audio que será reproducido
+	 * Método para reproducir el sonido indicado
+	 * 
+	 * @param Audio:sound
+	 *            objeto de la clase audio que será reproducido
 	 */
 	function playSound(sound) {
 		// Si no esta activado el sonido no reproducimos nada
@@ -182,27 +184,23 @@ function Sound() {
 		}
 
 		// Buscamos un canal libre
-		for (i = 0; i < channels.length; i++) {
-			thistime = new Date();
-			if (channels[i].finished < thistime.getTime()) {
-				// Guardamos la duracion del audio
-				channels[i].finished = thistime.getTime() + sound.duration * 1000;
-				// Guardamos el sonido en el canal
-				channels[i].channel = sound.cloneNode(true);
-				// Reproducimos el canal
-				channels[i].channel.play();
-				return;
+		var now = new Date().getTime();
+		for (var i = 0; i < channels.length; i++) {
+			if (channels[i].finished < now) {
+				break;
 			}
 		}
 		// Si llegamos hasta aqui es que no hay canales libres
-		// Añadimos un canal
-		addChannel();
+		if (i == channels.length) {
+			// Añadimos un canal
+			addChannel();
+		}
 		// Guardamos la duracion del audio
-		channels[channels.length - 1].finished = thistime.getTime() + sound.duration * 1000;
+		channels[i].finished = now + sound.duration * 1000;
 		// Guardamos el sonido en el canal
-		channels[channels.length - 1].channel = sound.cloneNode(true);
+		channels[i].channel = sound.cloneNode(true);
 		// Reproducimos el canal
-		channels[channels.length - 1].channel.play();
+		channels[i].channel.play();
 	}
 
 	/*******************************************************************************************************************
@@ -214,7 +212,7 @@ function Sound() {
 	 */
 	this.playRigthPlaced = function() {
 		playSound(placedSound);
-		if (helpSoundEnabled) {
+		if (getOptions().audioHelp) {
 			playSound(rightSound);
 		}
 	}
@@ -224,7 +222,7 @@ function Sound() {
 	 */
 	this.playWrongPlaced = function() {
 		playSound(placedSound);
-		if (helpSoundEnabled) {
+		if (getOptions().audioHelp) {
 			playSound(wrongSound);
 		}
 	}
@@ -248,20 +246,6 @@ function Sound() {
 	 */
 	this.playExplosion = function() {
 		playSound(explosionSound);
-	}
-
-	/**
-	 * Método para activar el sonido de ayuda al colocar piezas
-	 */
-	this.enableHelpSound = function() {
-		helpSoundEnabled = true;
-	}
-
-	/**
-	 * Método para desactivar el sonido de ayuda al colocar piezas
-	 */
-	this.disableHelpSound = function() {
-		helpSoundEnabled = false;
 	}
 
 }

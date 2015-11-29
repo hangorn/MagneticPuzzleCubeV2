@@ -164,13 +164,6 @@ function ClassicModeView(sce, numC, mats) {
 
 	document.body.appendChild(formCont);
 
-	// Guardamos la opcion de ayuda con sonidos segun corresponda
-	if (ov.getOptions().getAudioHelp()) {
-		sound.enableHelpSound();
-	} else {
-		sound.disableHelpSound();
-	}
-
 	claC = new ClassicModeController(formCont, numberOfCubes, mats, cl);
 
 	/*******************************************************************************************************************
@@ -212,6 +205,7 @@ function ClassicModeView(sce, numC, mats) {
 		if (!finished) {
 			cl.start();
 		}
+		container.appendChild(renderer.domElement);
 		// Mostramos el puzzle
 		pv.show();
 		// Mostramos la interfaz del modo clasico
@@ -236,6 +230,9 @@ function ClassicModeView(sce, numC, mats) {
 		document.body.removeChild(formCont);
 		// Deshabilitamos el controlador asociado
 		claC.remove();
+		if (renderer.domElement.parentNode == container) {
+			container.removeChild(renderer.domElement);
+		}
 	}
 
 	/**

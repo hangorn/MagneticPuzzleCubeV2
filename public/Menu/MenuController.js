@@ -657,7 +657,7 @@ function MenuController() {
 		if (menuEntrys[currentMenu].dataType == "options") {
 			// Mostramos el dialogo de opciones pasandole la funcion que se ejecutara al para mostrar la vista
 			// correspondiente
-			ov.show(onMenuBack);
+			OptionsController.show(onMenuBack);
 		}
 		// Si el menu seleccionado es el menu de puntuaciones
 		else if (menuEntrys[currentMenu].dataType == "scores") {

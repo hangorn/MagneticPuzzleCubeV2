@@ -111,13 +111,6 @@ function MultiplayerModeView(sce, ty, mats, iniPos, iniRot) {
 
 	document.body.appendChild(formCont);
 
-	// Guardamos la opcion de ayuda con sonidos segun corresponda
-	if (ov.getOptions().getAudioHelp()) {
-		sound.enableHelpSound();
-	} else {
-		sound.disableHelpSound();
-	}
-
 	mulC = new MultiplayerModeController(formCont, numberOfCubes, mats, cl, type);
 
 	// Ocultamos toda la vista, ya que se iniciara oculta y para mostrarla habra que indicarselo
@@ -323,6 +316,7 @@ function MultiplayerModeView(sce, ty, mats, iniPos, iniRot) {
 		if (!finished) {
 			cl.start();
 		}
+		container.appendChild(renderer.domElement);
 		// Mostramos el puzzle
 		pv.show();
 		// Si se trata de una partida contrareloj
@@ -353,6 +347,9 @@ function MultiplayerModeView(sce, ty, mats, iniPos, iniRot) {
 		document.body.removeChild(formCont);
 		// Deshabilitamos el controlador asociado
 		mulC.remove();
+		if (renderer.domElement.parentNode == container) {
+			container.removeChild(renderer.domElement);
+		}
 	}
 
 	/**

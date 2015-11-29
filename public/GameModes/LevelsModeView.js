@@ -165,13 +165,6 @@ function LevelsModeView(sce, l, mats) {
 
 	document.body.appendChild(formCont);
 
-	// Guardamos la opcion de ayuda con sonidos segun corresponda
-	if (ov.getOptions().getAudioHelp()) {
-		sound.enableHelpSound();
-	} else {
-		sound.disableHelpSound();
-	}
-
 	levC = new LevelsModeController(formCont, allMaterials, materials, cl);
 
 	/*******************************************************************************************************************
@@ -735,6 +728,7 @@ function LevelsModeView(sce, l, mats) {
 		if (!finished) {
 			cl.start();
 		}
+		container.appendChild(renderer.domElement);
 		// Mostramos el puzzle
 		pv.show();
 		// Mostramos la interfaz del modo niveles
@@ -759,6 +753,9 @@ function LevelsModeView(sce, l, mats) {
 		document.body.removeChild(formCont);
 		// Deshabilitamos el controlador asociado
 		levC.remove();
+		if (renderer.domElement.parentNode == container) {
+			container.removeChild(renderer.domElement);
+		}
 	}
 
 	/**

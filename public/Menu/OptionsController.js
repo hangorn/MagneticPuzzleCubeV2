@@ -17,19 +17,24 @@
 /*
  *  CLASE OPTIONSCONTROLLER
  *  */
-function OptionsController(cont, opt, endAct) {
+function OptionsController(endAct, opts) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
 
-	// Contenedor con el formulario para las opciones
-	var formCont;
+	// Contenedor HTML con la vista
+	var view;
+	// Formulario con todos los cotroles
+	var form;
+
 	// Accción que se ejecutará al finalizar la selección de opciones, tanto
 	// con cancelar como con aceptar
 	var endAction;
+	// Datos con los opciones seleccionadas
+	var options;
 
-	// Valor de la sensibilidad antes de cambiarla
+	// Valor de la sensibilidad antes de cambiarla para corregir valores incorrectos
 	var previousSensivility;
 
 	/*******************************************************************************************************************
@@ -38,48 +43,19 @@ function OptionsController(cont, opt, endAct) {
 	/**
 	 * Constructor de la clase OptionsController
 	 * 
-	 * @param HTMLElement:cont
-	 *            contenedor con todos los elementos de la vista.
-	 * @param Optiones:opt
-	 *            objeto de la clase options donde se guardarán las opciones.
 	 * @param Callback:endAct
 	 *            función de rellamada que se ejecutará al terminar con las opciones tanto aceptar como cancelar, de
 	 *            esta forma se mostrará el estado anterior, sea cual sea.
 	 */
 
-	// Guardamos la accion que se ejecutará al finalizar
-	endAction = endAct;
-
-	// Registramos el evento de modificacion del slide de la sensibilidad
-	cont.getElementsByTagName('form')[0].sensitivitySlide.addEventListener('change', onSensitivitySlideChange, false);
-	// Registramos el evento de modificacion del texto de la sensibilidad
-	cont.getElementsByTagName('form')[0].sensitivityText.addEventListener('change', onSensitivityTextChange, false);
-	// Registramos el evento de modificacion de la seleccion del boton de movimiento
-	cont.getElementsByTagName('form')[0].movOpt[0].addEventListener('change', onMovOptChange, false);
-	cont.getElementsByTagName('form')[0].movOpt[1].addEventListener('change', onMovOptChange, false);
-	// Registramos el evento de modificacion de la seleccion del boton de movimiento
-	cont.getElementsByTagName('form')[0].rotOpt[0].addEventListener('change', onRotOptChange, false);
-	cont.getElementsByTagName('form')[0].rotOpt[1].addEventListener('change', onRotOptChange, false);
-	// Registramos el evento de la pulsación del boton de cancelar
-	cont.getElementsByTagName('form')[0].cancel.addEventListener('click', onCancelClick, false);
-	// Registramos el evento de la pulsación del boton de aceptar
-	cont.getElementsByTagName('form')[0].accept.addEventListener('click', onAcceptClick, false);
-
-	// Iniciamos los elementos con los valores por defecto de las opciones
-	cont.getElementsByTagName('form')[0].sensitivitySlide.value = opt.getSensitivity();
-	cont.getElementsByTagName('form')[0].sensitivityText.value = opt.getSensitivity();
-	previousSensivility = opt.getSensitivity();
-	cont.getElementsByTagName('form')[0].audioHelpCheck.checked = opt.getAudioHelp();
-	if (opt.getMovOpt() == 0) {
-		cont.getElementsByTagName('form')[0].movOpt[0].checked = true;
-	} else {
-		cont.getElementsByTagName('form')[0].movOpt[1].checked = true;
-	}
-	if (opt.getRotOpt() == 0) {
-		cont.getElementsByTagName('form')[0].rotOpt[0].checked = true;
-	} else {
-		cont.getElementsByTagName('form')[0].rotOpt[1].checked = true;
-	}
+	options = opts;
+	// Creamos un contenedor
+	view = document.createElement('div');
+	// Cargamos la vista en el contenedor y cuando se cargue la mostramos
+	addDynamicComponent("menu/optionsForm.html", view, function() {
+		form = view.getElementsByTagName('form')[0];
+		show(endAct);
+	});
 
 	/*******************************************************************************************************************
 	 * Métodos Privados
@@ -93,7 +69,7 @@ function OptionsController(cont, opt, endAct) {
 	 */
 	function onSensitivitySlideChange(event) {
 		// Actualizamos el texto y guardamos la sensibilidad
-		previousSensivility = cont.getElementsByTagName('form')[0].sensitivityText.value = event.target.value;
+		previousSensivility = form.sensitivityText.value = event.target.value;
 	}
 
 	/**
@@ -104,12 +80,11 @@ function OptionsController(cont, opt, endAct) {
 	 */
 	function onSensitivityTextChange(event) {
 		// Comprobamos que el texto introducido sea un valor valido
-		if (parseFloat(event.target.value) != NaN
-				&& parseFloat(event.target.value) <= cont.getElementsByTagName('form')[0].sensitivityText.max
-				&& parseFloat(event.target.value) >= cont.getElementsByTagName('form')[0].sensitivityText.min) {
-			previousSensivility = cont.getElementsByTagName('form')[0].sensitivitySlide.value = event.target.value;
+		if (parseFloat(event.target.value) != NaN && parseFloat(event.target.value) <= form.sensitivityText.max
+				&& parseFloat(event.target.value) >= form.sensitivityText.min) {
+			previousSensivility = form.sensitivitySlide.value = event.target.value;
 		} else {
-			event.target.value = cont.getElementsByTagName('form')[0].sensitivitySlide.value = previousSensivility;
+			event.target.value = form.sensitivitySlide.value = previousSensivility;
 		}
 	}
 
@@ -121,14 +96,14 @@ function OptionsController(cont, opt, endAct) {
 	 */
 	function onMovOptChange(event) {
 		// Comprobamos si el elemento seleccionado es el boton izquierdo
-		if (event.target == cont.getElementsByTagName('form')[0].movOpt[0]) {
+		if (event.target == form.movOpt[0]) {
 			// Seleccionamos el boton derecho para el giro
-			cont.getElementsByTagName('form')[0].rotOpt[1].checked = true;
+			form.rotOpt[1].checked = true;
 		}
 		// Si no es el izquierdo, entonces es el derecho
 		else {
 			// Seleccionamos el boton derecho para el giro
-			cont.getElementsByTagName('form')[0].rotOpt[0].checked = true;
+			form.rotOpt[0].checked = true;
 		}
 	}
 
@@ -140,14 +115,14 @@ function OptionsController(cont, opt, endAct) {
 	 */
 	function onRotOptChange(event) {
 		// Comprobamos si el elemento seleccionado es el boton izquierdo
-		if (event.target == cont.getElementsByTagName('form')[0].rotOpt[0]) {
+		if (event.target == form.rotOpt[0]) {
 			// Seleccionamos el boton derecho para el giro
-			cont.getElementsByTagName('form')[0].movOpt[1].checked = true;
+			form.movOpt[1].checked = true;
 		}
 		// Si no es el izquierdo, entonces es el derecho
 		else {
 			// Seleccionamos el boton derecho para el giro
-			cont.getElementsByTagName('form')[0].movOpt[0].checked = true;
+			form.movOpt[0].checked = true;
 		}
 	}
 
@@ -159,7 +134,7 @@ function OptionsController(cont, opt, endAct) {
 	 */
 	function onCancelClick(event) {
 		// Ocultamos la vista
-		ov.hide();
+		hide();
 		// Ejecutamos la acción suministrada
 		endAction();
 	}
@@ -172,7 +147,7 @@ function OptionsController(cont, opt, endAct) {
 	 */
 	function onAcceptClick(event) {
 		// Ocultamos la vista
-		ov.hide();
+		hide();
 		// Guardamos las opciones
 		saveOptions();
 		// Ejecutamos la acción suministrada
@@ -186,41 +161,27 @@ function OptionsController(cont, opt, endAct) {
 	 *            caracteristicas del evento lanzado.
 	 */
 	function saveOptions() {
+		// TODO usar metodo getOptions() y guardar en disco
 		// Guardamos la sensibilidad
-		opt.setSensitivity(cont.getElementsByTagName('form')[0].sensitivitySlide.value);
+		options.sensitivity = form.sensitivitySlide.value;
 		// Guardamos si estará activada la ayudo con sonidos
-		opt.setAudioHelp(cont.getElementsByTagName('form')[0].audioHelpCheck.checked);
+		options.audioHelp = form.audioHelpCheck.checked;
 		// Guardamos las opciones de los botones del raton
 		// Si esta seleccionado el boton izquierdo como control de movimiento, y por tanto
 		// el boton derecho como control de giro
-		if (cont.getElementsByTagName('form')[0].movOpt[0].checked) {
+		if (form.movOpt[0].checked) {
 			// Guardamos el boton de movimiento
-			opt.setMovOpt(0);
+			options.movOpt = 0;
 			// Guardamos el boton de giro
-			opt.setRotOpt(2);
+			options.rotOpt = 2;
 		} else {
 			// Guardamos el boton de movimiento
-			opt.setMovOpt(2);
+			options.movOpt = 2;
 			// Guardamos el boton de giro
-			opt.setRotOpt(0);
+			options.rotOpt = 0;
 		}
-	}
-
-	/*******************************************************************************************************************
-	 * Métodos Públicos
-	 ******************************************************************************************************************/
-
-	/**
-	 * Método que elimina el controlador. Lo único que hace es eliminar los manejadores de eventos que tiene registrados
-	 */
-	this.remove = function() {
-		// Eliminamos los receptores de eventos de los botones
-		cont.getElementsByTagName('form')[0].sensitivitySlide.removeEventListener('change', onSensitivitySlideChange,
-				false);
-		cont.getElementsByTagName('form')[0].sensitivityText.removeEventListener('change', onSensitivityTextChange,
-				false);
-		cont.getElementsByTagName('form')[0].cancel.removeEventListener('click', onCancelClick, false);
-		cont.getElementsByTagName('form')[0].accept.removeEventListener('click', onAcceptClick, false);
+		var aa = JSON.stringify(options);
+		localStorage.magPuzCubOptions = aa;
 	}
 
 	/**
@@ -230,22 +191,106 @@ function OptionsController(cont, opt, endAct) {
 	 *            función de rellamada que se ejecutará al terminar con las opciones tanto aceptar como cancelar, de
 	 *            esta forma se mostrará el estado anterior, sea cual sea.
 	 */
-	this.enable = function(endAct) {
+	function enable(endAct) {
 		// Guardamos la accion que se ejecutará al finalizar
 		endAction = endAct;
 
-		// Registramos los receptores de eventos de los botones
-		cont.getElementsByTagName('form')[0].sensitivitySlide.addEventListener('change', onSensitivitySlideChange,
-				false);
-		cont.getElementsByTagName('form')[0].sensitivityText.addEventListener('change', onSensitivityTextChange, false);
-		cont.getElementsByTagName('form')[0].cancel.addEventListener('click', onCancelClick, false);
-		cont.getElementsByTagName('form')[0].accept.addEventListener('click', onAcceptClick, false);
+		// Registramos el evento de modificacion del slide de la sensibilidad
+		form.sensitivitySlide.addEventListener('change', onSensitivitySlideChange, false);
+		// Registramos el evento de modificacion del texto de la sensibilidad
+		form.sensitivityText.addEventListener('change', onSensitivityTextChange, false);
+		// Registramos el evento de modificacion de la seleccion del boton de movimiento
+		form.movOpt[0].addEventListener('change', onMovOptChange, false);
+		form.movOpt[1].addEventListener('change', onMovOptChange, false);
+		// Registramos el evento de modificacion de la seleccion del boton de movimiento
+		form.rotOpt[0].addEventListener('change', onRotOptChange, false);
+		form.rotOpt[1].addEventListener('change', onRotOptChange, false);
+		// Registramos el evento de la pulsación del boton de cancelar
+		form.cancel.addEventListener('click', onCancelClick, false);
+		// Registramos el evento de la pulsación del boton de aceptar
+		form.accept.addEventListener('click', onAcceptClick, false);
 
-		// Iniciamos los elementos con los valores que ya tenian las opciones
-		cont.getElementsByTagName('form')[0].sensitivitySlide.value = opt.getSensitivity();
-		cont.getElementsByTagName('form')[0].sensitivityText.value = opt.getSensitivity();
-		previousSensivility = opt.getSensitivity();
-		cont.getElementsByTagName('form')[0].audioHelpCheck.checked = opt.getAudioHelp();
+		// Iniciamos los elementos con los valores por defecto de las opciones
+		form.sensitivitySlide.value = options.sensitivity;
+		form.sensitivityText.value = options.sensitivity;
+		previousSensivility = options.sensitivity;
+		form.audioHelpCheck.checked = options.audioHelp;
+		if (options.movOpt == 0) {
+			form.movOpt[0].checked = true;
+		} else {
+			form.movOpt[1].checked = true;
+		}
+		if (options.rotOpt == 0) {
+			form.rotOpt[0].checked = true;
+		} else {
+			form.rotOpt[1].checked = true;
+		}
 	}
 
+	/**
+	 * Método que elimina el controlador. Lo único que hace es eliminar los manejadores de eventos que tiene registrados
+	 */
+	function remove(endAct) {
+		// Eliminamos los receptores de eventos de los botones
+		form.sensitivitySlide.removeEventListener('change', onSensitivitySlideChange, false);
+		form.sensitivityText.removeEventListener('change', onSensitivityTextChange, false);
+		form.movOpt[0].removeEventListener('change', onMovOptChange, false);
+		form.movOpt[1].removeEventListener('change', onMovOptChange, false);
+		form.rotOpt[0].removeEventListener('change', onRotOptChange, false);
+		form.rotOpt[1].removeEventListener('change', onRotOptChange, false);
+		form.cancel.removeEventListener('click', onCancelClick, false);
+		form.accept.removeEventListener('click', onAcceptClick, false);
+	}
+
+	function show(endAct) {
+		// Mostramos la vista
+		document.body.appendChild(view);
+		// Activamos el controlador
+		enable(endAct);
+
+	}
+
+	function hide() {
+		// Desactivamos el controlador
+		remove();
+		// Ocultamos la vista
+		document.body.removeChild(view);
+	}
+
+	/*******************************************************************************************************************
+	 * Métodos Públicos
+	 ******************************************************************************************************************/
+
+	this.show = show;
+}
+
+/***********************************************************************************************************************
+ * Métodos estáticos
+ **********************************************************************************************************************/
+var options;
+getOptions = function() {
+	if(!options) {
+		if(localStorage.magPuzCubOptions) {
+			options = JSON.parse(localStorage.magPuzCubOptions);
+		} else {
+			options = new Options();
+		}
+	}
+	return options;
+}
+
+/**
+ * Muestra el dialgo de opciones, se encarga de crear el controlador si es necesario.
+ * 
+ * @param Callback:endAct
+ *            función de rellamada que se ejecutará al terminar con las opciones tanto aceptar como cancelar, de esta
+ *            forma se mostrará el estado anterior, sea cual sea.
+ */
+var instance;
+OptionsController.show = function(endAct) {
+	if (instance) {
+		instance.show(endAct);
+	} else {
+		instance = new OptionsController(endAct, getOptions());
+	}
 }

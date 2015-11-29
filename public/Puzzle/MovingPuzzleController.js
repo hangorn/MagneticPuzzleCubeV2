@@ -90,7 +90,7 @@ function MovingPuzzleController(cam, sce, cub, puz) {
 	objects = cub.concat(puzzle.getPuzzle());
 
 	// Sensibilidad por defecto
-	sensitivity = ov.getOptions().getSensitivity() / 100;
+	sensitivity = getOptions().sensitivity / 100;
 
 	// Creamos un plano para el picking
 	plane = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000, 8, 8), new THREE.MeshBasicMaterial({
@@ -143,7 +143,7 @@ function MovingPuzzleController(cam, sce, cub, puz) {
 		ray.ray.direction = vector.subSelf(camera.position).normalize();
 
 		// Si es el boton de giro
-		if (event.button == ov.getOptions().getRotOpt()) {
+		if (event.button == getOptions().rotOpt) {
 			// Activamos el flag del boton de rotacion
 			rotDown = true;
 
@@ -188,7 +188,7 @@ function MovingPuzzleController(cam, sce, cub, puz) {
 		}
 
 		// Si es el boton de movimiento
-		if (event.button == ov.getOptions().getMovOpt()) {
+		if (event.button == getOptions().movOpt) {
 			// Activamos el flag del boton de movimiento
 			movDown = true;
 			// Si no esta resuelto el puzzle
@@ -412,7 +412,7 @@ function MovingPuzzleController(cam, sce, cub, puz) {
 		event.preventDefault();
 
 		// Si es el boton de giro
-		if (event.button == ov.getOptions().getRotOpt()) {
+		if (event.button == getOptions().rotOpt) {
 			// Desactivamos el flag de boton de rotacion pulsado
 			rotDown = false;
 			// Si no esta pulsado el boton de movimiento
@@ -430,7 +430,7 @@ function MovingPuzzleController(cam, sce, cub, puz) {
 		}
 
 		// Si es el boton de movimiento
-		if (event.button == ov.getOptions().getMovOpt()) {
+		if (event.button == getOptions().movOpt) {
 			// Desactivamos el flag de boton de movimiento pulsado
 			movDown = false;
 			// Si hay algun objeto seleccionado
@@ -535,7 +535,7 @@ function MovingPuzzleController(cam, sce, cub, puz) {
 		document.addEventListener('mouseup', onPuzzleMouseUp, false);
 
 		// Obtenemos la sensibilidad con la que se debe girar
-		sensitivity = ov.getOptions().getSensitivity() / 100;
+		sensitivity = getOptions().sensitivity / 100;
 
 		// Activamos la animacion del movimiento de los cubos
 		enableAnimation();
