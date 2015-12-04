@@ -66,6 +66,33 @@ body {
 	text-align: right;
 }
 
+.soundComponent {
+	position: absolute;
+	top: 0px;
+	margin: 10px;
+	cursor: pointer;
+}
+
+.clockComponentContainer {
+	margin-top: 10px;
+	width: 100%;
+	text-align: center;
+	position: fixed;
+}
+
+.clockComponent {
+	width: 205px;
+	text-align: left;
+	padding: 5px;
+	padding-left: 25px;
+	background-color: #000000;
+	color: #ff0000;
+	font-size: large;
+	border-width: 4px;
+	border-radius: 20px;
+	font-family: Stalinist One, cursive;
+}
+
 /*****************************************
  *  menus
  *****************************************/

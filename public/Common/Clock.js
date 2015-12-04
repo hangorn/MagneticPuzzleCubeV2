@@ -27,6 +27,7 @@ function Clock(iniT, cb) {
 
 	// Elemento html que representará el reloj
 	var domElement;
+	var text;
 	// Contador de javascript
 	var timeO;
 	// Función callback que se lanzará cuando se termine el tiempo en la cuenta regresiva
@@ -66,26 +67,18 @@ function Clock(iniT, cb) {
 		return;
 	};
 
-	// Creamos el elemento html donde se mostrara el tiempo
-	domElement = document.createElement('input');
-	domElement.type = 'text';
-	domElement.readOnly = 'readOnly';
-	domElement.value = getHours(initialTime) + ' : ' + getMinutes(initialTime) + ' : ' + getSeconds(initialTime);
-	domElement.style.width = '205px';
-	domElement.style.position = 'absolute';
-	domElement.style.top = (20).toString() + 'px';
-	domElement.style.left = '40%';
-	domElement.style.textAlign = 'left';
-	domElement.style.padding = '5px';
-	domElement.style.paddingLeft = '25px';
-	domElement.style.backgroundColor = '#000000';
-	domElement.style.color = '#ff0000';
-	domElement.style.fontSize = 'large';
-	domElement.style.borderWidth = '4px';
-	domElement.style.borderRadius = '20px';
-	domElement.style.fontFamily = "'Stalinist One', cursive";
+	// Creamos un contenedor para poder centrarlo
+	domElement = document.createElement('div');
+	domElement.className = 'clockComponentContainer';
+	// Cremos el componente donde se mostrara el texto
+	text = document.createElement('input');
+	text.type = 'text';
+	text.readOnly = 'readOnly';
+	text.value = getHours(initialTime) + ' : ' + getMinutes(initialTime) + ' : ' + getSeconds(initialTime);
+	text.className = 'clockComponent';
+	domElement.appendChild(text);
 	// Desactivamos la seleccion de texto, y la interaccion con el raton en general para el reloj
-	domElement.onmousedown = function() {
+	text.onmousedown = function() {
 		return false;
 	};
 
@@ -98,7 +91,7 @@ function Clock(iniT, cb) {
 	 */
 	function launch() {
 		if (!stopped) {
-			// Obtenemos la diferencia de tiempo entre el momento actual y en el que se empezo es decir el tiempo que se
+			// Obtenemos la diferencia de tiempo entre el momento actual y en el que se empezo, es decir el tiempo que se
 			// lleva contando en segundos sin decimales
 			var elapsed = Math.round((Date.now() - startTime) / 1000);
 			// Si es un cronometro normal
@@ -129,7 +122,7 @@ function Clock(iniT, cb) {
 	 *            tiempo que se mostrará en el reloj en segundos.
 	 */
 	function showTime(time) {
-		domElement.value = getHours(time) + ' : ' + getMinutes(time) + ' : ' + getSeconds(time);
+		text.value = getHours(time) + ' : ' + getMinutes(time) + ' : ' + getSeconds(time);
 	}
 
 	/**

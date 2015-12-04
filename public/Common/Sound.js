@@ -60,22 +60,17 @@ function Sound() {
 	// Creamos el icono de sonido
 	// Creamos un contenedor y los situamos de manera que no interfiera con el resto de elementos
 	iconSound = document.createElement('div');
-	iconSound.style.position = 'absolute';
-	iconSound.style.top = '0';
-	iconSound.style.margin = '10px'
 	// Creamos la imagen con el icono de sonido
 	var img = document.createElement('img');
 	img.src = 'img/sound.png';
 	img.onclick = onSoundClick; // Registramos la funcion al hacer click
-	img.style.position = 'absolute';
-	img.style.cursor = 'pointer'; // Indicamos que el puntero para este elemento es un puntero ('mano')
+	img.className = 'soundComponent';
 	iconSound.appendChild(img); // Añadimos la imagen al contenedor
 	// Creamos la imagen el el icono de no sonido
 	notSoundIcon = document.createElement('img');
+	notSoundIcon.className = 'soundComponent';
 	notSoundIcon.src = 'img/notSound.png';
 	notSoundIcon.onclick = onSoundClick; // Registramos la funcion al hacer click
-	notSoundIcon.style.position = 'absolute';
-	notSoundIcon.style.cursor = 'pointer'; // Indicamos que el puntero para este elemento es un puntero ('mano')
 	if (enabled) {
 		// Si el sonido esta activado no mostramos el icono de sonido desactivado
 		notSoundIcon.style.display = 'none';
