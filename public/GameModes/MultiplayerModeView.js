@@ -77,6 +77,7 @@ function MultiplayerModeView(sce, ty, mats, iniPos, iniRot) {
 	numberOfCubes = (type % 2) + 2;
 
 	// Creamos la vista del puzzle
+	container.appendChild(renderer.domElement);
 	pv = new MultiplayerPuzzleView(scene, numberOfCubes, type, mats, finish, iniPos, iniRot);
 
 	// Creamos el contenedor que contendra el formulario para las distintas opciones

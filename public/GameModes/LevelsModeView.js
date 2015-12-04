@@ -307,6 +307,7 @@ function LevelsModeView(sce, l, mats) {
 	 *            imagenes, si no se utilizan las siguientes.
 	 */
 	function startLevel(l, restart) {
+		container.appendChild(renderer.domElement);
 		switch (l) {
 		case 0: // Nivel 1: 8 cubos (2 soluciones) con 12 imagenes
 			if (!restart) {

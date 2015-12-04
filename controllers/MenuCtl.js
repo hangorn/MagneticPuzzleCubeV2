@@ -27,7 +27,8 @@ exports.getMenu = function(req, res) {
 	}
 	// Si es la vista de buscar partidas multijugador o la de ayuda, no podemos usar la plantilla comun
 	if (req.url.indexOf("findServerForm") != -1 || req.url.indexOf("helpForm") != -1
-			|| req.url.indexOf("scoresForm") != -1 || req.url.indexOf("optionsForm") != -1) {
+			|| req.url.indexOf("scoresForm") != -1 || req.url.indexOf("optionsForm") != -1
+			|| req.url.indexOf("libraryForm") != -1) {
 		template = req.url.replace(".html", ".ejs").replace("/menu", "menu");
 	}
 	res.render(template, data);

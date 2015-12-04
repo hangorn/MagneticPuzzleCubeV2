@@ -84,6 +84,7 @@ function ClassicModeView(sce, numC, mats) {
 	}
 
 	// Creamos la vista del puzzle
+	container.appendChild(renderer.domElement);
 	pv = new PuzzleView(scene, numberOfCubes, mats, finish);
 
 	// Creamos el contenedor que contendra el formulario para las distintas opciones

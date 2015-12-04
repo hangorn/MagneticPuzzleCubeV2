@@ -54,6 +54,8 @@ function MenuController() {
 	var helpCtl;
 	// Controlador de las puntuaciones
 	var scoresCtl;
+	// Controlador de la biblioteca de imagenes
+	var libraryCtl;
 
 	/*******************************************************************************************************************
 	 * Constructor
@@ -244,11 +246,16 @@ function MenuController() {
 		view.hide();
 
 		// Si no esta creada la vista de la biblioteca la creamos
-		if (lv == undefined) {
-			lv = new LibraryView(IMAGES, libType);
-			// Si esta creada solo la mostramos
+		if (libraryCtl == undefined) {
+			libraryCtl = new LibraryController(libType, function(mats) {
+				if (mats) {
+					materials = mats;
+				}
+				show();
+			});
 		} else {
-			lv.show(libType);
+			// Si esta creada solo la mostramos
+			libraryCtl.show(libType);
 		}
 	}
 
@@ -693,15 +700,5 @@ function MenuController() {
 	}
 
 	this.show = show;
-
-	/**
-	 * Método para fijar los materiales con los que se creara el puzzle
-	 * 
-	 * @param Materials[]:mats
-	 *            array con los materiales con los que se creará el puzzle.
-	 */
-	this.setMaterials = function(mats) {
-		materials = mats;
-	}
 
 }

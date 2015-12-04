@@ -25,7 +25,7 @@
 /*
  *  CLASE LIBRARYCONTROLLER
  *  */
-function LibraryController(pla, pag, pagIn, type, cub, ctl) {
+function LibraryController(type, backAction) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
@@ -42,12 +42,6 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	// Rayo que realizará las operaciones de intersección
 	var ray;
 
-	// Array con los planos que mostrarán las imágenes
-	var planes;
-	// Array con los números de página
-	var pages;
-	// Array de array con los indices de las imágenes de cada página
-	var pagesIndex;
 	// Array con todos los planos de una determinada página
 	var pagePlanes = [];
 	// Pagina actual
@@ -55,8 +49,6 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	// Tipo de vista con la que ha sido creado el controlador, 1 -> imágenes seleccionables, 2 -> formar dos cubos con
 	// imágenes, 3 -> formar tres cubos con imágenes
 	var typeView;
-	// Array con los cubos donde se insertarán las imágenes si corresponde
-	var cubes;
 
 	// Flag para saber si el botón derecho está pulsado
 	var rightDown;
@@ -69,11 +61,18 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	// Vector de 2 coordenadas que alamacena la posición actual del ratón
 	var mouse = new THREE.Vector2();
 
+	// Figura/imagen que esta agrandada
+	var zoomedIn = null;
+	// Control para subir/abrir ficheros
+	var inputFile;
+	// Lista de botones
+	var buttons;
+
 	// Sensibilidad de giro, relación entre el movimiento del ratón y la cantidad de giro de una figura
 	var sensitivity;
 
-	// Controlador padre, del que depende este
-	var parentCtl;
+	// Vista gestionada con THREE.js
+	var view;
 
 	/*******************************************************************************************************************
 	 * Constructor
@@ -81,35 +80,26 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	/**
 	 * Constructor de la clase LibraryController
 	 * 
-	 * @param Mesh[]:pla
-	 *            array de figuras que contendrá los planos de la imágenes.
-	 * @param Mesh[]:pag
-	 *            array de figuras que contendrá los números de página.
-	 * @param Integer:ty
+	 * @param Integer:type
 	 *            tipo de vista, 1 -> imágenes seleccionables, 2 -> formar dos cubos con imagánes, 3 formar tres cubos
 	 *            con imágenes.
-	 * @param Integer[[]]:cub
-	 *            array de arrays de enteros que contendrá los índices de las imágenes de cada página.
-	 * @param MenuController:parentCtl
-	 *            controlador padre, del que depende este
+	 * @param Callback:backAction
+	 *            acción que se ejecutará al pulsar el botón de atrás o el botón de aceptar. Esta función recibirá un
+	 *            parámetro con un array de los materiales seleccionados. Si se pulsa atras este parametro tendra valor
+	 *            null
 	 */
 
 	// Guardamos los parametros obtenidos
-	planes = pla;
-	pages = pag;
-	pagesIndex = pagIn;
 	typeView = type;
-	cubes = cub;
-	parentCtl = ctl;
+	// Creamos la vista
+	view = new LibraryView(typeView);
 
 	// Sensibilidad por defecto
 	sensitivity = getOptions().sensitivity / 100;
 
 	// Guardamos los planos de la primera pagina
 	currentPage = 0;
-	for (var i = 0; i < pagesIndex[0].length; i++) {
-		pagePlanes.push(planes[pagesIndex[0][i]]);
-	}
+	pagePlanes = view.getCurrentPlanes();
 
 	// Creamos un plano para el picking
 	plane = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000, 8, 8), new THREE.MeshBasicMaterial({
@@ -128,8 +118,6 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	// Creamos un rayo con origen en la posicion de la camara
 	ray = new THREE.Raycaster(camera.position);
 
-	container.appendChild(renderer.domElement);
-
 	// Añadimos receptores de eventos para el raton
 	// Si el tipo de vista necesita arrastra el raton registramos los eventos correspondientes
 	if (typeView != 1) {
@@ -145,12 +133,20 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 		return false
 	};
 
-	// Añadimos los eventos de los botones
-	document.getElementById('addImgButton').addEventListener('click', onLibraryAddImage, false);
-	document.getElementById('inputFile').addEventListener('change', onLibraryFile, false);
+	// Creamos una entrada de archivos
+	inputFile = document.createElement('input')
+	inputFile.type = 'file';
+	inputFile.multiple = true;
+	inputFile.accept = 'image/*';
+	inputFile.addEventListener('change', onLibraryFile, false);
+	// inputFile.style.display = 'none';
+	// container.appendChild(inputFile);
 
-	document.getElementById('acceptButton').addEventListener('click', onLibraryAccept, false);
-	document.getElementById('backButton').addEventListener('click', onLibraryBack, false);
+	// Asociamos cada boton con su accion y los guardamos para luego poder hacer el picking sobre ellos
+	view.getAcceptButton().action = onLibraryAccept;
+	view.getBackButton().action = onLibraryBack;
+	view.getAddImgButton().action = onLibraryAddImage;
+	buttons = [ view.getAcceptButton(), view.getBackButton(), view.getAddImgButton() ];
 
 	/*******************************************************************************************************************
 	 * Métodos Privados
@@ -165,6 +161,12 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	function onLibraryMouseDown(event) {
 		// Impedimos que se produzca la accion por defecto
 		event.preventDefault();
+
+		// Si hay una imagen agrandada la restauramos
+		if (zoomedIn != null) {
+			zoomedIn.position.copy(new THREE.Vector3(zoomedIn.iniPosX, zoomedIn.iniPosY, 0));
+			zoomedIn = null;
+		}
 
 		// Calculamos donde esta el raton con el eje de coordenadas en el centro
 		mouse.x = (event.clientX / windowWidth) * 2 - 1;
@@ -191,7 +193,7 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 		}
 
 		// Obtenemos los cubos que son atravesados por el vector
-		var intersects = ray.intersectObjects(cubes);
+		var intersects = ray.intersectObjects(view.getCubes());
 		// Si hay algun objeto
 		if (intersects.length > 0) {
 			// Obtenemos el primer objeto atravesado, que sera el seleccionado, el que esta delante
@@ -219,7 +221,7 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 		// Si hay algun objeto seleccionado
 		if (SELECTED) {
 			// Si la figura seleccionada no es uno de los cubos
-			if (cubes.indexOf(SELECTED) == -1) {
+			if (view.getCubes().indexOf(SELECTED) == -1) {
 				// Calculamos donde esta el raton con el eje de coordenadas en el centro
 				mouse.x = (event.clientX / windowWidth) * 2 - 1;
 				mouse.y = -(event.clientY / windowHeight) * 2 + 1;
@@ -237,11 +239,11 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 					// Movemos la figura seleccionada
 					SELECTED.position.copy(intersects[0].point);
 					// Si esta en la zona de los cubos adelantamos la figura para que se sobreponga a los cubos
-					if (lv.isCubeZone(intersects[0].point)) {
-						lv.putZBefore(SELECTED);
+					if (view.isCubeZone(intersects[0].point)) {
+						view.putZBefore(SELECTED);
 					} else {
 						// Ponemos la figura que se esta moviendo delante para que se superponga al resto de planos
-						lv.putZ1(SELECTED);
+						view.putZ1(SELECTED);
 					}
 				}
 
@@ -294,7 +296,7 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 		} else {
 			if (typeView != 1) {
 				// Obtenemos los planos de la pagina que son atravesados por el vector
-				var intersects = ray.intersectObjects(cubes);
+				var intersects = ray.intersectObjects(view.getCubes());
 				// Si hay objetos atravesados de los planos
 				if (intersects.length > 0) {
 					// Cambiamos al cursor de seleccion
@@ -303,8 +305,8 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 				}
 			}
 
-			// Obtenemos los numeros de pagina que son atravesados por el vector
-			var intersects = ray.intersectObjects(pages);
+			// Obtenemos los numeros de pagina o los botones que son atravesados por el vector
+			var intersects = ray.intersectObjects(view.getPages().concat(buttons));
 			// Si hay objetos atravesados de los numeros de pagina
 			if (intersects.length > 0) {
 				// Cambiamos al cursor de seleccion
@@ -314,8 +316,17 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 					INTERSECTED = intersects[0].object;
 					// Cambiamos el color de la figura
 					var rand = randomColor();
-					INTERSECTED.material.materials[0].color.setHSV(rand, 0.95, 0.85);
-					INTERSECTED.material.materials[1].color.setHSV(rand, 0.95, 0.50);
+					// Para diferencia entre paginas y botones comprobamos si tienen varios materiales (solo las
+					// letras/paginas tiene dos materiales: frontal y lateral)
+					if (INTERSECTED.material.materials) {
+						INTERSECTED.material.materials[0].color.setHSV(rand, 0.95, 0.85);
+						INTERSECTED.material.materials[1].color.setHSV(rand, 0.95, 0.50);
+					} else {
+						INTERSECTED.text.material.materials[0].color.setHSV(rand, 0.95, 0.85); // Color letra frontal
+						INTERSECTED.text.material.materials[1].color.setHSV(rand, 0.95, 0.50); // Color letra lateral
+						INTERSECTED.material.color.setHex((1 - rand) * 0xffffff); // Color fondo
+
+					}
 				}
 			}
 			// Si no hay objetos atravesados
@@ -325,8 +336,17 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 				// Si hay algun objeto con el color cambiado
 				if (INTERSECTED) {
 					var rand = randomColor();
-					INTERSECTED.material.materials[0].color.setHSV(rand, 0.95, 0.85);
-					INTERSECTED.material.materials[1].color.setHSV(rand, 0.95, 0.50);
+					// Para diferencia entre paginas y botones comprobamos si tienen varios materiales (solo las
+					// letras/paginas tiene dos materiales: frontal y lateral)
+					if (INTERSECTED.material.materials) {
+						INTERSECTED.material.materials[0].color.setHSV(rand, 0.95, 0.85);
+						INTERSECTED.material.materials[1].color.setHSV(rand, 0.95, 0.50);
+					} else {
+						INTERSECTED.text.material.materials[0].color.setHSV(rand, 0.95, 0.85); // Color letra frontal
+						INTERSECTED.text.material.materials[1].color.setHSV(rand, 0.95, 0.50); // Color letra lateral
+						INTERSECTED.material.color.setHex((1 - rand) * 0xffffff); // Color fondo
+
+					}
 					INTERSECTED = null;
 				}
 			}
@@ -346,15 +366,15 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 		// Si hay algun objeto seleccionado
 		if (SELECTED) {
 			// Si la figura seleccionada no es uno de los cubos
-			if (cubes.indexOf(SELECTED) == -1) {
+			if (view.getCubes().indexOf(SELECTED) == -1) {
 				// Si se suelta en la zona de los cubos
-				if (lv.isCubeZone(SELECTED.position)) {
+				if (view.isCubeZone(SELECTED.position)) {
 					// Buscamos el cubo mas cercano a la posicion en la que se ha soltado el plano
 					var min = 0, dist;
 					// Recorremos los cubos
-					for (var i = 0; i < cubes.length; i++) {
+					for (var i = 0; i < view.getCubes().length; i++) {
 						// Calculamos la distancia
-						var d = SELECTED.position.distanceTo(cubes[i].position);
+						var d = SELECTED.position.distanceTo(view.getCubes()[i].position);
 						// Si la distancia minima no esta definida la iniciamos
 						if (dist === undefined) {
 							dist = d;
@@ -367,13 +387,13 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 
 					// Ahora obtenemos la cara del cubo que esta hacia la camara
 					// Primero creamos un vector hacia el cubo
-					var vector = new THREE.Vector3().copy(cubes[min].position);
+					var vector = new THREE.Vector3().copy(view.getCubes()[min].position);
 					ray.ray.direction = vector.subSelf(camera.position).normalize();
 					// Obtenemos la interseccion con el cubo
-					var intersects = ray.intersectObject(cubes[min]);
+					var intersects = ray.intersectObject(view.getCubes()[min]);
 
 					// Guardamos el material en la cara con la que intersecciona el vector
-					cubes[min].material.materials[intersects[0].faceIndex] = SELECTED.material;
+					view.getCubes()[min].material.materials[intersects[0].faceIndex] = SELECTED.material;
 				}
 
 				// Se devuelve a la posicion inicial
@@ -397,6 +417,12 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 		// Impedimos que se produzca la accion por defecto
 		event.preventDefault();
 
+		// Si hay una imagen agrandada la restauramos
+		if (zoomedIn != null) {
+			zoomedIn.position.copy(new THREE.Vector3(zoomedIn.iniPosX, zoomedIn.iniPosY, 0));
+			zoomedIn = null;
+		}
+
 		// Calculamos donde esta el raton con el eje de coordenadas en el centro
 		mouse.x = (event.clientX / windowWidth) * 2 - 1;
 		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
@@ -406,7 +432,7 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 		ray.ray.direction = vector.subSelf(camera.position).normalize();
 
 		// Obtenemos los numeros de pagina que son atravesados por el vector
-		var intersects = ray.intersectObjects(pages);
+		var intersects = ray.intersectObjects(view.getPages());
 		// Si hay algun objeto
 		if (intersects.length > 0) {
 			// Obtenemos el identificador del texto para saber que tenemos que hacer
@@ -414,24 +440,21 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 
 			// Comprobamos que accion hay que realizar
 			if (ID == -2) {// Ir a la primera pagina
-				lv.showPage(currentPage = 0);
+				view.showPage(currentPage = 0);
 			} else if (ID == -1) {// Ir a la pagina anterior
-				lv.showPage(currentPage = (currentPage == 0 ? 0 : currentPage - 1));
-			} else if (ID == pagesIndex.length) {// Ir a la pagina siguiente
-				lv.showPage(currentPage = (currentPage == pagesIndex.length - 1 ? pagesIndex.length - 1
+				view.showPage(currentPage = (currentPage == 0 ? 0 : currentPage - 1));
+			} else if (ID == view.getNumberOfPages()) {// Ir a la pagina siguiente
+				view.showPage(currentPage = (currentPage == view.getNumberOfPages() - 1 ? view.getNumberOfPages() - 1
 						: currentPage + 1));
-			} else if (ID == pagesIndex.length + 1) {// Ir a la ultima pagina
-				lv.showPage(currentPage = (pagesIndex.length - 1));
-			} else if (ID >= 0 && ID <= pagesIndex.length - 1) {// Ir a la pagina seleccionada
-				lv.showPage(currentPage = ID);
+			} else if (ID == view.getNumberOfPages() + 1) {// Ir a la ultima pagina
+				view.showPage(currentPage = (view.getNumberOfPages() - 1));
+			} else if (ID >= 0 && ID <= view.getNumberOfPages() - 1) {// Ir a la pagina seleccionada
+				view.showPage(currentPage = ID);
 			} else { // A este punto no deberia llegar nunca
 				console.error("ID de pagina de la biblioteca de imagenes desconocido");
 			}
 			// Guardamos los planos de la pagina seleccionada
-			pagePlanes = [];
-			for (var i = 0; i < pagesIndex[currentPage].length; i++) {
-				pagePlanes.push(planes[pagesIndex[currentPage][i]]);
-			}
+			pagePlanes = view.getCurrentPlanes();
 		}
 
 		// Si el modo de vista es el imagenes seleccionables
@@ -457,6 +480,13 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 				intersects[0].object.position.y = intersects[0].object.iniPosY
 				intersects[0].object.position.z = 0;
 			}
+		}
+
+		// Obtenemos los botones que son atravesados por el vector
+		var intersects = ray.intersectObjects(buttons);
+		// Si hay algun objeto/boton ejecutamos su accion correspondiente
+		if (intersects.length > 0) {
+			intersects[0].object.action();
 		}
 	}
 
@@ -501,6 +531,8 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 
 			// Si hay algun objeto
 			if (intersects.length > 0) {
+				// Guardamos el objeto para poder restaurarlo
+				zoomedIn = intersects[0].object;
 				// Cambiamos la posicion del objeto, lo ponemos delante
 				intersects[0].object.position.x = 0;
 				intersects[0].object.position.y = 0;
@@ -517,7 +549,7 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	 */
 	function onLibraryAddImage(event) {
 		// Obtenemos la entrada de archivos y ejecutamos su evento click
-		document.getElementById("inputFile").click();
+		inputFile.click();
 	}
 
 	/**
@@ -551,17 +583,14 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 							map : texture[k]
 						});
 						// Si se ha podido añadir el material a la biblioteca
-						if (lv.addImg(material)) {
+						if (view.addImg(material)) {
 							// Añadimos el material a la lista de materiales
 							IMAGES.push(material);
 						} else {
 							alert("No caben mas imágenes en la biblioteca.");
 						}
 						// Guardamos los planos de la pagina seleccionada
-						pagePlanes = [];
-						for (var j = 0; j < pagesIndex[currentPage].length; j++) {
-							pagePlanes.push(planes[pagesIndex[currentPage][j]]);
-						}
+						pagePlanes = view.getCurrentPlanes();
 					}
 				}
 			}));
@@ -576,12 +605,11 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	 */
 	function onLibraryAccept(event) {
 		// Obtenemos los materiales de la biblioteca
-		var mats = finish();
+		var mats = view.getSelectedMaterials();
 		// Ocultamos la vista de la biblioteca
-		lv.hide();
-		// Le pasamos los materiales al menu y lo mostramos
-		menuCtl.setMaterials(mats);
-		menuCtl.show();
+		hide();
+		// Le pasamos los materiales a la accion correspondiente
+		backAction(mats);
 	}
 
 	/**
@@ -592,61 +620,21 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	 */
 	function onLibraryBack(event) {
 		// Ocultamos la vista de la biblioteca
-		lv.hide();
-		// Mostramos el menu
-		menuCtl.show();
+		hide();
+		// Le pasamos los materiales a la accion correspondiente
+		backAction(null);
 	}
-
-	/**
-	 * Método que obtendrá los materiales seleccionados cuando se termine de escoger
-	 * 
-	 * @return Material[] array de materiales que contendrá todos los materiales seleccionados.
-	 */
-	function finish() {
-		var mats = [];
-
-		// Si la vista es la de imagenes seleccionables
-		if (typeView == 1) {
-			// Recorremos todas la imagenes
-			for (var i = 0; i < planes.length; i++) {
-				// Y si estan seleccionadas
-				if (planes[i].selected) {
-					// Guardamos sus materiales
-					mats.push(planes[i].material);
-				}
-			}
-			return mats;
-		}
-
-		// Si no es la vista recorremos todos los cubos
-		for (var i = 0; i < typeView; i++) {
-			// Recorremos las caras de cada cubo
-			for (var j = 0; j < 6; j++) {
-				// Guardamos el material de cada cara
-				mats.push(cubes[i].material.materials[j]);
-			}
-		}
-		return mats;
-	}
-
-	/*******************************************************************************************************************
-	 * Métodos Públicos
-	 ******************************************************************************************************************/
 
 	/**
 	 * Método que elimina el controlador. Lo único que hace es eliminar los manejadores de eventos que tiene registrados
 	 */
-	this.remove = function() {
+	function remove() {
 		// Borramos receptores de eventos para el raton
 		document.getElementById('canvas').removeEventListener('mousedown', onLibraryMouseDown, false);
 		document.removeEventListener('mouseup', onLibraryMouseUp, false);
 		document.removeEventListener('mousemove', onLibraryMouseMove, false);
 		document.getElementById('canvas').removeEventListener('click', onLibraryClick, false);
 		document.getElementById('canvas').removeEventListener('dblclick', onLibraryDblClick, false);
-
-		// Borramos los eventos de los botones
-		document.getElementById('addImgButton').removeEventListener('click', onLibraryAddImage, false);
-		document.getElementById('inputFile').removeEventListener('change', onLibraryFile, false);
 
 		// Quitamos el plano del picking de la escena
 		scene.remove(plane);
@@ -659,11 +647,11 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 	 * @param Integer:type
 	 *            tipo de la vista con la que se activa el controlador.
 	 */
-	this.enable = function(type) {
+	function enable() {
 		container.appendChild(renderer.domElement);
 		// Añadimos receptores de eventos para el raton
 		// Si el tipo de vista necesita arrastra el raton registramos los eventos correspondientes
-		if (type != 1) {
+		if (typeView != 1) {
 			document.getElementById('canvas').addEventListener('mousedown', onLibraryMouseDown, false);
 			document.addEventListener('mouseup', onLibraryMouseUp, false);
 		}
@@ -671,25 +659,38 @@ function LibraryController(pla, pag, pagIn, type, cub, ctl) {
 		document.getElementById('canvas').addEventListener('click', onLibraryClick, false);
 		document.getElementById('canvas').addEventListener('dblclick', onLibraryDblClick, false);
 
-		// Añadimos los eventos de los botones
-		document.getElementById('addImgButton').addEventListener('click', onLibraryAddImage, false);
-		document.getElementById('inputFile').addEventListener('change', onLibraryFile, false);
-
 		// Añadimos el plano a la escena
 		scene.add(plane);
-
-		// Guardamos el nuevo tipo de vista
-		typeView = type;
 
 		// Guardamos la sensibilidad actual
 		sensitivity = getOptions().sensitivity / 100;
 
 		// Colocamos como pagina actual la primera
 		currentPage = 0;
-		pagePlanes = [];
-		for (var i = 0; i < pagesIndex[0].length; i++) {
-			pagePlanes.push(planes[pagesIndex[0][i]]);
-		}
+		pagePlanes = view.getCurrentPlanes();
 	}
+
+	function hide() {
+		// Desactivamos el controlador
+		remove();
+		// Ocultamos la vista
+		view.hide();
+	}
+
+	function show(type) {
+		// Guardamos el nuevo tipo de vista
+		typeView = type;
+
+		// Mostramos la vista
+		view.show(typeView);
+		// Activamos el controlador
+		enable();
+	}
+
+	/*******************************************************************************************************************
+	 * Métodos Públicos
+	 ******************************************************************************************************************/
+
+	this.show = show;
 
 }

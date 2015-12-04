@@ -100,6 +100,7 @@ function TrialModeView(sce, numC, diff, mats) {
 	materials = mats;
 
 	// Creamos la vista del puzzle
+	container.appendChild(renderer.domElement);
 	pv = new PuzzleView(scene, numberOfCubes, materials, puzzleFinished);
 
 	// Creamos el contenedor que contendra el formulario para las distintas opciones

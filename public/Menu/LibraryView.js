@@ -25,7 +25,7 @@
 /*
  *  CLASE LIBRARYVIEW
  *  */
-function LibraryView(mat, ty) {
+function LibraryView(ty) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
@@ -51,7 +51,7 @@ function LibraryView(mat, ty) {
 
 	// Altura de las imágenes en pixeles
 	var imagesHeight;
-	// Espacion para las imágenes
+	// Espacio para las imágenes
 	var imgSpace;
 	// Separación entre cada imagen
 	var separation;
@@ -80,15 +80,13 @@ function LibraryView(mat, ty) {
 	/**
 	 * Constructor de la clase LibraryView
 	 * 
-	 * @param Material[]:mat
-	 *            array con todos los materiales.
 	 * @param Integer:ty
 	 *            tipo de vista, 1 -> imágenes seleccionables, 2 -> formar dos cubos con imagánes, 3 formar tres cubos
 	 *            con imágenes.
 	 */
 
 	// Guardamos la escena y los materiales
-	materials = mat;
+	materials = IMAGES;
 	// Guardamos el tipo de vista, comrpobando que sea correcto
 	type = (ty >= 1 && ty <= 3) ? ty : 1;
 	// Iniciamos el tamaño de las imagenes y la separacion entre estas
@@ -99,249 +97,17 @@ function LibraryView(mat, ty) {
 
 	// Limpiamos la escena
 	clearView();
-
 	// Calculamos los margenes
-	margins = calculateMargins();
+	margins = new THREE.Vector2(-803.8333 * 11 / 5, 803.8333);
 
-	// Creamos un plano para cada material
-	for (var i = 0; i < materials.length; i++) {
-		// Creamos la geometria con la altura indicada y con su anchura proporcional
-		var geometry = new THREE.PlaneGeometry(imagesHeight * materials[i].map.image.width
-				/ materials[i].map.image.height, imagesHeight, 1, 1);
-		// Creamos la figura con la geometria anterior
-		var plane = new THREE.Mesh(geometry, materials[i]);
-		// Añadimos una propiedad para saber si la figura esta seleccionada, si es la vista de seleccionar imagenes,
-		// se marcan todas como seleccionadas, si no no se marca ninguna
-		if (type == 1) {
-			plane.selected = true;
-		} else {
-			plane.selected = false;
-		}
-		// Creamos otro plano para mostrar si la figura esta seleccionada
-		var geometry = new THREE.PlaneGeometry(imagesHeight * materials[i].map.image.width
-				/ materials[i].map.image.height + 40, imagesHeight + 40, 1, 1);
-		var material = new THREE.MeshBasicMaterial({
-			color : 0x7777aa,
-			overdraw : true
-		});
-		plane.selectedPlane = new THREE.Mesh(geometry, material);
-		plane.selectedPlane.position.z = -2;
-		planes.push(plane);
-	}
-
-	// Espacio que se utilizara para mostrar las imagenes
-	imgSpace = {
-		bottom : -margins.y,
-		top : margins.y - 200,
-		left : margins.x,
-		rigth : -margins.x
-	};
-	// Si es le tipo de vista con cubos
-	if (type == 2 || type == 3) {
-		// Dejamos espacio para los cubos
-		imgSpace.rigth -= (imagesHeight + separation * 4);
-	}
-	// Numero de imagenes por pagina
-	var pagImg = 0;
-	// Array con los indices de las imagenes de una pagina
-	var page = [];
-	// Numero de filas que se han introducido
-	var row = 0;
-	// Posicion horizontal en pixeles de la ultima figura introducida
-	var pos = imgSpace.left;
-	// Colocamos los planos
-	for (var i = 0; i < materials.length; i++) {
-		// Calculamos el tamaño horizontal del plano
-		var size = planes[i].geometry.vertices[1].x - planes[i].geometry.vertices[0].x;
-
-		// Calculamos la posicion horizontal que deberá tener el plano
-		var posx = pos + separation + size / 2;
-
-		// Si llega al final de la fila, pasamos a la fila siguiente
-		if (posx + size / 2 >= imgSpace.rigth - separation) {
-			// Aumentamos el numero de filas
-			row++;
-			// Colocamos el plano a la izquierda del todo
-			posx = imgSpace.left + separation + size / 2;
-		}
-
-		// Calculamos la posicion vertical que deberá tener el plano
-		var posy = imgSpace.top - separation - imagesHeight / 2 - row * (separation + imagesHeight);
-
-		// Si se llega al final de la pagina
-		if (posy - imagesHeight / 2 <= imgSpace.bottom + separation) {
-			// Reiniciamos la cuenta de las imagenes por pagina
-			pagImg = 0;
-			// Reiniciamos la cuenta de columnas
-			row = 0;
-
-			// Guardamos los indices de las imagenes de esta paginas en el array
-			pagesIndex.push(page);
-			// Vaciamos el array de imagenes por pagina
-			page = [];
-
-			// Calculamos la posicion vertical que deberá tener el plano en la nueva pagina
-			posy = imgSpace.top - separation - imagesHeight / 2 - row * (separation + imagesHeight);
-		}
-
-		// Colocamos el plano en la posicion calculada
-		planes[i].position.x = planes[i].selectedPlane.position.x = planes[i].iniPosX = posx;
-		planes[i].position.y = planes[i].selectedPlane.position.y = planes[i].iniPosY = posy;
-
-		// Guardamos el indice del plano en la informacion de la pagina
-		page.push(i);
-		// Aumentamos el numero de imagenes que tiene la pagina actual
-		pagImg++;
-
-		// Colocamos la posicion el el lado derecho del plano, no en el centro, para el siguente plano que se coloque
-		pos = posx + size / 2;
-	}
-	// Guardamos los indices de la ultima pagina
-	pagesIndex.push(page);
+	// Creamos las imagenes y mostramos las que correspondan
+	buildImages();
+	buildPagination();
 
 	// Si es una vista con cubos, los creamos
 	if (type == 2 || type == 3) {
-		// Recorremos cada uno de los cubos
-		for (var i = 0; i < type; i++) {
-			var mats = [];
-			for (var j = 0; j < 6; j++) {
-				mats.push(materials[j + i * 6]);
-			}
-			cubes[i] = new THREE.Mesh(new THREE.CubeGeometry(imagesHeight, imagesHeight, imagesHeight, 1, 1, 1),
-					new THREE.MeshFaceMaterial(mats));
-			cubes[i].position.x = imgSpace.rigth + separation * 1.5 + imagesHeight / 2;
-			cubes[i].position.y = imgSpace.top - separation - imagesHeight / 2 - i * (separation + imagesHeight);
-			cubes[i].rotation.y = -0.51;
-			// Añadimos la figura a la escena
-			scene.add(cubes[i]);
-		}
-		// Añadimos un rectangulo para mostrar el area de los cubos
-		var geometry = new THREE.Geometry();
-		var vertice
-		vertice = new THREE.Vector3(imgSpace.rigth, imgSpace.bottom + 50, 0);
-		geometry.vertices.push(vertice);
-		vertice = new THREE.Vector3(-margins.x - 50, imgSpace.bottom + 50, 0);
-		geometry.vertices.push(vertice);
-		vertice = new THREE.Vector3(-margins.x - 50, imgSpace.top - 50, 0);
-		geometry.vertices.push(vertice);
-		vertice = new THREE.Vector3(imgSpace.rigth, imgSpace.top - 50, 0);
-		geometry.vertices.push(vertice);
-		vertice = new THREE.Vector3(imgSpace.rigth, imgSpace.bottom + 50, 0);
-		geometry.vertices.push(vertice);
-		line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
-			color : 0xff0000
-		}));
-		scene.add(line);
+		buildCubes();
 	}
-
-	// Ahora crearemos los botones para cambiar de pagina
-	// Espacio que se utilizara para mostrar los numeros de pagina
-	var textSpace = {
-		bottom : -margins.y,
-		top : margins.y,
-		left : margins.x + 80, // Dejamos espacio para el icono del sonido
-		rigth : -margins.x
-	};// Tamaño del texto
-	// Separacion vertical de los numeros de pagina
-	var verTextSep = 200;
-	// Separacion horizontal de los numeros de pagina
-	var horTextSep = 150;
-	// Ultima posicion horizontal en la que se ha colocado un numero
-	var pos = textSpace.left;
-
-	// Creamos el simbolo de ir a la pagina inicial
-	var text = createText("<<")
-	// Colocamos la figura en el lugar que le corresponde
-	text.position.x = pos + horTextSep;
-	text.position.y = textSpace.top - verTextSep;
-	// Guardamos una propiedad para saber a que pagina corresponde
-	text.textID = -2;
-	pos += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x) + horTextSep;
-	// Añadimos a la escena
-	scene.add(text);
-	pages.push(text);
-
-	// Creamos el simbolo de ir a la pagina anterior
-	var text = createText("<")
-	// Colocamos la figura en el lugar que le corresponde
-	text.position.x = pos + horTextSep;
-	text.position.y = textSpace.top - verTextSep;
-	// Guardamos una propiedad para saber a que pagina corresponde
-	text.textID = -1;
-	pos += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x) + horTextSep;
-	// Añadimos a la escena
-	scene.add(text);
-	pages.push(text);
-
-	// Recorremos cada pagina
-	for (var i = 0; i < pagesIndex.length; i++) {
-		var text = createText((i + 1).toString());
-
-		// Colocamos la figura en el lugar que le corresponde
-		text.position.x = pos + horTextSep;
-		text.position.y = textSpace.top - verTextSep;
-		// Guardamos una propiedad para saber a que pagina corresponde
-		text.textID = i;
-		pos += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x) + horTextSep;
-
-		scene.add(text);
-		pages.push(text);
-	}
-
-	// Creamos el simbolo de ir a la pagina siguiente
-	var text = createText(">")
-	// Colocamos la figura en el lugar que le corresponde
-	text.position.x = pos + horTextSep;
-	text.position.y = textSpace.top - verTextSep;
-	// Guardamos una propiedad para saber a que pagina corresponde
-	text.textID = i;
-	pos += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x) + horTextSep;
-	// Añadimos a la escena
-	scene.add(text);
-	pages.push(text);
-
-	// Creamos el simbolo de ir a la ultima pagina
-	var text = createText(">>")
-	// Colocamos la figura en el lugar que le corresponde
-	text.position.x = pos + horTextSep;
-	text.position.y = textSpace.top - verTextSep;
-	// Guardamos una propiedad para saber a que pagina corresponde
-	text.textID = i + 1;
-	pos += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x) + horTextSep;
-	// Añadimos a la escena
-	scene.add(text);
-	pages.push(text);
-
-	// Creamos un canvas para crear un degradado en el marcador de pagina
-	var canvas = document.createElement('canvas');
-	canvas.width = 128;
-	canvas.height = 128;
-	// Creamos un degradado en el canvas
-	var context = canvas.getContext('2d');
-	var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0 / 4, canvas.width / 2,
-			canvas.height / 2, canvas.width / 2);
-	gradient.addColorStop(0.5, '#' + backgroundColor.toString(16));
-	gradient.addColorStop(0.7, '#9fabc9');
-	gradient.addColorStop(1, '#' + backgroundColor.toString(16));
-	context.fillStyle = gradient;
-	context.fillRect(0, 0, canvas.width, canvas.height);
-	// Creamos la textura y el material con el degradado
-	var shadowTexture = new THREE.Texture(canvas);
-	shadowTexture.needsUpdate = true;
-	var shadowMaterial = new THREE.MeshBasicMaterial({
-		map : shadowTexture
-	});
-
-	// Creamos un circulo que marcara la pagina en la que se esta utilizando el degradado
-	pageMark = new THREE.Mesh(new THREE.PlaneGeometry(textSize + 250, textSize + 250, 1, 1), shadowMaterial);
-	scene.add(pageMark);
-	// Lo colocamos en el numero de pagina correspondiente
-	pageMark.position.x = pages[2].position.x
-			+ (pages[2].geometry.boundingBox.max.x - pages[2].geometry.boundingBox.min.x) / 2 - 10;
-	pageMark.position.y = pages[2].position.y
-			+ (pages[2].geometry.boundingBox.max.y - pages[2].geometry.boundingBox.min.y) / 2 + 10;
-	pageMark.position.z = -40;
-	pageMark.rotation.x = -0.5;
 
 	// Mostramos la primera pagina
 	for (var i = 0; i < pagesIndex[0].length; i++) {
@@ -352,11 +118,9 @@ function LibraryView(mat, ty) {
 	}
 
 	// Añadimos los botones necesarios
-	addAcceptButton();
-	addBackButton();
-	addAddImgButton();
-	// Creamos el controlador de la biblioteca de imagenes
-	libC = new LibraryController(planes, pages, pagesIndex, type, cubes);
+	buildButtons();
+	// Mostramos los graficos 3D
+	container.appendChild(renderer.domElement);
 
 	/*******************************************************************************************************************
 	 * Métodos Privados
@@ -375,13 +139,272 @@ function LibraryView(mat, ty) {
 	}
 
 	/**
-	 * Método para calcular los márgenes entre los que se mostrarán los imágenes
-	 * 
-	 * @return Vector2 vector de dos elementos donde la X es el margen izquierdo o derecho, y la Y es el margen superior
-	 *         o inferior
+	 * Método encargado de construir un plano por cada imagen, y mostrar las correspondientes segun la paginación
 	 */
-	function calculateMargins() {
-		return new THREE.Vector2(-803.8333 * 11 / 5, 803.8333);
+	function buildImages() {
+		// Creamos un plano para cada material
+		for (var i = 0; i < materials.length; i++) {
+			// Creamos la geometria con la altura indicada y con su anchura proporcional
+			var geometry = new THREE.PlaneGeometry(imagesHeight * materials[i].map.image.width
+					/ materials[i].map.image.height, imagesHeight, 1, 1);
+			// Creamos la figura con la geometria anterior
+			var plane = new THREE.Mesh(geometry, materials[i]);
+			// Añadimos una propiedad para saber si la figura esta seleccionada, si es la vista de seleccionar imagenes,
+			// se marcan todas como seleccionadas, si no no se marca ninguna
+			plane.selected = type == 1;
+			// Creamos otro plano para mostrar si la figura esta seleccionada
+			var geometry = new THREE.PlaneGeometry(imagesHeight * materials[i].map.image.width
+					/ materials[i].map.image.height + 40, imagesHeight + 40, 1, 1);
+			var material = new THREE.MeshBasicMaterial({
+				color : 0x7777aa,
+				overdraw : true
+			});
+			plane.selectedPlane = new THREE.Mesh(geometry, material);
+			plane.selectedPlane.position.z = -2;
+			planes.push(plane);
+		}
+
+		// Espacio que se utilizara para mostrar las imagenes
+		imgSpace = {
+			bottom : -margins.y,
+			top : margins.y - 200,
+			left : margins.x,
+			rigth : -margins.x
+		};
+		// Si es le tipo de vista con cubos
+		if (type == 2 || type == 3) {
+			// Dejamos espacio para los cubos
+			imgSpace.rigth -= (imagesHeight + separation * 4);
+		}
+		// Numero de imagenes por pagina
+		var pagImg = 0;
+		// Array con los indices de las imagenes de una pagina
+		var page = [];
+		// Numero de filas que se han introducido
+		var row = 0;
+		// Posicion horizontal en pixeles de la ultima figura introducida
+		var pos = imgSpace.left;
+		// Colocamos los planos
+		for (var i = 0; i < materials.length; i++) {
+			// Calculamos el tamaño horizontal del plano
+			var size = planes[i].geometry.vertices[1].x - planes[i].geometry.vertices[0].x;
+
+			// Calculamos la posicion horizontal que deberá tener el plano
+			var posx = pos + separation + size / 2;
+
+			// Si llega al final de la fila, pasamos a la fila siguiente
+			if (posx + size / 2 >= imgSpace.rigth - separation) {
+				// Aumentamos el numero de filas
+				row++;
+				// Colocamos el plano a la izquierda del todo
+				posx = imgSpace.left + separation + size / 2;
+			}
+
+			// Calculamos la posicion vertical que deberá tener el plano
+			var posy = imgSpace.top - separation - imagesHeight / 2 - row * (separation + imagesHeight);
+
+			// Si se llega al final de la pagina
+			if (posy - imagesHeight / 2 <= imgSpace.bottom + separation) {
+				// Reiniciamos la cuenta de las imagenes por pagina
+				pagImg = 0;
+				// Reiniciamos la cuenta de columnas
+				row = 0;
+
+				// Guardamos los indices de las imagenes de esta paginas en el array
+				pagesIndex.push(page);
+				// Vaciamos el array de imagenes por pagina
+				page = [];
+
+				// Calculamos la posicion vertical que deberá tener el plano en la nueva pagina
+				posy = imgSpace.top - separation - imagesHeight / 2 - row * (separation + imagesHeight);
+			}
+
+			// Colocamos el plano en la posicion calculada
+			planes[i].position.x = planes[i].selectedPlane.position.x = planes[i].iniPosX = posx;
+			planes[i].position.y = planes[i].selectedPlane.position.y = planes[i].iniPosY = posy;
+
+			// Guardamos el indice del plano en la informacion de la pagina
+			page.push(i);
+			// Aumentamos el numero de imagenes que tiene la pagina actual
+			pagImg++;
+
+			// Colocamos la posicion el el lado derecho del plano, no en el centro, para el siguente plano que se
+			// coloque
+			pos = posx + size / 2;
+		}
+		// Guardamos los indices de la ultima pagina
+		pagesIndex.push(page);
+	}
+
+	/**
+	 * Método encargado de construir los cubos donde se añadirán las imágenes
+	 */
+	function buildCubes() {
+		// Recorremos cada uno de los cubos
+		for (var i = 0; i < type; i++) {
+			var mats = [];
+			for (var j = 0; j < 6; j++) {
+				mats.push(materials[j + i * 6]);
+			}
+			cubes[i] = new THREE.Mesh(new THREE.CubeGeometry(imagesHeight, imagesHeight, imagesHeight, 1, 1, 1),
+					new THREE.MeshFaceMaterial(mats));
+			cubes[i].position.x = imgSpace.rigth + separation * 1.5 + imagesHeight / 2;
+			cubes[i].position.y = imgSpace.top - separation - imagesHeight / 2 - i * (separation + imagesHeight);
+			cubes[i].rotation.y = -0.51;
+			// Añadimos la figura a la escena
+			scene.add(cubes[i]);
+		}
+		// Añadimos un rectangulo para mostrar el area de los cubos
+		var geometry = new THREE.Geometry();
+		var vertice
+		vertice = new THREE.Vector3(imgSpace.rigth, imgSpace.bottom + 150, 0);
+		geometry.vertices.push(vertice);
+		vertice = new THREE.Vector3(-margins.x - 50, imgSpace.bottom + 150, 0);
+		geometry.vertices.push(vertice);
+		vertice = new THREE.Vector3(-margins.x - 50, imgSpace.top - 50, 0);
+		geometry.vertices.push(vertice);
+		vertice = new THREE.Vector3(imgSpace.rigth, imgSpace.top - 50, 0);
+		geometry.vertices.push(vertice);
+		vertice = new THREE.Vector3(imgSpace.rigth, imgSpace.bottom + 150, 0);
+		geometry.vertices.push(vertice);
+		line = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+			color : 0xff0000
+		}));
+		scene.add(line);
+	}
+
+	/**
+	 * Método encargado de construir los controles para poder seleccionar las distintas páginas
+	 */
+	function buildPagination() {
+		// Ahora crearemos los botones para cambiar de pagina
+		// Espacio que se utilizara para mostrar los numeros de pagina
+		var textSpace = {
+			bottom : -margins.y,
+			top : margins.y,
+			left : margins.x + 80, // Dejamos espacio para el icono del sonido
+			rigth : -margins.x
+		};// Tamaño del texto
+		// Separacion vertical de los numeros de pagina
+		var verTextSep = 200;
+		// Separacion horizontal de los numeros de pagina
+		var horTextSep = 150;
+		// Ultima posicion horizontal en la que se ha colocado un numero
+		var pos = textSpace.left;
+
+		var letters = [ "<<", "<", ">", ">>" ];
+		// Recorremos cada pagina
+		for (var i = -2; i < pagesIndex.length + 2; i++) {
+			var letter;
+			if (i < 0) {
+				letter = letters[i + 2];
+			} else if (i >= pagesIndex.length) {
+				letter = letters[i - pagesIndex.length + 2];
+			} else {
+				letter = (i + 1).toString();
+			}
+
+			var text = createText(letter);
+
+			// Colocamos la figura en el lugar que le corresponde
+			text.position.x = pos + horTextSep;
+			text.position.y = textSpace.top - verTextSep;
+			// Guardamos una propiedad para saber a que pagina corresponde
+			text.textID = i;
+			pos += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x) + horTextSep;
+
+			scene.add(text);
+			pages.push(text);
+		}
+
+		// Creamos un canvas para crear un degradado en el marcador de pagina
+		var canvas = document.createElement('canvas');
+		canvas.width = 128;
+		canvas.height = 128;
+		// Creamos un degradado en el canvas
+		var context = canvas.getContext('2d');
+		var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0 / 4, canvas.width / 2,
+				canvas.height / 2, canvas.width / 2);
+		gradient.addColorStop(0.5, '#' + backgroundColor.toString(16));
+		gradient.addColorStop(0.7, '#9fabc9');
+		gradient.addColorStop(1, '#' + backgroundColor.toString(16));
+		context.fillStyle = gradient;
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		// Creamos la textura y el material con el degradado
+		var shadowTexture = new THREE.Texture(canvas);
+		shadowTexture.needsUpdate = true;
+		var shadowMaterial = new THREE.MeshBasicMaterial({
+			map : shadowTexture
+		});
+
+		// Creamos un circulo que marcara la pagina en la que se esta utilizando el degradado
+		pageMark = new THREE.Mesh(new THREE.PlaneGeometry(textSize + 250, textSize + 250, 1, 1), shadowMaterial);
+		scene.add(pageMark);
+		// Lo colocamos en el numero de pagina correspondiente
+		pageMark.position.x = pages[2].position.x
+				+ (pages[2].geometry.boundingBox.max.x - pages[2].geometry.boundingBox.min.x) / 2 - 10;
+		pageMark.position.y = pages[2].position.y
+				+ (pages[2].geometry.boundingBox.max.y - pages[2].geometry.boundingBox.min.y) / 2 + 10;
+		pageMark.position.z = -40;
+		pageMark.rotation.x = -0.5;
+	}
+
+	/**
+	 * Método encargado de construir los botones
+	 */
+	function buildButtons() {
+		// Tenemos que guardar la altura maxima de entre todos los botones para poder centrarlos verticalmente
+		var maxHeight = 0;
+		// Creamos un metodo generico para crear cada boton
+		var createButton = function(text, position) {
+			var rand = Math.random();
+			// Creamos el texto del boton
+			var button = createText(text);
+			// Calculamos su tamaño
+			var width = Math.abs(button.geometry.boundingBox.max.x - button.geometry.boundingBox.min.x);
+			var height = Math.abs(button.geometry.boundingBox.max.y - button.geometry.boundingBox.min.y);
+			if (height > maxHeight) {
+				maxHeight = height;
+			}
+			// Posicionamos el texto
+			button.position.x = -width / 2;
+			button.position.z = height;
+
+			// Creamos un fondo con forma de cilindro
+			// Creamos el material con dos colores, uno para las caras planas y otro para la curva
+			var backgroundMat = new THREE.MeshBasicMaterial({
+				color : rand * 0xffffff,
+				overdraw : true
+			});
+			// Creamos la geometria algo mas alta y ancha que el texto
+			var backgroundGeometry = new THREE.CylinderGeometry(height * 3 / 4, height * 3 / 4, width + 40, 20, 20,
+					true);
+			var background = new THREE.Mesh(backgroundGeometry, backgroundMat);
+			background.rotation.z = deg2Rad(90);
+			background.text = button;
+
+			// Creamos un contenedor para el boton de su tamaño
+			var mat = new THREE.MeshBasicMaterial({
+				color : (1 - rand) * 0xffffff,
+				overdraw : true,
+				visible : false
+			});
+			var container = new THREE.Mesh(new THREE.PlaneGeometry(width, height, 1, 1), mat);
+			// Añadimos el boton al contenedor y el fondo
+			container.add(button);
+			container.add(background);
+			container.background = background;
+			// Movemos el contenedor
+			container.position.x = position - 150; // Un poco descentrado hacia la izquierda para no ponerlo encima de
+													// los cubos
+			container.position.z = 10;
+			scene.add(container);
+			return container;
+		}
+		acceptButton = createButton("Aceptar", -margins.x / 2);
+		addImgButton = createButton("Añadir imagen", 0);
+		backButton = createButton("Atrás", margins.x / 2);
+		acceptButton.position.y = addImgButton.position.y = backButton.position.y = -margins.y + 30 + maxHeight / 2;
 	}
 
 	/**
@@ -434,87 +457,6 @@ function LibraryView(mat, ty) {
 		text.rotation.x = -0.5;
 
 		return text;
-	}
-
-	/**
-	 * Método que crea y muestra el boton de aceptar
-	 */
-	function addAcceptButton() {
-		// Creamos un boton
-		acceptButton = document.createElement('input');
-		acceptButton.type = 'button';
-		acceptButton.id = 'acceptButton';
-		acceptButton.value = 'aceptar';
-		// Lo añadimos al contenedor principal
-		container.appendChild(acceptButton);
-		// Movemos el contenedor, con el boton dentro
-		acceptButton.style.position = 'absolute';
-		acceptButton.style.bottom = '10px';
-		if (type == 1) {
-			acceptButton.style.left = (window.innerWidth * 3 / 4 - acceptButton.width / 2).toString() + 'px';
-		} else {
-			var width = (-margins.x) * 2 - imgSpace.rigth - margins.x;
-			acceptButton.style.left = (window.innerWidth * 3 / 4 * (-margins.x * 2) / width - acceptButton.width / 2)
-					.toString()
-					+ 'px';
-		}
-	}
-
-	/**
-	 * Método que crea y muestra el boton de anterior
-	 */
-	function addBackButton() {
-		// Creamos un boton
-		backButton = document.createElement('input');
-		backButton.type = 'button';
-		backButton.id = 'backButton';
-		backButton.value = 'atras';
-		// Lo añadimos al contenedor principal
-		container.appendChild(backButton);
-		// Movemos el contenedor, con el boton dentro
-		backButton.style.position = 'absolute';
-		backButton.style.bottom = '10px';
-		if (type == 1) {
-			backButton.style.left = (window.innerWidth / 4 - backButton.width / 2).toString() + 'px';
-		} else {
-			var width = (-margins.x) * 2 - imgSpace.rigth - margins.x;
-			backButton.style.left = (window.innerWidth * 1 / 4 * (-margins.x * 2) / width - backButton.width / 2)
-					.toString()
-					+ 'px';
-		}
-	}
-
-	/**
-	 * Método que crea y muestra el boton de anterior
-	 */
-	function addAddImgButton() {
-		// Creamos un boton
-		addImgButton = document.createElement('input');
-		addImgButton.type = 'button';
-		addImgButton.id = 'addImgButton';
-		addImgButton.value = 'añadir imagen';
-		// Lo añadimos al contenedor principal
-		container.appendChild(addImgButton);
-		// Movemos el contenedor, con el boton dentro
-		addImgButton.style.position = 'absolute';
-		addImgButton.style.bottom = '10px';
-		if (type == 1) {
-			addImgButton.style.left = (window.innerWidth / 2 - addImgButton.width / 2).toString() + 'px';
-		} else {
-			var width = (-margins.x) * 2 - imgSpace.rigth - margins.x;
-			addImgButton.style.left = (window.innerWidth / 2 * (-margins.x * 2) / width - addImgButton.width / 2)
-					.toString()
-					+ 'px';
-		}
-
-		// Creamos una entrada de archivos
-		var inputFile = document.createElement('input');
-		inputFile.type = 'file';
-		inputFile.id = 'inputFile';
-		inputFile.multiple = true;
-		inputFile.accept = 'image/*';
-		inputFile.style.display = 'none';
-		container.appendChild(inputFile);
 	}
 
 	/*******************************************************************************************************************
@@ -755,15 +697,10 @@ function LibraryView(mat, ty) {
 			scene.remove(line);
 		}
 
-		// Se esconden los botones
-		acceptButton.style.display = 'none';
-		// Botón de anterior
-		backButton.style.display = 'none';
-		// Botón de añadir imagen
-		addImgButton.style.display = 'none';
-
-		// Paramos el controlador asociado
-		libC.remove();
+		// Ocultamos los botones
+		scene.remove(acceptButton);
+		scene.remove(backButton);
+		scene.remove(addImgButton);
 	}
 
 	/**
@@ -989,45 +926,85 @@ function LibraryView(mat, ty) {
 			scene.add(line);
 		}
 
-		type = t;
-
 		// Mostramos los botones
+		scene.add(acceptButton);
+		scene.add(backButton);
+		scene.add(addImgButton);
 
-		// Boton de aceptar
-		if (type == 1) {
-			acceptButton.style.left = (window.innerWidth * 3 / 4 - acceptButton.width / 2).toString() + 'px';
-		} else {
-			var width = (-margins.x) * 2 - imgSpace.rigth - margins.x;
-			acceptButton.style.left = (window.innerWidth * 3 / 4 * (-margins.x * 2) / width - acceptButton.width / 2)
-					.toString()
-					+ 'px';
+		type = t;
+	}
+
+	/**
+	 * Obtiene un arrays con los planos (imagenes) que se estan mostrando actualmente (de la pagina actual)
+	 * 
+	 * @returns Mesh[] array con los planos de la pagina actual
+	 */
+	this.getCurrentPlanes = function() {
+		var pagePlanes = [];
+		for (var i = 0; i < pagesIndex[currentPage].length; i++) {
+			pagePlanes.push(planes[pagesIndex[currentPage][i]]);
 		}
-		acceptButton.style.display = 'block';
+		return pagePlanes;
+	}
 
-		// Botón de anterior
+	/**
+	 * Obtiene el numero total de paginas que hay actualmente
+	 * 
+	 * @returns Integer numero de paginas
+	 */
+	this.getNumberOfPages = function() {
+		return pagesIndex.length;
+	}
+
+	/**
+	 * Método que obtendrá los materiales seleccionados cuando se termine de escoger
+	 * 
+	 * @return Material[] array de materiales que contendrá todos los materiales seleccionados.
+	 */
+	this.getSelectedMaterials = function() {
+		var mats = [];
+
+		// Si la vista es la de imagenes seleccionables
 		if (type == 1) {
-			backButton.style.left = (window.innerWidth / 4 - backButton.width / 2).toString() + 'px';
-		} else {
-			var width = (-margins.x) * 2 - imgSpace.rigth - margins.x;
-			backButton.style.left = (window.innerWidth * 1 / 4 * (-margins.x * 2) / width - backButton.width / 2)
-					.toString()
-					+ 'px';
+			// Recorremos todas la imagenes
+			for (var i = 0; i < planes.length; i++) {
+				// Y si estan seleccionadas
+				if (planes[i].selected) {
+					// Guardamos sus materiales
+					mats.push(planes[i].material);
+				}
+			}
+			return mats;
 		}
-		backButton.style.display = 'block';
 
-		// Botón de añadir imagen
-		if (type == 1) {
-			addImgButton.style.left = (window.innerWidth / 2 - addImgButton.width / 2).toString() + 'px';
-		} else {
-			var width = (-margins.x) * 2 - imgSpace.rigth - margins.x;
-			addImgButton.style.left = (window.innerWidth / 2 * (-margins.x * 2) / width - addImgButton.width / 2)
-					.toString()
-					+ 'px';
+		// Si no es la vista recorremos todos los cubos
+		for (var i = 0; i < type; i++) {
+			// Recorremos las caras de cada cubo
+			for (var j = 0; j < 6; j++) {
+				// Guardamos el material de cada cara
+				mats.push(cubes[i].material.materials[j]);
+			}
 		}
-		addImgButton.style.display = 'block';
+		return mats;
+	}
 
-		// Habilitamos el controlador con el tipo correspondiente
-		libC.enable(t);
+	/**
+	 * GETTERS VARIOS
+	 */
+	this.getPages = function() {
+		return pages;
+	}
+	this.getCubes = function() {
+		return cubes;
+	}
+	this.getAcceptButton = function() {
+		return acceptButton.background;
+	}
+	this.getBackButton = function() {
+		return backButton.background;
+	}
+	this.getAddImgButton = function() {
+		return addImgButton.background;
 	}
 
 }
