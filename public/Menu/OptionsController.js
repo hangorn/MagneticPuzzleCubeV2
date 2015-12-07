@@ -31,7 +31,7 @@ function OptionsController(endAct, opts) {
 	// Accción que se ejecutará al finalizar la selección de opciones, tanto
 	// con cancelar como con aceptar
 	var endAction;
-	// Datos con los opciones seleccionadas
+	// Datos con las opciones seleccionadas
 	var options;
 
 	// Valor de la sensibilidad antes de cambiarla para corregir valores incorrectos
@@ -161,7 +161,6 @@ function OptionsController(endAct, opts) {
 	 *            caracteristicas del evento lanzado.
 	 */
 	function saveOptions() {
-		// TODO usar metodo getOptions() y guardar en disco
 		// Guardamos la sensibilidad
 		options.sensitivity = form.sensitivitySlide.value;
 		// Guardamos si estará activada la ayudo con sonidos
@@ -171,17 +170,16 @@ function OptionsController(endAct, opts) {
 		// el boton derecho como control de giro
 		if (form.movOpt[0].checked) {
 			// Guardamos el boton de movimiento
-			options.movOpt = 0;
+			options.movButton = 0;
 			// Guardamos el boton de giro
-			options.rotOpt = 2;
+			options.rotButton = 2;
 		} else {
 			// Guardamos el boton de movimiento
-			options.movOpt = 2;
+			options.movButton = 2;
 			// Guardamos el boton de giro
-			options.rotOpt = 0;
+			options.rotButton = 0;
 		}
-		var aa = JSON.stringify(options);
-		localStorage.magPuzCubOptions = aa;
+		localStorage.magPuzCubOptions = JSON.stringify(options);
 	}
 
 	/**
@@ -215,12 +213,12 @@ function OptionsController(endAct, opts) {
 		form.sensitivityText.value = options.sensitivity;
 		previousSensivility = options.sensitivity;
 		form.audioHelpCheck.checked = options.audioHelp;
-		if (options.movOpt == 0) {
+		if (options.movButton == 0) {
 			form.movOpt[0].checked = true;
 		} else {
 			form.movOpt[1].checked = true;
 		}
-		if (options.rotOpt == 0) {
+		if (options.rotButton == 0) {
 			form.rotOpt[0].checked = true;
 		} else {
 			form.rotOpt[1].checked = true;

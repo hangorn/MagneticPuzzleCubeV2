@@ -93,7 +93,7 @@ function HelpController(backAction) {
 			};
 		}
 		// Transformamos la opciones de movimiento en 1 o 0, ya que el boton derecho toma el valor 2
-		var option = getOptions().movOpt ? 1 : 0;
+		var option = getOptions().movButton ? 1 : 0;
 		// Recorremos los botones, y en funcion de las opciones habra que cambiarlos:
 		// El boton de mover sera acorde al valor de la opcion (opcion 0 => dato en 0, opcion 2 => dato en 1), pero el
 		// boton de rotar sera el opuesto (opcion 0 => dato en 1, opcion 2 => dato en 0)

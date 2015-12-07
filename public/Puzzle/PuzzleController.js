@@ -146,7 +146,7 @@ function PuzzleController(cam, sce, cub, puz) {
 		ray.ray.direction = vector.subSelf(camera.position).normalize();
 
 		// Si es el boton de giro
-		if (event.button == getOptions().rotOpt) {
+		if (event.button == getOptions().rotButton) {
 			// Activamos el flag del boton de rotacion
 			rotDown = true;
 
@@ -189,7 +189,7 @@ function PuzzleController(cam, sce, cub, puz) {
 		}
 
 		// Si es el boton de movimiento
-		if (event.button == getOptions().movOpt) {
+		if (event.button == getOptions().movButton) {
 			// Activamos el flag del boton de movimiento
 			movDown = true;
 			// Si no esta resuelto el puzzle
@@ -413,7 +413,7 @@ function PuzzleController(cam, sce, cub, puz) {
 		event.preventDefault();
 
 		// Si es el boton de giro
-		if (event.button == getOptions().rotOpt) {
+		if (event.button == getOptions().rotButton) {
 			// Desactivamos el flag de boton de rotacion pulsado
 			rotDown = false;
 			// Si no esta pulsado el boton de movimiento
@@ -426,7 +426,7 @@ function PuzzleController(cam, sce, cub, puz) {
 		}
 
 		// Si es el boton de movimiento
-		if (event.button == getOptions().movOpt) {
+		if (event.button == getOptions().movButton) {
 			// Desactivamos el flag de boton de movimiento pulsado
 			movDown = false;
 			// Si hay algun objeto seleccionado
