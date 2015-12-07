@@ -22,13 +22,11 @@ exports.getMenu = function(req, res) {
 	// Si es la vista de los niveles necesitamos los datos de los niveles
 	if (req.url.indexOf("levelsModeForm") != -1) {
 		data.levelsData = require("../public/data/Levels.json").data;
-	} else if (req.url.indexOf("createServerForm") != -1) {
+	} else if (req.url.indexOf("createServerModeForm") != -1) {
 		data.levelsData = require("../public/data/MultiplayerLevels.json").data;
 	}
-	// Si es la vista de buscar partidas multijugador o la de ayuda, no podemos usar la plantilla comun
-	if (req.url.indexOf("findServerForm") != -1 || req.url.indexOf("helpForm") != -1
-			|| req.url.indexOf("scoresForm") != -1 || req.url.indexOf("optionsForm") != -1
-			|| req.url.indexOf("libraryForm") != -1) {
+	// Si es la vista de buscar partidas multijugador, ayuda, puntuaciones, opciones, no podemos usar la plantilla comun
+	if (req.url.indexOf("Mode") == -1) {
 		template = req.url.replace(".html", ".ejs").replace("/menu", "menu");
 	}
 	res.render(template, data);

@@ -25,7 +25,7 @@
 	[{"type":"html",	"data":"menu/levelsModeForm.html", "mode":"levels"}],
 	[{"type":"html",	"data":"menu/trialModeForm.html", "mode":"trial"}],
 	[{"type":"html",	"data":"menu/survivalModeForm.html", "mode":"survival"}],
-	[{"type":"html",	"data":"menu/createServerForm.html", "mode":"multiplayer"}],
+	[{"type":"html",	"data":"menu/createServerModeForm.html", "mode":"multiplayer"}],
 	[{"type":"html",	"data":"menu/findServerForm.html", "mode":"findServer"}]
 ]
 }

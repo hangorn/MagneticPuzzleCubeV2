@@ -319,7 +319,7 @@ function MenuController() {
 
 		// Si se trata del modo clasico
 		if (menuEntrys[currentMenu].mode == "classic") {
-			cmv = new ClassicModeView(scene, view.getSelectedNumberOfCubes(), materials);
+			new ClassicModeController(view.getSelectedNumberOfCubes(), materials);
 		}
 
 		// Si se trata del modo niveles

@@ -93,6 +93,19 @@ body {
 	font-family: Stalinist One, cursive;
 }
 
+#buttonsGameForm {
+	z-index: 10px;
+	position: fixed;
+	top: 90px;
+	left: 0px;
+}
+
+#buttonsGameForm input {
+	display: block;
+	margin: 10px;
+	cursor: pointer;
+}
+
 /*****************************************
  *  menus
  *****************************************/
@@ -233,14 +246,26 @@ body {
 	font-weight: bolder;
 	text-align: center;
 	overflow: auto;
-	display: block;
+	display: table;
+}
+
+.smallDialog {
+	position: absolute;
+	top: 40%;
+	left: 43%;
+	margin-left: auto;
+	margin-right: auto;
+	padding: auto;
+	width: 14%;
+	height: 20%;
+	min-height: 120px;
+	min-width: 140px;
 }
 
 .mediumDialog {
 	position: absolute;
 	top: 37%;
 	left: 30%;
-	display: block;
 	margin-left: auto;
 	margin-right: auto;
 	padding: auto;
@@ -250,6 +275,11 @@ body {
 	min-width: 800px;
 }
 
-.dialog * {
-	padding-top: 5px;
+.dialogContainer {
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.dialogContainer * {
+	margin: 10px;
 }
