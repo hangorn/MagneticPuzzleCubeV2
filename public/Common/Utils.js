@@ -27,7 +27,7 @@
  *            primer vector de tres elementos a comparar.
  * @param Vector3:b
  *            segundo vector de tres elementos a comparar.
- * @return Integer -1=menor que, 1=mayor que, 0=igual.
+ * @returns Integer -1=menor que, 1=mayor que, 0=igual.
  */
 function compareVector3(a, b) {
 	if (a.x < b.x) {// X menor que
@@ -53,7 +53,7 @@ function compareVector3(a, b) {
  * 
  * @param Float:number
  *            entero que se aproximará a la potencia de dos más cercana.
- * @return Integer entero aproximado a la potencia de dos mas cercana.
+ * @returns Integer entero aproximado a la potencia de dos mas cercana.
  */
 function round2Power(number) {
 	var logarithm, rounded, power;
@@ -68,7 +68,7 @@ function round2Power(number) {
  * 
  * @param Float:angle
  *            ángulo en radianes que se aproximará al multiplo de 90 grados / Pi/2 radianes mas cercano.
- * @return Float ángulo aproximado al multiplo de 90 grados / Pi/2 radianes mas cercano.
+ * @returns Float ángulo aproximado al multiplo de 90 grados / Pi/2 radianes mas cercano.
  */
 function roundAngle(angle) {
 	var div, rounded;
@@ -82,7 +82,7 @@ function roundAngle(angle) {
  * 
  * @param Float:degrees
  *            ángulo que se convertirá en radianes.
- * @return Float ángulo pasado a radianes.
+ * @returns Float ángulo pasado a radianes.
  */
 function deg2Rad(degrees) {
 	return degrees * Math.PI / 180;
@@ -92,7 +92,7 @@ function deg2Rad(degrees) {
  * 
  * @param Float:rad
  *            ángulo que se convertirá en grados.
- * @return Float ángulo pasado a grados.
+ * @returns Float ángulo pasado a grados.
  */
 function rad2Deg(rad) {
 	return rad / Math.PI * 180;
@@ -105,7 +105,7 @@ function rad2Deg(rad) {
  *            ruta en la que se encuentra la imagen a cargar en la textura.
  * @param Callback:f
  *            funcion que se lanzará cuando se cargue la imagen
- * @return Texture textura de la imagen suministrada.
+ * @returns Texture textura de la imagen suministrada.
  */
 function loadTexture(path, f) {
 	var image = new Image(), texture = new THREE.Texture(image);
@@ -126,7 +126,7 @@ function loadTexture(path, f) {
  * 
  * @param Image:image->
  *            imagen a codificar.
- * @return String imagen codificada en base 64.
+ * @returns String imagen codificada en base 64.
  */
 function imageToBase64(image) {
 	// Creamos un canvas
@@ -153,7 +153,7 @@ function imageToBase64(image) {
  * 
  * @param String:base64->
  *            cadena de texto a decodificar.
- * @return Image imagen codificada en base 64.
+ * @returns Image imagen codificada en base 64.
  */
 function base64ToImage(base64) {
 	// Creamos una imagen
@@ -187,7 +187,7 @@ function shuffle(array) {
  * Función que calcula un numéro aleatorio entre 0 y 1 ambos exclusive, sin repetir con el anterior. Se utilizará para
  * crear colores aleatorios.
  * 
- * @return Float decimal entre 0 y 1, ambos exclusive, que se utilizará para crear un color.
+ * @returns Float decimal entre 0 y 1, ambos exclusive, que se utilizará para crear un color.
  */
 function randomColor() {
 	var rand = Math.random();
@@ -219,7 +219,7 @@ function randomColor() {
  * 
  * @param Date:d
  *            objeto de la clase Date con los datos de la fecha que se transformará.
- * @return String cadena de caracteres con la fecha en español.
+ * @returns String cadena de caracteres con la fecha en español.
  */
 function spanishDate(d) {
 	var weekday = [ "Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado" ];

@@ -33,9 +33,11 @@ function ClassicModeController(numC, mats) {
 	this.numberOfCubes;
 	// Materiales con los que esta hecho el puzzle
 	this.materials;
+	// Puzzle al que se esta jugando
+	this.puzzle;
+	
 	// Flag para saber si se ha acabado el modo
 	this.finished = false;
-
 	// Flag para saber si se esta mostrando la solucion parcial
 	this.showingSolution = false;
 
@@ -104,9 +106,9 @@ ClassicModeController.prototype.init = function() {
 	// Creamos la vista del puzzle
 	container.appendChild(renderer.domElement);
 	var ctl = this;
-	pv = new PuzzleView(scene, this.numberOfCubes, this.materials, function() {
+	pv = this.puzzle = new PuzzleView(scene, this.numberOfCubes, function() {
 		ctl.finish();
-	});
+	}, this.materials);
 
 	// Creamos el reloj para cronometrar el tiempo
 	this.clock = new Clock(0);
@@ -138,6 +140,20 @@ ClassicModeController.prototype.finish = function() {
 };
 
 /**
+ * Método para reiniciar el puzzle
+ */
+ClassicModeController.prototype.restart = function() {
+	// Eliminamos de la vista el actual modo de juego
+	this.hide();
+	// Iniciamos de nuevo este modo
+	this.init();
+	// Mostramos la interfaz en el cuerpo del documento HTML
+	document.body.appendChild(this.view);
+	// Activamos las acciones
+	this.enable();
+}
+
+/**
  * Manejador del evento de pulsación del botón de mostrar todas las soluciones
  * 
  * @param EventObject:event->
@@ -161,11 +177,11 @@ ClassicModeController.prototype.onShowSolutionsClick = function(event) {
  */
 ClassicModeController.prototype.onShowSolutionClick = function(event) {
 	if (this.showingSolution) {
-		pv.hideSolution();
+		this.puzzle.hideSolution();
 		this.form.showSolution.value = 'mostrar una posible solucion';
 		this.showingSolution = false;
 	} else {
-		pv.showSolution();
+		this.puzzle.showSolution();
 		this.form.showSolution.value = 'ocultar la posible solucion';
 		this.showingSolution = true;
 		this.clock.addTime(20);
@@ -179,7 +195,7 @@ ClassicModeController.prototype.onShowSolutionClick = function(event) {
  *            caracteristicas del evento lanzado.
  */
 ClassicModeController.prototype.onPlaceCubeClick = function(event) {
-	pv.placeCube();
+	this.puzzle.placeCube();
 	this.clock.addTime(40);
 };
 
@@ -206,14 +222,7 @@ ClassicModeController.prototype.onMenuClick = function(event) {
 ClassicModeController.prototype.onRestartClick = function(event) {
 	// Confirmamos que se desea reiniciar
 	if (confirm('Esta seguro que desea reiniciar?')) {
-		// Eliminamos de la vista el actual modo de juego
-		this.hide();
-		// Iniciamos de nuevo este modo
-		this.init();
-		// Mostramos la interfaz en el cuerpo del documento HTML
-		document.body.appendChild(this.view);
-		// Activamos las acciones
-		this.enable();
+		this.restart();
 	}
 };
 
@@ -229,7 +238,7 @@ ClassicModeController.prototype.onOptionsClick = function(event) {
 	// Mostramos el dialogo de opciones
 	var ctl = this;
 	OptionsController.show(function() {
-		// Mostramos la vista del modo clasico
+		// Mostramos la vista de este modo de juego
 		ctl.show();
 	});
 };
@@ -244,7 +253,7 @@ ClassicModeController.prototype.onPauseClick = function(event) {
 	// Pausamos el reloj
 	this.clock.pause();
 	// Desactivamos el controlador del puzzle
-	pv.disableController();
+	this.puzzle.disableController();
 
 	// Creamos un dialogo para mostrar mientras el juego este pausado
 	if (this.pauseDialog == undefined) {
@@ -263,7 +272,7 @@ ClassicModeController.prototype.onPauseClick = function(event) {
 					ctl.clock.start();
 				}
 				// Activamos el controlador del puzzle
-				pv.enableController();
+				ctl.puzzle.enableController();
 			}
 		});
 	} else {
@@ -305,7 +314,7 @@ ClassicModeController.prototype.show = function() {
 	}
 	container.appendChild(renderer.domElement);
 	// Mostramos el puzzle
-	pv.show();
+	this.puzzle.show();
 	// Mostramos la interfaz en el cuerpo del documento HTML
 	document.body.appendChild(this.view);
 	// Activamos las acciones
@@ -320,7 +329,7 @@ ClassicModeController.prototype.hide = function() {
 	this.clock.pause();
 	document.body.removeChild(this.clock.getDomElement());
 	// Ocultamos el puzzle
-	pv.hide();
+	this.puzzle.hide();
 	// Borramos la interfaz del cuerpo del documento HTML
 	document.body.removeChild(this.view);
 	// Deshabilitamos el controlador asociado
@@ -336,6 +345,9 @@ ClassicModeController.prototype.hide = function() {
  * 
  */
 ClassicModeController.prototype.getButtonsWithActions = function() {
+	//Ocultamos los botones de siguiente y anterior, no se usan en este modo
+	this.form.removeChild(this.form.next);
+	this.form.removeChild(this.form.previous);
 	var ctl = this;
 	// Creamos funciones anonimas por que si no javascript se piensa que 'this' es 'window' dentro de las funciones
 	return [ {

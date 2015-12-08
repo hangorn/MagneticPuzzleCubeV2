@@ -192,7 +192,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 * 
 	 * @param Object3D:object
 	 *            objeto 3D, en este caso un cubo para el cual se calculará la posición en el puzzle.
-	 * @return Vector3 posición calculada que debe tener la figura en el puzzle.
+	 * @returns Vector3 posición calculada que debe tener la figura en el puzzle.
 	 */
 	var positionPuzzle = function(object) {
 		// Si no hay ninguna figura en el puzzle, se coloca en el centro
@@ -296,7 +296,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 * 
 	 * @param Object3D:object
 	 *            objeto 3D para el cual se calculará la rotación en el puzzle.
-	 * @return Vector3 rotación calculada que debe tener la figura en el puzzle.
+	 * @returns Vector3 rotación calculada que debe tener la figura en el puzzle.
 	 */
 	var rotationPuzzle = function(object) {
 		// Creamos un vector para almacenar la rotacion
@@ -329,7 +329,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 * 
 	 * @param Vector3:puzzleRot
 	 *            Rotación en el puzzle.
-	 * @return Vector3 rotación calculada que debe tener la figura en el puzzle.
+	 * @returns Vector3 rotación calculada que debe tener la figura en el puzzle.
 	 */
 	var worldRotationFromPuzzleRotation = function(puzzleRot) {
 		// Creamos un vector para almacenar la rotacion
@@ -353,7 +353,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 * 
 	 * @param Vector3:puzzleCoord
 	 *            Rotación en el puzzle.
-	 * @return Vector3 rotación calculada que debe tener la figura en el puzzle.
+	 * @returns Vector3 rotación calculada que debe tener la figura en el puzzle.
 	 */
 	var worldCoordFromPuzzlePosition = function(puzzleCoord) {
 		// Guardamos una copia para no modificar las originales
@@ -374,7 +374,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 *            Segunda posición que se comparará.
 	 * @param Float:dist
 	 *            Distancia para la que se calculara si son adyacentes.
-	 * @return Boolean true si son adyacentes y false si no.
+	 * @returns Boolean true si son adyacentes y false si no.
 	 */
 	var isNext = function(pos1, pos2, dist) {
 		// Comprobamos que en los tres ejes la distancia entre los dos
@@ -389,7 +389,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método para saber el centro del cubo formado en el puzzle
 	 * 
-	 * @return Object3D objeto 3D que representa el cubo que se encuentra en el centro o null si no se encuentra.
+	 * @returns Object3D objeto 3D que representa el cubo que se encuentra en el centro o null si no se encuentra.
 	 */
 	var getCenterCube = function() {
 		// Distancia entre una figura y la posicion mas alejada en un
@@ -456,8 +456,8 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método para saber el centro del cubo formado en el puzzle
 	 * 
-	 * @return Vector3 vector de 3 dimensione que representa la posicion en la que se encuentra en el centro o null si
-	 *         no se encuentra.
+	 * @returns Vector3 vector de 3 dimensione que representa la posicion en la que se encuentra en el centro o null si
+	 *          no se encuentra.
 	 */
 	var getCenter = function() {
 		// Distancia entre una figura y la posicion mas alejada en un
@@ -544,7 +544,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 * 
 	 * @param Vector3:pos
 	 *            posición en la que se buscará el cubo.
-	 * @return Object3D objeto 3D que representa el cubo buscado o null si no se encuentra.
+	 * @returns Object3D objeto 3D que representa el cubo buscado o null si no se encuentra.
 	 */
 	var getCube = function(pos) {
 		for (var i = 0; i < group.children.length; i++) {
@@ -563,7 +563,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 *            entero que identifica la cara: 1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera, 6=trasera.
 	 * @param Vecto3:center
 	 *            vector de 3 elementos que representa el centro a partir del cual se obtendran los cubos.
-	 * @return Object3D[] array de objetos 3D con los cubos de la cara solicitada.
+	 * @returns Object3D[] array de objetos 3D con los cubos de la cara solicitada.
 	 */
 	var getFaceCubes = function(face, center) {
 		var cubes = [];
@@ -725,8 +725,8 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 * @param Integer:puzzleFace
 	 *            entero que identifica la cara del puzzle: 1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera,
 	 *            6=trasera.
-	 * @return Vector2 vector de dos componentes donde el primero es el identificador de la cara y el segundo la
-	 *         rotacion de esta.
+	 * @returns Vector2 vector de dos componentes donde el primero es el identificador de la cara y el segundo la
+	 *          rotacion de esta.
 	 */
 	var getFaceIndex = function(cube, puzzleFace) {
 		// Si no esta el cubo en el puzzle hay que ponerlo temporalmente con una rotacion como si estuviera en el puzzle
@@ -839,8 +839,8 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método que busca los cubos mas alejados en cada dirección de cada eje
 	 * 
-	 * @return Cube[][] array con un array de objetos Cube por cada direccion de cada eje siguiendo el siguiente orden
-	 *         1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera, 6=trasera.
+	 * @returns Cube[][] array con un array de objetos Cube por cada direccion de cada eje siguiendo el siguiente orden
+	 *          1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera, 6=trasera.
 	 */
 	var searchEndCubes = function() {
 		// Buscamos los cubos que estan mas alejados del centro en una de las coordenadas (+ y -)
@@ -906,13 +906,18 @@ function TooManyPiecesPuzzle(numC, mats) {
 		return endCubes;
 	}
 
-	/*
-	 * Nombre: sectionToPuzzleCoord Sinopsis: Método que calcula las coordenadas de una seccion en el puzzle dependiendo
-	 * de la rotación de esta y de la cara en la que se encuentre, en unidades de la sección, entre 1 y -1, con el
-	 * centro del eje de coordenadas en el centro de la imagen que forman las secciones. Entradas: @param Vector2:sect
-	 * vector de dos elementos con las coordenadas de la sección. @param Integer:rot ángulo en grados que esta girada la
-	 * sección. @param Integer:face entero que identifica la cara: 0=derecha, 1=izquierda, 2=superior, 3=inferior,
-	 * 4=delantera, 5=trasera. @return Boolean booleano que será true si están colocadas correctamente y false si no.
+	/**
+	 * Método que calcula las coordenadas de una seccion en el puzzle dependiendo de la rotación de esta y de la cara en
+	 * la que se encuentre, en unidades de la sección, entre 1 y -1, con el centro del eje de coordenadas en el centro
+	 * de la imagen que forman las secciones.
+	 * 
+	 * @param Vector2:sect
+	 *            vector de dos elementos con las coordenadas de la sección.
+	 * @param Integer:rot
+	 *            ángulo en grados que esta girada la sección.
+	 * @param Integer:face
+	 *            entero que identifica la cara: 0=derecha, 1=izquierda, 2=superior, 3=inferior, 4=delantera, 5=trasera.
+	 * @returns Boolean booleano que será true si están colocadas correctamente y false si no.
 	 */
 	var sectionToPuzzleCoord = function(sect, rot, face) {
 		var coord = new THREE.Vector3();
@@ -980,14 +985,23 @@ function TooManyPiecesPuzzle(numC, mats) {
 		return coord;
 	}
 
-	/*
-	 * Nombre: isSectionsProperlyPlaced Sinopsis: Método que calcula si una seccion esta correctamente colocada respecto
-	 * a otra teniendo en cuenta que ambas están giradas el mismo angulo. Entradas: @param Vector2:sect1 vector de dos
-	 * elementos con las coordenadas de la primera sección. @param Vector2:sect2 vector de dos elementos con las
-	 * coordenadas de la segunda sección. @param Vector2:pos1 posición del cubo con la primera sección. @param
-	 * Vector2:pos2 posición del cubo con la segunda sección. @param Integer:rot ángulo en grados que esta girada las
-	 * secciones. @param Integer:face entero que identifica la cara: 0=derecha, 1=izquierda, 2=superior, 3=inferior,
-	 * 4=delantera, 5=trasera. @return Boolean booleano que será true si están colocadas correctamente y false si no.
+	/**
+	 * Método que calcula si una seccion esta correctamente colocada respecto a otra teniendo en cuenta que ambas están
+	 * giradas el mismo angulo.
+	 * 
+	 * @param Vector2:sect1
+	 *            vector de dos elementos con las coordenadas de la primera sección.
+	 * @param Vector2:sect2
+	 *            vector de dos elementos con las coordenadas de la segunda sección.
+	 * @param Vector2:pos1
+	 *            posición del cubo con la primera sección.
+	 * @param Vector2:pos2
+	 *            posición del cubo con la segunda sección.
+	 * @param Integer:rot
+	 *            ángulo en grados que esta girada las secciones.
+	 * @param Integer:face
+	 *            entero que identifica la cara: 0=derecha, 1=izquierda, 2=superior, 3=inferior, 4=delantera, 5=trasera.
+	 * @returns Boolean booleano que será true si están colocadas correctamente y false si no.
 	 */
 	var isSectionsProperlyPlaced = function(sect1, sect2, pos1, pos2, rot, face) {
 		// Obtenemos las coordenadas de las secciones centradas en el centro de su cara y giradas segun el mundo
@@ -1033,14 +1047,16 @@ function TooManyPiecesPuzzle(numC, mats) {
 		}
 	}
 
-	/*
-	 * Nombre: getImgGroups Sinopsis: Método que obtiene a partir de una array con los cubos de cada extremo de cada
-	 * eje, una array con información de cada grupo de cubos en cada extremo que tiene la misma imagen y rotación y esta
-	 * bien colocados entre si. Entradas: @param Cube[][]:endCubes-> array con un array de objetos Cube por cada
-	 * direccion de cada eje siguiendo el siguiente orden 1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera,
-	 * 6=trasera. @return [Integer,Integer,Cube[]][][] array que contendra un array por cada extremo de cada eje que a
-	 * su vez cada uno contendra un array por cada grupo de cubos con la misma imagen y rotacion en las secciones, con
-	 * la siguiente informacion: imagen, rotacion, array con los cubos que forman el grupo.
+	/**
+	 * Método que obtiene a partir de una array con los cubos de cada extremo de cada eje, una array con información de
+	 * cada grupo de cubos en cada extremo que tiene la misma imagen y rotación y esta bien colocados entre si.
+	 * 
+	 * @param Cube[][]:endCubes
+	 *            array con un array de objetos Cube por cada direccion de cada eje siguiendo el siguiente orden
+	 *            1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera, 6=trasera.
+	 * @returns [Integer,Integer,Cube[]][][] array que contendra un array por cada extremo de cada eje que a su vez cada
+	 *          uno contendra un array por cada grupo de cubos con la misma imagen y rotacion en las secciones, con la
+	 *          siguiente informacion: imagen, rotacion, array con los cubos que forman el grupo.
 	 */
 	var getImgGroups = function(endCubes) {
 		// Vamos a crear una array con un array por cada direccion de los ejes que contendra:
@@ -1164,7 +1180,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 *            entero que identificará la imagen.
 	 * @param Vector2:sect
 	 *            vector de 2 dimensiones con la sección de la imágen.
-	 * @return Cube cubo con la imagen y sección suministradas.
+	 * @returns Cube cubo con la imagen y sección suministradas.
 	 */
 	var searchCube = function(img, sect) {
 		for (var i = 0; i < cubes.length; i++) {
@@ -1190,7 +1206,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 *            entero con la rotación en grados de la sección con la que tiene que coincidir.
 	 * @param Integer:rot2
 	 *            entero con la rotación en grados de la sección a colocar.
-	 * @return Vector3 vector de 3 elementos con la rotación calculada en radianes.
+	 * @returns Vector3 vector de 3 elementos con la rotación calculada en radianes.
 	 */
 	var getRotationFromSections = function(face1, face2, rot1, rot2) {
 		var rot = new THREE.Vector3();
@@ -1398,7 +1414,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método que devuelve un booleano en funcion de si el puzzle esta resuelto o no
 	 * 
-	 * @return Boolean true si el puzzle está resuelto y false si no.
+	 * @returns Boolean true si el puzzle está resuelto y false si no.
 	 */
 	this.isSolved = function() {
 		// Si es un puzzle de 3 cubos
@@ -1478,7 +1494,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	 * 
 	 * @param Vector2:position
 	 *            Posición para la que realizara el cálculo.
-	 * @return Boolean true si se encuentra en la zona del puzzle y false si no.
+	 * @returns Boolean true si se encuentra en la zona del puzzle y false si no.
 	 */
 	this.isPuzzleZone = function(position) {
 		if (position.x < -puzzleAreaSize / 2 || position.x > puzzleAreaSize / 2 || position.y < -puzzleAreaSize / 2
@@ -1492,7 +1508,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método para obtener el objeto 3D que representa al grupo de piezas encajadas en el puzzle
 	 * 
-	 * @return Object3D objeto 3D que representa al grupo de piezas encajadas en el puzzle.
+	 * @returns Object3D objeto 3D que representa al grupo de piezas encajadas en el puzzle.
 	 */
 	this.getPuzzle = function() {
 		return group;
@@ -1501,7 +1517,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método para obtener el array de objetos 3D de piezas del puzzle
 	 * 
-	 * @return Object3D[] array de objetos 3D de piezas del puzzle.
+	 * @returns Object3D[] array de objetos 3D de piezas del puzzle.
 	 */
 	this.getPuzzleCubes = function() {
 		return cubes;
@@ -1510,7 +1526,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método para obtener el tamaño de los cubos
 	 * 
-	 * @return Integer tamaño de los cubos en pixeles.
+	 * @returns Integer tamaño de los cubos en pixeles.
 	 */
 	this.getCubeSize = function() {
 		return cubeSize;
@@ -1519,7 +1535,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método para obtener el tamaño del área del puzzle
 	 * 
-	 * @return Integer tamaño del área del puzzle.
+	 * @returns Integer tamaño del área del puzzle.
 	 */
 	this.getPuzzleAreaSize = function() {
 		return puzzleAreaSize;
@@ -1528,7 +1544,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método para obtener el tamaño del área del puzzle
 	 * 
-	 * @return Integer tamaño del área del puzzle.
+	 * @returns Integer tamaño del área del puzzle.
 	 */
 	this.getNumberOfCubes = function() {
 		return numberOfCubes * numberOfCubes * numberOfCubes;
@@ -1565,8 +1581,8 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método para obetener la solución al puzzle como se encuentre el momento de llamar a este método
 	 * 
-	 * @return Object3D objeto 3D que muestra la solución actual con un pequeña transparencia, o null si no se encuentra
-	 *         ninguna.
+	 * @returns Object3D objeto 3D que muestra la solución actual con un pequeña transparencia, o null si no se
+	 *          encuentra ninguna.
 	 */
 	this.getSolution = function() {
 		// Si el puzzle no tiene ninguna pieza encajada
@@ -1683,7 +1699,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 	/**
 	 * Método para colocar automáticamente un cubo en el puzzle de manera correcta
 	 * 
-	 * @return boolean booleano indicando si se ha colocado una pieza
+	 * @returns boolean booleano indicando si se ha colocado una pieza
 	 */
 	this.placeCube = function() {
 		// Si no hay ningun cubo en el puzzle
@@ -1844,11 +1860,12 @@ function TooManyPiecesPuzzle(numC, mats) {
 		return placed;
 	}
 
-	/*
-	 * Nombre: isLastCubeRigthPlaced Sinopsis: Método para averiguar si el último cubo introducido en el puzzle esta
-	 * bien colocado, es decir, si alguna de las caras del cubo esta bien colocada respecto a algun cubo que ya esté en
-	 * el puzzle. Entradas: @return Boolean booleano que será true si alguna cara del último cubo colocado coincide con
-	 * alguna del puzzle, false si no.
+	/**
+	 * Método para averiguar si el último cubo introducido en el puzzle esta bien colocado, es decir, si alguna de las
+	 * caras del cubo esta bien colocada respecto a algun cubo que ya esté en el puzzle.
+	 * 
+	 * @returns Boolean booleano que será true si alguna cara del último cubo colocado coincide con alguna del puzzle,
+	 *          false si no.
 	 */
 	this.isLastCubeRigthPlaced = function() {
 		// Si solo hay un cubo o ninguno

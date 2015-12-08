@@ -412,7 +412,7 @@ function LibraryView(ty) {
 	 * 
 	 * @param String:str
 	 *            cadena de texto con la que se creará la figura.
-	 * @return Mesh objeto 3D creado con el texto suministrado.
+	 * @returns Mesh objeto 3D creado con el texto suministrado.
 	 */
 	function createText(str) {
 		// Creamos un color aletorio
@@ -505,7 +505,7 @@ function LibraryView(ty) {
 	 * 
 	 * @param Vector2:position
 	 *            Posición para la que realizara el cálculo.
-	 * @return Boolean true si se encuentra en la zona de los cubos y false si no.
+	 * @returns Boolean true si se encuentra en la zona de los cubos y false si no.
 	 */
 	this.isCubeZone = function(position) {
 		if (position.x < imgSpace.rigth || position.x > -margins.x - 50 || position.y < imgSpace.bottom + 50
@@ -541,7 +541,7 @@ function LibraryView(ty) {
 	 * 
 	 * @param Material:material
 	 *            material con el que se creará el plano que represente a la figura.
-	 * @return Boolean muestra si se tuvo éxito al añadir la imagen.
+	 * @returns Boolean muestra si se tuvo éxito al añadir la imagen.
 	 */
 	this.addImg = function(material) {
 		// Flag para saber si hay que añadir un nuevo numero de pagina
@@ -959,7 +959,7 @@ function LibraryView(ty) {
 	/**
 	 * Método que obtendrá los materiales seleccionados cuando se termine de escoger
 	 * 
-	 * @return Material[] array de materiales que contendrá todos los materiales seleccionados.
+	 * @returns Material[] array de materiales que contendrá todos los materiales seleccionados.
 	 */
 	this.getSelectedMaterials = function() {
 		var mats = [];

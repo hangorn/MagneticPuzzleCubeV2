@@ -133,7 +133,7 @@ function Cube(mats, cubeSize, imgs, sectionImgs, numberOfSections) {
 	 * 
 	 * @param Integer:index
 	 *            entero que identifica la cara: 1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera, 6=trasera.
-	 * @return Face objeto Face con el indice indicado si este es correcto o null si es incorrecto.
+	 * @returns Face objeto Face con el indice indicado si este es correcto o null si es incorrecto.
 	 */
 	this.getFace = function(index) {
 		if (index >= 1 && index <= 6) {

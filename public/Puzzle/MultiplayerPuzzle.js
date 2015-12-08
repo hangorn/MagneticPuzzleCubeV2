@@ -146,7 +146,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 * 
 	 * @param Object3D:object
 	 *            objeto 3D, en este caso un cubo para el cual se calculará la posición en el puzzle.
-	 * @return Vector3 posición calculada que debe tener la figura en el puzzle.
+	 * @returns Vector3 posición calculada que debe tener la figura en el puzzle.
 	 */
 	var positionPuzzle = function(object) {
 		// Si no hay ninguna figura en el puzzle, se coloca en el centro
@@ -250,7 +250,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 * 
 	 * @param Object3D:object
 	 *            objeto 3D para el cual se calculará la rotación en el puzzle.
-	 * @return Vector3 rotación calculada que debe tener la figura en el puzzle.
+	 * @returns Vector3 rotación calculada que debe tener la figura en el puzzle.
 	 */
 	var rotationPuzzle = function(object) {
 		// Creamos un vector para almacenar la rotacion
@@ -283,7 +283,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 * 
 	 * @param Vector3:puzzleRot
 	 *            Rotación en el puzzle.
-	 * @return Vector3 rotación calculada que debe tener la figura en el puzzle.
+	 * @returns Vector3 rotación calculada que debe tener la figura en el puzzle.
 	 */
 	var worldRotationFromPuzzleRotation = function(puzzleRot) {
 		// Creamos un vector para almacenar la rotacion
@@ -307,7 +307,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 * 
 	 * @param Vector3:puzzleCoord
 	 *            Rotación en el puzzle.
-	 * @return Vector3 rotación calculada que debe tener la figura en el puzzle.
+	 * @returns Vector3 rotación calculada que debe tener la figura en el puzzle.
 	 */
 	var worldCoordFromPuzzlePosition = function(puzzleCoord) {
 		// Guardamos una copia para no modificar las originales
@@ -328,7 +328,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 *            Segunda posición que se comparará.
 	 * @param Float:dist
 	 *            Distancia para la que se calculara si son adyacentes.
-	 * @return Boolean true si son adyacentes y false si no.
+	 * @returns Boolean true si son adyacentes y false si no.
 	 */
 	var isNext = function(pos1, pos2, dist) {
 		// Comprobamos que en los tres ejes la distancia entre los dos
@@ -343,7 +343,7 @@ function MultiplayerPuzzle(numC, mats) {
 	/**
 	 * Método para saber el centro del cubo formado en el puzzle
 	 * 
-	 * @return Object3D objeto 3D que representa el cubo que se encuentra en el centro o null si no se encuentra.
+	 * @returns Object3D objeto 3D que representa el cubo que se encuentra en el centro o null si no se encuentra.
 	 */
 	var getCenterCube = function() {
 		// Distancia entre una figura y la posicion mas alejada en un
@@ -410,7 +410,7 @@ function MultiplayerPuzzle(numC, mats) {
 	/**
 	 * Método para saber el centro del cubo formado en el puzzle
 	 * 
-	 * @return Vector3 vector de 3 dimensione que representa la posicion en la que se encuentra en el centro o null si
+	 * @returns Vector3 vector de 3 dimensione que representa la posicion en la que se encuentra en el centro o null si
 	 *         no se encuentra.
 	 */
 	var getCenter = function() {
@@ -498,7 +498,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 * 
 	 * @param Vector3:pos
 	 *            posición en la que se buscará el cubo.
-	 * @return Object3D objeto 3D que representa el cubo buscado o null si no se encuentra.
+	 * @returns Object3D objeto 3D que representa el cubo buscado o null si no se encuentra.
 	 */
 	var getCube = function(pos) {
 		for (var i = 0; i < group.children.length; i++) {
@@ -517,7 +517,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 *            entero que identifica la cara: 1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera, 6=trasera.
 	 * @param Vecto3:center
 	 *            vector de 3 elementos que representa el centro a partir del cual se obtendran los cubos.
-	 * @return Object3D[] array de objetos 3D con los cubos de la cara solicitada.
+	 * @returns Object3D[] array de objetos 3D con los cubos de la cara solicitada.
 	 */
 	var getFaceCubes = function(face, center) {
 		var cubes = [];
@@ -681,7 +681,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 * @param Integer:puzzleFace
 	 *            entero que identifica la cara del puzzle: 1=derecha, 2=izquierda, 3=superior, 4=inferior, 5=delantera,
 	 *            6=trasera.
-	 * @return Vector2 vector de dos componentes donde el primero es el identificador de la cara y el segundo la
+	 * @returns Vector2 vector de dos componentes donde el primero es el identificador de la cara y el segundo la
 	 *         rotacion de esta.
 	 */
 	var getFaceIndex = function(cube, puzzleFace) {
@@ -803,7 +803,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 *            ángulo en grados que esta girada la sección.
 	 * @param Integer:face
 	 *            entero que identifica la cara: 0=derecha, 1=izquierda, 2=superior, 3=inferior, 4=delantera, 5=trasera.
-	 * @return Boolean booleano que será true si están colocadas correctamente y false si no.
+	 * @returns Boolean booleano que será true si están colocadas correctamente y false si no.
 	 */
 	var sectionToPuzzleCoord = function(sect, rot, face) {
 		var coord = new THREE.Vector3();
@@ -887,7 +887,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 *            ángulo en grados que esta girada las secciones.
 	 * @param Integer:face
 	 *            entero que identifica la cara: 0=derecha, 1=izquierda, 2=superior, 3=inferior, 4=delantera, 5=trasera.
-	 * @return Boolean booleano que será true si están colocadas correctamente y false si no.
+	 * @returns Boolean booleano que será true si están colocadas correctamente y false si no.
 	 */
 	var isSectionsProperlyPlaced = function(sect1, sect2, pos1, pos2, rot, face) {
 		// Obtenemos las coordenadas de las secciones centradas en el centro de su cara y giradas segun el mundo
@@ -940,7 +940,7 @@ function MultiplayerPuzzle(numC, mats) {
 	/**
 	 * Método que devuelve un booleano en funcion de si el puzzle esta resuelto o no
 	 * 
-	 * @return Boolean true si el puzzle está resuelto y false si no.
+	 * @returns Boolean true si el puzzle está resuelto y false si no.
 	 */
 	this.isSolved = function() {
 		// Si es un puzzle de 3 cubos
@@ -1019,7 +1019,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 * 
 	 * @param Vector2:position
 	 *            Posición para la que realizara el cálculo.
-	 * @return Boolean true si se encuentra en la zona del puzzle y false si no.
+	 * @returns Boolean true si se encuentra en la zona del puzzle y false si no.
 	 */
 	this.isPuzzleZone = function(position) {
 		if (position.x < -puzzleAreaSize / 2 || position.x > puzzleAreaSize / 2 || position.y < -puzzleAreaSize / 2
@@ -1033,7 +1033,7 @@ function MultiplayerPuzzle(numC, mats) {
 	/**
 	 * Método para obtener el objeto 3D que representa al grupo de piezas encajadas en el puzzle
 	 * 
-	 * @return Object3D objeto 3D que representa al grupo de piezas encajadas en el puzzle.
+	 * @returns Object3D objeto 3D que representa al grupo de piezas encajadas en el puzzle.
 	 */
 	this.getPuzzle = function() {
 		return group;
@@ -1042,7 +1042,7 @@ function MultiplayerPuzzle(numC, mats) {
 	/**
 	 * Método para obtener el array de objetos 3D de piezas del puzzle
 	 * 
-	 * @return Object3D[] array de objetos 3D de piezas del puzzle.
+	 * @returns Object3D[] array de objetos 3D de piezas del puzzle.
 	 */
 	this.getPuzzleCubes = function() {
 		return cubes;
@@ -1051,7 +1051,7 @@ function MultiplayerPuzzle(numC, mats) {
 	/**
 	 * Método para obtener el tamaño de los cubos
 	 * 
-	 * @return Integer tamaño de los cubos en pixeles.
+	 * @returns Integer tamaño de los cubos en pixeles.
 	 */
 	this.getCubeSize = function() {
 		return cubeSize;
@@ -1060,7 +1060,7 @@ function MultiplayerPuzzle(numC, mats) {
 	/**
 	 * Método para obtener el tamaño del área del puzzle
 	 * 
-	 * @return Integer tamaño del área del puzzle.
+	 * @returns Integer tamaño del área del puzzle.
 	 */
 	this.getPuzzleAreaSize = function() {
 		return puzzleAreaSize;
@@ -1069,7 +1069,7 @@ function MultiplayerPuzzle(numC, mats) {
 	/**
 	 * Método para obtener el tamaño del área del puzzle
 	 * 
-	 * @return Integer tamaño del área del puzzle.
+	 * @returns Integer tamaño del área del puzzle.
 	 */
 	this.getNumberOfCubes = function() {
 		return numberOfCubes * numberOfCubes * numberOfCubes;
@@ -1106,7 +1106,7 @@ function MultiplayerPuzzle(numC, mats) {
 	 * Método para averiguar si el último cubo introducido en el puzzle esta bien colocado, es decir, si alguna de las
 	 * caras del cubo esta bien colocada respecto a algun cubo que ya esté en el puzzle.
 	 * 
-	 * @return Boolean booleano que será true si alguna cara del último cubo colocado coincide con alguna del puzzle,
+	 * @returns Boolean booleano que será true si alguna cara del último cubo colocado coincide con alguna del puzzle,
 	 *         false si no.
 	 */
 	this.isLastCubeRigthPlaced = function() {

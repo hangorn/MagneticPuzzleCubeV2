@@ -109,7 +109,7 @@ function Sound() {
 	 * 
 	 * @param string:file
 	 *            cadena de caracteres con el nombre del fichero de audio.
-	 * @return audio objeto del DOM del tipo audio creado con los datos especificados.
+	 * @returns audio objeto del DOM del tipo audio creado con los datos especificados.
 	 */
 	function loadAudio(file) {
 		// Creamos el objeto del DOM audio

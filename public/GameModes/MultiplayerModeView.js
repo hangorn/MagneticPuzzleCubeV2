@@ -506,7 +506,7 @@ function MultiplayerModeView(sce, ty, mats, iniPos, iniRot) {
 	/**
 	 * Método para saber si el puzzle está resuelto
 	 * 
-	 * @return Boolean booleano que indicará si el puzzle está resuelto
+	 * @returns Boolean booleano que indicará si el puzzle está resuelto
 	 */
 	this.isDone = function() {
 		return finished;

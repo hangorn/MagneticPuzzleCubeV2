@@ -61,7 +61,7 @@ function ColoredPuzzleView(sce, numC, finAct) {
 	}
 
 	// Llamamos al constructor de PuzzleView para heredar todos sus metodos y atributos
-	PuzzleView.call(this, scene, numberOfCubes, materials, finAct, true);
+	PuzzleView.call(this, scene, numberOfCubes, finAct, materials, true);
 
 	coloredMaterials = materials;
 
@@ -72,7 +72,7 @@ function ColoredPuzzleView(sce, numC, finAct) {
 	/**
 	 * Método que devuelve un array con los materiales de colores que formarán el puzzle
 	 * 
-	 * @return Material[] array con los materiales de colores que formarán el puzzle.
+	 * @returns Material[] array con los materiales de colores que formarán el puzzle.
 	 */
 	this.getMaterials = function() {
 		return coloredMaterials;

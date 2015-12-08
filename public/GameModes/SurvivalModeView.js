@@ -119,7 +119,7 @@ function SurvivalModeView(sce, numC, diff, mats) {
 
 	// Creamos la vista del puzzle
 	container.appendChild(renderer.domElement);
-	pv = new PuzzleView(scene, numberOfCubes, materials, puzzleFinished);
+	pv = new PuzzleView(scene, numberOfCubes, puzzleFinished, materials);
 
 	// Creamos el contenedor que contendra el formulario para las distintas opciones
 	formCont = document.createElement('div');
@@ -242,7 +242,7 @@ function SurvivalModeView(sce, numC, diff, mats) {
 		}
 
 		// Creamos la vista del puzzle
-		pv = new PuzzleView(scene, numberOfCubes, materials, puzzleFinished);
+		pv = new PuzzleView(scene, numberOfCubes, puzzleFinished, materials);
 		// Creamos el reloj para cronometrar el tiempo
 		form.removeChild(cl.getDomElement());
 		cl = new Clock(difTimes[numberOfCubes - 2][difficulty] + time - solvedPuzzles * (5 - difficulty), timeFinished);

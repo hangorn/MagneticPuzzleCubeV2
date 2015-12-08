@@ -324,7 +324,7 @@ function MenuController() {
 
 		// Si se trata del modo niveles
 		if (menuEntrys[currentMenu].mode == "levels") {
-			lmv = new LevelsModeView(scene, lastEntrySelected, materials);
+			new LevelsModeController(lastEntrySelected, materials);
 		}
 
 		// Si se trata del modo contrareloj

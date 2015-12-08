@@ -71,7 +71,7 @@ function Face(pos, indexImg, indexSectionX, indexSectionY, rot) {
 	/**
 	 * Método que devuelve índice de la imagen que contiene la cara
 	 * 
-	 * @return Integer índice de la imagen que contiene la cara.
+	 * @returns Integer índice de la imagen que contiene la cara.
 	 */
 	this.getImg = function() {
 		return img;
@@ -80,7 +80,7 @@ function Face(pos, indexImg, indexSectionX, indexSectionY, rot) {
 	/**
 	 * Método que devuelve el vector de dos elementos que contiene la sección de la imagen
 	 * 
-	 * @return Vector2 vector de dos elementos que contiene la sección de la imagen.
+	 * @returns Vector2 vector de dos elementos que contiene la sección de la imagen.
 	 */
 	this.getSection = function() {
 		return section;
@@ -93,7 +93,7 @@ function Face(pos, indexImg, indexSectionX, indexSectionY, rot) {
 	 *            Coordenada x que se comparará.
 	 * @param Integer:y
 	 *            Coordenada y que se comparará.
-	 * @return Boolean true si las coordenadas suministradas son iguales que la sección de la cara, false si no.
+	 * @returns Boolean true si las coordenadas suministradas son iguales que la sección de la cara, false si no.
 	 */
 	this.compareSection = function(x, y) {
 		if (x == section.x && y == section.y) {
@@ -107,7 +107,7 @@ function Face(pos, indexImg, indexSectionX, indexSectionY, rot) {
 	 * 
 	 * @param Vector2:sect
 	 *            Sección que se comparará.
-	 * @return Boolean true si las secciones son contiguas y false si no.
+	 * @returns Boolean true si las secciones son contiguas y false si no.
 	 */
 	this.isNextSection = function(sect) {
 		// Calculamos las diferencias entre las coordenadas de las secciones
@@ -128,7 +128,7 @@ function Face(pos, indexImg, indexSectionX, indexSectionY, rot) {
 	/**
 	 * Método que devuelve la rotación en grados de la sección
 	 * 
-	 * @return Float rotación en grados de la sección.
+	 * @returns Float rotación en grados de la sección.
 	 */
 	this.getRot = function() {
 		return rotation;

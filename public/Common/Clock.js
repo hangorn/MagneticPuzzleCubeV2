@@ -130,7 +130,7 @@ function Clock(iniT, cb) {
 	 * 
 	 * @param Integer:time
 	 *            tiempo del que se extraeran los segundos.
-	 * @return String cadena de texto con los segundos con dos digitos.
+	 * @returns String cadena de texto con los segundos con dos digitos.
 	 */
 	function getSeconds(time) {
 		var sec = time % 60;
@@ -146,7 +146,7 @@ function Clock(iniT, cb) {
 	 * 
 	 * @param Integer:time
 	 *            tiempo del que se extraeran los minutos.
-	 * @return String cadena de texto con los minutos con dos digitos.
+	 * @returns String cadena de texto con los minutos con dos digitos.
 	 */
 	function getMinutes(time) {
 		var min = Math.floor(time / 60) % 60;
@@ -162,7 +162,7 @@ function Clock(iniT, cb) {
 	 * 
 	 * @param Integer:time
 	 *            tiempo del que se extraeran las horas.
-	 * @return String cadena de texto con las horas con dos digitos como mínimo.
+	 * @returns String cadena de texto con las horas con dos digitos como mínimo.
 	 */
 	function getHours(time) {
 		var hour = Math.floor(time / 3600);

@@ -212,7 +212,7 @@ function Puzzle() {
 	/**
 	 * Método para saber si un puzzle puede estar resuelto.
 	 * 
-	 * @return Boolean booleano para indicar si un puzzle puede estar resuelto.
+	 * @returns Boolean booleano para indicar si un puzzle puede estar resuelto.
 	 */
 	this.isSolved = function() {
 		// Si el puzzle no contiene todos los cubos

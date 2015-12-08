@@ -17,7 +17,7 @@
 /*
  *  CLASE MOVINGPUZZLEVIEW
  *  */
-function MovingPuzzleView(sce, numC, mats, finAct, col) {
+function MovingPuzzleView(sce, numC, finAct, mats, col) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
@@ -275,7 +275,7 @@ function MovingPuzzleView(sce, numC, mats, finAct, col) {
 	/**
 	 * Método que será llamado cada vez que se inserte/encaje un cubo en el puzzle
 	 * 
-	 * @return Boolean booleano que indicará si el puzzle ha sido resuelto al encajar la pieza
+	 * @returns Boolean booleano que indicará si el puzzle ha sido resuelto al encajar la pieza
 	 */
 	this.cubeInserted = function() {
 		isDone = false;
@@ -324,7 +324,7 @@ function MovingPuzzleView(sce, numC, mats, finAct, col) {
 	/**
 	 * Método para saber si el puzzle está resuelto
 	 * 
-	 * @return Boolean booleano que indicará si el puzzle está resuelto
+	 * @returns Boolean booleano que indicará si el puzzle está resuelto
 	 */
 	this.isDone = function() {
 		return isDone;
