@@ -17,31 +17,27 @@
 /*
  *  CLASE SURVIVALMODECONTROLLER
  *  */
-function SurvivalModeController(cont, numC, diff, allMats, mats, cl) {
+function SurvivalModeController(numC, diff, mats) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
 
-	// Número de piezas que tendrá el puzzle
-	var numberOfCubes;
 	// Dificultad del puzzle
-	var difficulty;
-	// Materiales con los que está hecho el puzzle
-	var materials;
+	this.difficulty;
+	// Creamos un array para cada numero de cubos con los tiempos de cada dificultad, la primera la mas fácil, la última
+	// la mas díficil
+	this.difTimes = [ [ 5 * 60, 3 * 60, 1 * 60, 40 ], // 8 cubos
+	[ 20 * 60, 10 * 60, 5 * 60, 4 * 60 ] ]; // 27 cubos
+	// Tiempe que sobra de un puzzle para hacer el siguiente
+	this.remainingTime = 0;
+	// Número de puzzles que se han resuelto
+	this.solvedPuzzles = 0;
+
 	// Todos los materiales que se utilizarán en el modo de juego
-	var allMaterials;
-
-	// Reloj
-	var clock;
-
-	// Flag para saber si se ha acabado el tiempo
-	var overTime = false;
-
-	// Referencia a la ventana abierta
-	var solWin;
-	// Flag para saber si se esta mostrando la solucion parcial
-	var showingSolution = false;
+	this.allMaterials;
+	// Índice del ultimo material usado en el puzzle actual
+	this.lastMaterialUsed = -1;
 
 	/*******************************************************************************************************************
 	 * Constructor
@@ -49,8 +45,6 @@ function SurvivalModeController(cont, numC, diff, allMats, mats, cl) {
 	/**
 	 * Constructor de la clase SurvivalModeController
 	 * 
-	 * @param HTMLElement:cont->
-	 *            contendor con todos los elementos de la vista.
 	 * @param Integer:numC
 	 *            numero de cubos que tendra el puzzle, para simplicar se indicará mediante el número de cubos en una
 	 *            dimensión, 27 (3x3x3) => 3.
@@ -58,185 +52,147 @@ function SurvivalModeController(cont, numC, diff, allMats, mats, cl) {
 	 *            entero que identificará la dificultad: 0->facil, 1->medio, 2->dificil, 3->imposible.
 	 * @param Material[]:mats
 	 *            array con los materiales a usar para crear el puzzle.
-	 * @param Material[]:allMats
-	 *            array con todos los materiales que se utilizaran en el modo de juego
-	 * @param Clock:cl
-	 *            objeto de la clase Clock con la que se cronometrará el tiempo.
 	 */
 
-	numberOfCubes = numC;
-	difficulty = diff;
-	materials = mats;
-	allMaterials = allMats;
-	clock = cl;
-
-	// Registramos el evento de la pulsación del boton de mostrar todas las soluciones
-	cont.getElementsByTagName('form')[0].showSolutions.addEventListener('click', onShowSolutionsClick, false);
-	// Registramos el evento de la pulsación del boton de mostrar la posible solución
-	cont.getElementsByTagName('form')[0].showSolution.addEventListener('click', onShowSolutionClick, false);
-	// Registramos el evento de la pulsación del boton de colocar una pieza en el puzzle
-	cont.getElementsByTagName('form')[0].placeCube.addEventListener('click', onPlaceCubeClick, false);
-	// Registramos el evento de la pulsación del boton de ir al menu
-	cont.getElementsByTagName('form')[0].menu.addEventListener('click', onMenuClick, false);
-	// Registramos el evento de la pulsación del boton de reiniciar
-	cont.getElementsByTagName('form')[0].restart.addEventListener('click', onRestartClick, false);
-	// Registramos el evento de la pulsación del boton de pausar
-	cont.getElementsByTagName('form')[0].options.addEventListener('click', onOptionsClick, false);
-	// Registramos el evento de la pulsación del boton de pausar
-	cont.getElementsByTagName('form')[0].pause.addEventListener('click', onPauseClick, false);
+	this.allMaterials = mats;
+	// Guardamos la dificultad del puzzle, comprobamos que sea correcto
+	if (diff != 0 && diff != 1 && diff != 2 && diff != 3) {
+		this.difficulty = 1;
+	} else {
+		this.difficulty = diff;
+	}
+	// Llamamos al constructor de la clase padre (ClassicModeController)
+	ClassicModeController.call(this, numC, mats);
 
 	/*******************************************************************************************************************
 	 * Métodos Privados
 	 ******************************************************************************************************************/
 
-	/**
-	 * Manejador del evento de pulsación del botón de mostrar todas las soluciones
-	 * 
-	 * @param EventObject:event->
-	 *            caracteristicas del evento lanzado.
-	 */
-	function onShowSolutionsClick(event) {
-		window.mats = materials;
-		window.numC = numberOfCubes;
-		window.sensitivity = getOptions().sensitivity;
-		solWin = window.open("Solutions/solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
-				+ ",left=" + (window.screen.availWidth - 300));
-	}
+}
 
-	/**
-	 * Manejador del evento de pulsación del botón de mostrar la posible solución
-	 * 
-	 * @param EventObject:event->
-	 *            caracteristicas del evento lanzado.
-	 */
-	function onShowSolutionClick(event) {
-		if (showingSolution) {
-			pv.hideSolution();
-			cont.getElementsByTagName('form')[0].showSolution.value = 'mostrar una posible solucion';
-			showingSolution = false;
-		} else {
-			pv.showSolution();
-			cont.getElementsByTagName('form')[0].showSolution.value = 'ocultar la posible solucion';
-			showingSolution = true;
-			if (!overTime) {
-				clock.addTime(20);
-			}
+/***********************************************************************************************************************
+ * Heredamos de ClassicModeController
+ **********************************************************************************************************************/
+SurvivalModeController.prototype = Object.create(ClassicModeController.prototype);
+SurvivalModeController.prototype.constructor = SurvivalModeController;
+
+/**
+ * Realiza las operaciones necesarias para arrancar el modo de juego
+ */
+SurvivalModeController.prototype.init = function() {
+	// Creamos la vista del puzzle
+	container.appendChild(renderer.domElement);
+	var ctl = this;
+	pv = this.puzzle = new PuzzleView(scene, this.numberOfCubes, function() {
+		ctl.finish();
+	}, this.getMaterials());
+
+	// Creamos el reloj para cronometrar el tiempo
+	var ctl = this;
+	this.clock = new Clock(this.difTimes[this.numberOfCubes - 2][this.difficulty] + this.remainingTime
+			- this.solvedPuzzles * (5 - this.difficulty), function() {
+		ctl.timeFinished();
+	});
+	document.body.appendChild(this.clock.getDomElement());
+	this.clock.start();
+};
+
+/**
+ * Método para obtener los materiales que se deben usar en el puzzle actual
+ * 
+ * @returns Materials[] array con los materiales necesarios
+ */
+SurvivalModeController.prototype.getMaterials = function() {
+	// Vaciamos la lista de materiales actuales
+	this.materials = []
+	// Recorremos todos los materiales disponibles, empezando por el ultimo que se ha usado, hasta tener todos los
+	// que necesitamos
+	for (var i = this.lastMaterialUsed + 1; this.materials.length < this.numberOfCubes * 6; i++) {
+		// Si hemos llegado al final de todos los materiales, volvemos a empezar
+		if (i == this.allMaterials.length) {
+			i = 0;
 		}
+		this.lastMaterialUsed = i;
+		this.materials.push(this.allMaterials[i]);
 	}
+	return this.materials;
+}
 
-	/**
-	 * Manejador del evento de pulsación del botón de colocar una pieza en el puzzle
-	 * 
-	 * @param EventObject:event->
-	 *            caracteristicas del evento lanzado.
-	 */
-	function onPlaceCubeClick(event) {
-		if (!overTime) {
-			pv.placeCube();
-			clock.addTime(40);
+/**
+ * Método que se ejecutará la terminar el puzzle
+ */
+SurvivalModeController.prototype.finish = function() {
+	// Incrementamos el numero de puzzles resueltos
+	this.solvedPuzzles++;
+	// Paramos el reloj y obtenemos el tiempo
+	var time = this.clock.finish();
+	// Obtenemos el mensaje que se mostrara
+	var sec = time % 60;
+	var min = Math.floor(time / 60) % 60;
+	var hour = Math.floor(time / 3600);
+	var text = "Enhorabuena!!! Puzzle solucionado !!! Te han sobrado ";
+	if (hour != 0) {
+		text += hour + " horas, ";
+	}
+	text += min + " minutos y " + sec + " segundos para la siguiente ronda";
+	alert(text);
+	this.restart();
+};
+
+/**
+ * Método que se ejecutará cuando se termine el tiempo
+ */
+SurvivalModeController.prototype.timeFinished = function() {
+	this.finished = true;
+	sound.playExplosion();
+	this.finishMode("Se ha terminado el tiempo. ");
+	this.puzzle.setDone();
+}
+
+/**
+ * Método que se cuando no se acabe la partida, cuando se acabe el tiempo o cuando se quiera salir o reiniciar.
+ * 
+ * @param String:str
+ *            cadena que se mostrara al inicio del mensaje.
+ */
+SurvivalModeController.prototype.finishMode = function(str) {
+	var text = str + " Has conseguido solucionar " + this.solvedPuzzles + " puzzles. Enhorabuena!!!";
+	// Mostramos el dialogo para guardar la puntuacion
+	var submode = this.difficulty * 2 + (3 - this.numberOfCubes);
+	ScoresController.saveScoreDialog(text, this.solvedPuzzles, 3, submode);
+}
+
+/**
+ * Manejador del evento de pulsación del botón de ir al menu principal
+ * 
+ * @param EventObject:event->
+ *            caracteristicas del evento lanzado.
+ */
+SurvivalModeController.prototype.onMenuClick = function(event) {
+	// Confirmamos que se desea salir
+	if (confirm("Esta seguro que desea salir?")) {
+		// Si no se ha acabado el tiempo ejecutamos la accion de finalizacion de modo
+		if (!this.puzzle.isDone()) {
+			this.finishMode("");
 		}
+		this.hide();
+		menuCtl.show(0);
 	}
+}
 
-	/**
-	 * Manejador del evento de pulsación del botón de ir al menu principal
-	 * 
-	 * @param EventObject:event->
-	 *            caracteristicas del evento lanzado.
-	 */
-	function onMenuClick(event) {
-		// Confirmamos que se desea salir
-		if (confirm('Esta seguro que desea salir?')) {
-			// Si no se ha acabado el tiempo ejecutamos la accion de finalizacion de modo
-			if (!overTime) {
-				smv.finishMode("");
-			}
-			smv.hide();
-			menuCtl.show(0);
+/**
+ * Manejador del evento de pulsación del botón de reiniciar el juego
+ * 
+ * @param EventObject:event->
+ *            caracteristicas del evento lanzado.
+ */
+SurvivalModeController.prototype.onRestartClick = function(event) {
+	// Confirmamos que se desea reiniciar
+	if (confirm("Esta seguro que desea reiniciar?")) {
+		// Si no se ha acabado el tiempo ejecutamos la accion de finalizacion de modo
+		if (!this.puzzle.isDone()) {
+			this.finishMode("");
 		}
+		this.restart();
 	}
-
-	/**
-	 * Manejador del evento de pulsación del botón de reiniciar el juego
-	 * 
-	 * @param EventObject:event->
-	 *            caracteristicas del evento lanzado.
-	 */
-	function onRestartClick(event) {
-		// Confirmamos que se desea reiniciar
-		if (confirm('Esta seguro que desea reiniciar?')) {
-			// Si no se ha acabado el tiempo ejecutamos la accion de finalizacion de modo
-			if (!overTime) {
-				smv.finishMode("");
-			}
-			// Eliminamos de la vista el actual modo de juego
-			smv.hide();
-			// Creamos otro igual
-			smv = new SurvivalModeView(scene, numberOfCubes, difficulty, allMaterials);
-		}
-	}
-
-	/**
-	 * Manejador del evento de pulsación del botón de opciones
-	 * 
-	 * @param EventObject:event->
-	 *            caracteristicas del evento lanzado.
-	 */
-	function onOptionsClick(event) {
-		// Eliminamos de la vista el actual modo de juego
-		smv.hide();
-		// Mostramos el dialogo de opciones, indicandole la accion que tendra que hacer cuando se oculten las opciones
-		OptionsController.show(function() {
-			// Mostramos la vista del modo supervivencia
-			smv.show();
-		});
-	}
-
-	/**
-	 * Manejador del evento de pulsación del botón de pausa
-	 * 
-	 * @param EventObject:event->
-	 *            caracteristicas del evento lanzado.
-	 */
-	function onPauseClick(event) {
-		smv.pause();
-	}
-
-	/*******************************************************************************************************************
-	 * Métodos Públicos
-	 ******************************************************************************************************************/
-	/**
-	 * Método que elimina el controlador. Lo único que hace es eliminar los manejadores de eventos que tiene registrados
-	 */
-	this.remove = function() {
-		// Eliminamos los receptores de eventos de los botones
-		cont.getElementsByTagName('form')[0].showSolutions.removeEventListener('click', onShowSolutionsClick, false);
-		cont.getElementsByTagName('form')[0].showSolution.removeEventListener('click', onShowSolutionClick, false);
-		cont.getElementsByTagName('form')[0].placeCube.removeEventListener('click', onPlaceCubeClick, false);
-		cont.getElementsByTagName('form')[0].menu.removeEventListener('click', onMenuClick, false);
-		cont.getElementsByTagName('form')[0].restart.removeEventListener('click', onRestartClick, false);
-		cont.getElementsByTagName('form')[0].options.removeEventListener('click', onOptionsClick, false);
-		cont.getElementsByTagName('form')[0].pause.removeEventListener('click', onPauseClick, false);
-	}
-
-	/**
-	 * Método que habilita el controlador. Registra los eventos necesarios
-	 */
-	this.enable = function() {
-		// Registramos los receptores de eventos de los botones
-		cont.getElementsByTagName('form')[0].showSolutions.addEventListener('click', onShowSolutionsClick, false);
-		cont.getElementsByTagName('form')[0].showSolution.addEventListener('click', onShowSolutionClick, false);
-		cont.getElementsByTagName('form')[0].placeCube.addEventListener('click', onPlaceCubeClick, false);
-		cont.getElementsByTagName('form')[0].menu.addEventListener('click', onMenuClick, false);
-		cont.getElementsByTagName('form')[0].restart.addEventListener('click', onRestartClick, false);
-		cont.getElementsByTagName('form')[0].options.addEventListener('click', onOptionsClick, false);
-		cont.getElementsByTagName('form')[0].pause.addEventListener('click', onPauseClick, false);
-	}
-
-	/**
-	 * Método para indicar al controlador que el tiempo se ha acabado
-	 */
-	this.timeIsOver = function() {
-		overTime = true;
-	}
-
 }

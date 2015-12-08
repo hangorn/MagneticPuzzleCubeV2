@@ -165,8 +165,8 @@ ClassicModeController.prototype.onShowSolutionsClick = function(event) {
 	window.numC = this.numberOfCubes;
 	window.sensitivity = getOptions().sensitivity;
 	// Mostramos la nueva ventana indicando: URL, nombre, tamaño y posicion
-	window.open("Solutions/solutionsWindow.html", "solutionsWindow", "width=300,height=" + window.screen.availHeight
-			+ ",left=" + (window.screen.availWidth - 300));
+	window.open('Solutions/solutionsWindow.html', 'solutionsWindow', 'width=300,height=' + window.screen.availHeight
+			+ ',left=' + (window.screen.availWidth - 300));
 };
 
 /**
@@ -178,11 +178,11 @@ ClassicModeController.prototype.onShowSolutionsClick = function(event) {
 ClassicModeController.prototype.onShowSolutionClick = function(event) {
 	if (this.showingSolution) {
 		this.puzzle.hideSolution();
-		this.form.showSolution.value = 'mostrar una posible solucion';
+		this.form.showSolution.value = "mostrar una posible solucion";
 		this.showingSolution = false;
 	} else {
 		this.puzzle.showSolution();
-		this.form.showSolution.value = 'ocultar la posible solucion';
+		this.form.showSolution.value = "ocultar la posible solucion";
 		this.showingSolution = true;
 		this.clock.addTime(20);
 	}
@@ -207,7 +207,7 @@ ClassicModeController.prototype.onPlaceCubeClick = function(event) {
  */
 ClassicModeController.prototype.onMenuClick = function(event) {
 	// Confirmamos que se desea salir
-	if (confirm('Esta seguro que desea salir?')) {
+	if (confirm("Esta seguro que desea salir?")) {
 		this.hide();
 		menuCtl.show(0);
 	}
@@ -221,7 +221,7 @@ ClassicModeController.prototype.onMenuClick = function(event) {
  */
 ClassicModeController.prototype.onRestartClick = function(event) {
 	// Confirmamos que se desea reiniciar
-	if (confirm('Esta seguro que desea reiniciar?')) {
+	if (confirm("Esta seguro que desea reiniciar?")) {
 		this.restart();
 	}
 };

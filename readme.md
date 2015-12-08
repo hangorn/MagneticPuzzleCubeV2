@@ -1,7 +1,7 @@
 Description
 =======================
 
-Puzzle game for web browsers.
+Puzzle game for web browsers. This webApp is a puzzle where the pieces are cubes with images on their faces. You can choose whatever image you want. There are quite different modes available to play, even multiplayer.
 
 Developt with WebGL using [THREE.js](https://github.com/mrdoob/three.js) framework for 3D graphics.
 

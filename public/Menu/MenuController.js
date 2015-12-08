@@ -336,7 +336,7 @@ function MenuController() {
 					difficulty = i;
 				}
 			}
-			tmv = new TrialModeView(scene, view.getSelectedNumberOfCubes(), difficulty, materials);
+			new TrialModeController(view.getSelectedNumberOfCubes(), difficulty, materials);
 		}
 
 		// Si se trata del modo supervivencia
@@ -348,7 +348,7 @@ function MenuController() {
 					difficulty = i;
 				}
 			}
-			smv = new SurvivalModeView(scene, view.getSelectedNumberOfCubes(), difficulty, materials);
+			new SurvivalModeController(view.getSelectedNumberOfCubes(), difficulty, materials);
 		}
 
 		// Si se trata de crear una partida multijugador

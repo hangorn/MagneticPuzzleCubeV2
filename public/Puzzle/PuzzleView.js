@@ -304,7 +304,8 @@ function PuzzleView(sce, numC, finAct, mats, col) {
 	 * Método para colocar automáticamente un cubo en el puzzle de manera correcta
 	 */
 	this.placeCube = function() {
-		if (puzzle.placeCube()) {
+		// Si no esta solucionado, se intenta insertar un cubo, si se consigue, se realizan las acciones indicadas
+		if (!isDone && puzzle.placeCube()) {
 			if (this.cubeInserted()) {
 				puzC.setIsDone();
 			}
