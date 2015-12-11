@@ -451,48 +451,23 @@ function MenuView(menuData) {
 	 *            función de rellamada que será ejecutada cuando se pulse el botón de cancelar.
 	 */
 	this.showWaitingDialog = function(message, cancelAction) {
-		if (waitingDialog == undefined) {
-			// Creamos el contenedor
-			waitingDialog = document.createElement('div');
-			waitingDialog.style.position = 'absolute';
-			waitingDialog.style.top = '35%';
-			waitingDialog.style.left = '35%';
-			waitingDialog.style.width = '20%';
-			waitingDialog.style.padding = '20px';
-			waitingDialog.style.color = '#ff0000';
-			waitingDialog.style.background = '#ffffff';
-			waitingDialog.style.borderRadius = '10px';
-			waitingDialog.style.fontSize = 'large';
-			waitingDialog.style.fontWeigth = 'bolder';
-			waitingDialog.style.border = '3px double black';
-			waitingDialog.style.textAlign = 'center';
-			waitingDialog.innerHTML += '<p>' + message + '</p>';
-			// Creamos una imagen
-			var i = document.createElement('img');
-			i.style.margin = '0';
-			i.style.width = '20%';
-			i.src = 'img/loading.gif';
-			// i.style.height = '100px';
-			waitingDialog.appendChild(i);
-			// Creamos el boton
-			var button = document.createElement('input');
-			button.type = 'button';
-			button.value = 'cancelar';
-			button.style.marginTop = '20px';
-			button.style.marginLeft = '40px';
-			button.onclick = function() // Definimos la funcion para cuando se pulse el boton
-			{
+		// Funcion que se ejecutara tanto si esta como si no esta cargado el dialogo, para personalizarlo
+		var custom = function() {
+			// Mostramos el mensaje indicado
+			waitingDialog.getElementsByTagName('p')[0].innerHTML = message;
+			waitingDialog.getElementsByClassName('waitingDialogCancel')[0].onclick = function() {
 				document.body.removeChild(waitingDialog);
 				cancelAction();
 			}
-			waitingDialog.appendChild(button);
 			document.body.appendChild(waitingDialog);
+		}
+		
+		if (waitingDialog == undefined) {
+			// Creamos el contenedor
+			waitingDialog = document.createElement('div');
+			Utils.addDynamicComponent('html/waitingDialog.html', waitingDialog, custom);
 		} else {
-			// Buscamos el parrafo con el mensaje
-			var p = waitingDialog.getElementsByTagName('p')[0];
-			// Mostramos el mensaje indicado
-			p.innerHTML = message;
-			document.body.appendChild(waitingDialog);
+			custom();
 		}
 	}
 
