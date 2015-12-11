@@ -74,7 +74,7 @@ function Clock(iniT, cb) {
 	text = document.createElement('input');
 	text.type = 'text';
 	text.readOnly = 'readOnly';
-	text.value = getHours(initialTime) + ' : ' + getMinutes(initialTime) + ' : ' + getSeconds(initialTime);
+	text.value = getHours(initialTime) + " : " + getMinutes(initialTime) + " : " + getSeconds(initialTime);
 	text.className = 'clockComponent';
 	domElement.appendChild(text);
 	// Desactivamos la seleccion de texto, y la interaccion con el raton en general para el reloj
@@ -122,7 +122,7 @@ function Clock(iniT, cb) {
 	 *            tiempo que se mostrará en el reloj en segundos.
 	 */
 	function showTime(time) {
-		text.value = getHours(time) + ' : ' + getMinutes(time) + ' : ' + getSeconds(time);
+		text.value = getHours(time) + " : " + getMinutes(time) + " : " + getSeconds(time);
 	}
 
 	/**
@@ -135,9 +135,9 @@ function Clock(iniT, cb) {
 	function getSeconds(time) {
 		var sec = time % 60;
 		if (sec < 10) {
-			return '0' + sec;
+			return "0" + sec;
 		} else {
-			return '' + sec;
+			return "" + sec;
 		}
 	}
 
@@ -151,9 +151,9 @@ function Clock(iniT, cb) {
 	function getMinutes(time) {
 		var min = Math.floor(time / 60) % 60;
 		if (min < 10) {
-			return '0' + min;
+			return "0" + min;
 		} else {
-			return '' + min;
+			return "" + min;
 		}
 	}
 
@@ -167,9 +167,9 @@ function Clock(iniT, cb) {
 	function getHours(time) {
 		var hour = Math.floor(time / 3600);
 		if (hour < 10) {
-			return '0' + hour;
+			return "0" + hour;
 		} else {
-			return '' + hour;
+			return "" + hour;
 		}
 	}
 

@@ -48,7 +48,7 @@ function ScoresController(backAction) {
 	// Creamos un contenedor
 	view = document.createElement('div');
 	// Cargamos la vista en el contenedor y cuando se cargue la mostramos
-	addDynamicComponent("menu/scoresForm.html", view, function() {
+	addDynamicComponent('menu/scoresForm.html', view, function() {
 		init();
 		show();
 		showMode(0);
@@ -91,16 +91,16 @@ function ScoresController(backAction) {
 		}
 
 		// Cambiamos el estilo de la pestaña seleccionada
-		modesContainer[mode].classList.add("selectedTab");
+		modesContainer[mode].classList.add('selectedTab');
 
 		// Si habia otro seleccionado lo deseleccionamos y ocultamos sus submodos
 		if (lastModeSelected != undefined) {
-			modesContainer[lastModeSelected].classList.remove("selectedTab");
-			submodesContainer[lastModeSelected].children[lastSubmodeSelected].classList.remove("selectedTab");
-			submodesContainer[lastModeSelected].classList.add("hide");
+			modesContainer[lastModeSelected].classList.remove('selectedTab');
+			submodesContainer[lastModeSelected].children[lastSubmodeSelected].classList.remove('selectedTab');
+			submodesContainer[lastModeSelected].classList.add('hide');
 		}
 		// Mostramos los submodos del seleccionado
-		submodesContainer[mode].classList.remove("hide");
+		submodesContainer[mode].classList.remove('hide');
 		// Guardamos el nuevo modo
 		lastModeSelected = mode;
 		// Mostramos el primer submodo
@@ -119,11 +119,11 @@ function ScoresController(backAction) {
 			return;
 		}
 		// Marcamos el modo seleccionado
-		submodesContainer[lastModeSelected].children[submode].classList.add("selectedTab");
+		submodesContainer[lastModeSelected].children[submode].classList.add('selectedTab');
 		// Si habia otro seleccionado lo deseleccionamos y si no es el mismo y si existe
 		if (lastSubmodeSelected != undefined && lastSubmodeSelected != submode
 				&& lastSubmodeSelected < submodesContainer[lastModeSelected].children.length) {
-			submodesContainer[lastModeSelected].children[lastSubmodeSelected].classList.remove("selectedTab");
+			submodesContainer[lastModeSelected].children[lastSubmodeSelected].classList.remove('selectedTab');
 		}
 		// Guardamos el nuevo submodo
 		lastSubmodeSelected = submode;
@@ -133,7 +133,7 @@ function ScoresController(backAction) {
 			socket = new Socket();
 		}
 		// Le decimos al servidor que nos proporcione las puntuaciones cuando se consigan se mostraran
-		ajaxRequest("data/Scores.json?mode=" + lastModeSelected + "&submode=" + lastSubmodeSelected, function(scores) {
+		ajaxRequest('data/Scores.json?mode=' + lastModeSelected + '&submode=' + lastSubmodeSelected, function(scores) {
 			showScores(JSON.parse(scores));
 		});
 
@@ -148,7 +148,7 @@ function ScoresController(backAction) {
 	 *            array con objetos que contienen la información de las puntuaciones.
 	 */
 	function showScores(scores) {
-		var table = view.getElementsByClassName("menuContainer")[0].getElementsByTagName("tbody")[0];
+		var table = view.getElementsByClassName('menuContainer')[0].getElementsByTagName('tbody')[0];
 		// Borramos todo lo que tubiera la tabla
 		while (table.firstChild) {
 			table.removeChild(table.firstChild);
@@ -182,7 +182,7 @@ function ScoresController(backAction) {
 			row.appendChild(makeData(score.name));
 		} else {
 			var n;
-			var names = score.name.split("#");
+			var names = score.name.split('#');
 			// Si es el modo cooperativo
 			if (score.submode == 0 || score.submode == 1) {
 				n = names[0] + ' & ' + names[1];
@@ -204,11 +204,11 @@ function ScoresController(backAction) {
 			var sc = "";
 			var sec = score.score % 60;
 			if (sec < 10) {
-				sec = '0' + sec;
+				sec = "0" + sec;
 			}
 			var min = Math.floor(score.score / 60) % 60;
 			if (min < 10) {
-				min = '0' + min;
+				min = "0" + min;
 			}
 			var hour = Math.floor(score.score / 3600);
 			if (hour != 0) {
@@ -231,15 +231,15 @@ function ScoresController(backAction) {
 	 *            flag para mostrar la imagen o la tabla. true->imagen, false->tabla
 	 */
 	function showLoadingImg(show) {
-		var container = view.getElementsByClassName("menuContainer")[0];
+		var container = view.getElementsByClassName('menuContainer')[0];
 		if (show) {
 			// Mostramos imagen y ocultamos tabla
-			container.getElementsByTagName("img")[0].classList.remove("hide");
-			container.getElementsByTagName("table")[0].classList.add("hide");
+			container.getElementsByTagName('img')[0].classList.remove('hide');
+			container.getElementsByTagName('table')[0].classList.add('hide');
 		} else {
 			// Mostramos tabla y ocultamos imagen
-			container.getElementsByTagName("img")[0].classList.add("hide");
-			container.getElementsByTagName("table")[0].classList.remove("hide");
+			container.getElementsByTagName('img')[0].classList.add('hide');
+			container.getElementsByTagName('table')[0].classList.remove('hide');
 		}
 	}
 
@@ -356,9 +356,9 @@ ScoresController.saveScoreDialog = function(text, score, mode, submode) {
 	if (!saveScoreCont) {
 		// Creamos un contenedor para todos los elementos del dialogo
 		saveScoreCont = document.createElement('div');
-		addDynamicComponent("html/saveScoreForm.html", saveScoreCont, function() {
+		addDynamicComponent('html/saveScoreForm.html', saveScoreCont, function() {
 			// Definimos la funcion para cuando se pulse el boton
-			saveScoreCont.getElementsByClassName("saveDialogCancel")[0].onclick = function() {
+			saveScoreCont.getElementsByClassName('saveDialogCancel')[0].onclick = function() {
 				// Ocultamos el dialogo
 				document.body.removeChild(saveScoreCont);
 			}
@@ -368,12 +368,12 @@ ScoresController.saveScoreDialog = function(text, score, mode, submode) {
 		// Mostramos el dialogo
 		document.body.appendChild(saveScoreCont);
 		// Mostramos el mensaje saveDialogText
-		saveScoreCont.getElementsByClassName("saveDialogText")[0].innerHTML = text;
+		saveScoreCont.getElementsByClassName('saveDialogText')[0].innerHTML = text;
 		// Redefinimos la funcion para cuando se pulse el boton de guarda puntuacion
 		// para que lo haga con los nuevos datos y no con los antiguos
-		saveScoreCont.getElementsByClassName("saveDialogOK")[0].onclick = function() {
+		saveScoreCont.getElementsByClassName('saveDialogOK')[0].onclick = function() {
 			// Obtenemos el nombre
-			var name = saveScoreCont.getElementsByClassName("saveDialogInput")[0].value || "Anonimo";
+			var name = saveScoreCont.getElementsByClassName('saveDialogInput')[0].value || "Anonimo";
 			// Si no tenemos conexion con el servidor la creamos
 			if (socket == undefined) {
 				socket = new Socket();

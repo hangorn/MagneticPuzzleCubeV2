@@ -201,7 +201,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 		}
 
 		// Calculamos las posibles posiciones, adyacentes a las figuras ya colocadas
-		// Vamos a crear un array ordenado por 'x' luego 'y' y luego 'z' con todas las posibles posiciones
+		// Vamos a crear un array ordenado por "x" luego "y" y luego "z" con todas las posibles posiciones
 		// Al ordenarlo sera mas facil hacer una busqueda y evitar las repeticiones
 		var possiblePositions = [];
 		// Recorremos todas las figuras que ya esten introducidas en el puzzle

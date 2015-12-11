@@ -26,7 +26,7 @@ canvas {
 <script src="SolutionsController.js"></script>
 
 
-<script src="../Utils.js"></script>
+<script src="../Common/Utils.js"></script>
 
 </head>
 
@@ -67,7 +67,7 @@ canvas {
 		windowWidth = window.innerWidth;
 
 		//Introduciomos el render en el contenedor
-		renderer.domElement.id = "solutionsCanvas";
+		renderer.domElement.id = 'solutionsCanvas';
 		container.appendChild(renderer.domElement);
 
 		sv = new SolutionsView(camera, scene, numC, materials, window.opener.sensitivity);

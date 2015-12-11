@@ -40,7 +40,7 @@ function HelpController(backAction) {
 	// Creamos un contenedor
 	view = document.createElement('div');
 	// Cargamos la vista en el contenedor y cuando se cargue la mostramos
-	addDynamicComponent("menu/helpForm.html", view, function() {
+	addDynamicComponent('menu/helpForm.html', view, function() {
 		show();
 	});
 
@@ -55,13 +55,13 @@ function HelpController(backAction) {
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onMenuClick(event) {
-		var sections = view.getElementsByClassName("menuContainer")[0].children;
+		var sections = view.getElementsByClassName('menuContainer')[0].children;
 		// Ocultamos todas las secciones
 		for (var i = 0; i < sections.length; i++) {
-			sections[i].classList.add("hide");
+			sections[i].classList.add('hide');
 		}
 		// Mostramos la seccion correspondiente al boton
-		sections[event.target.index].classList.remove("hide");
+		sections[event.target.index].classList.remove('hide');
 	}
 
 	/**
@@ -77,8 +77,8 @@ function HelpController(backAction) {
 	 * Metodo que en funcion de las opciones mostrara unos controles u otros.
 	 */
 	function checkOptions() {
-		var movButton = view.getElementsByClassName("movButton");
-		var rotButton = view.getElementsByClassName("rotButton");
+		var movButton = view.getElementsByClassName('movButton');
+		var rotButton = view.getElementsByClassName('rotButton');
 
 		// Guardamos en un objeto temporal los datos de ambos botones, en la primera posicion los datos del boton de
 		// mover, y en la segunda del de rotar
@@ -112,7 +112,7 @@ function HelpController(backAction) {
 	 */
 	function remove() {
 		// Dejamos de escuchar eventos de los botones
-		var buttons = view.getElementsByClassName("rightContainer")[0].children;
+		var buttons = view.getElementsByClassName('rightContainer')[0].children;
 		for (var i = 0; i < buttons.length; i++) {
 			buttons[i].removeEventListener('click', onMenuClick, false);
 		}
@@ -125,7 +125,7 @@ function HelpController(backAction) {
 	 */
 	function enable() {
 		// Activamos los eventos de los botones
-		var buttons = view.getElementsByClassName("rightContainer")[0].children;
+		var buttons = view.getElementsByClassName('rightContainer')[0].children;
 		for (var i = 0; i < buttons.length; i++) {
 			buttons[i].index = i;
 			buttons[i].addEventListener('click', onMenuClick, false);

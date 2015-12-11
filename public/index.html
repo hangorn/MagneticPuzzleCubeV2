@@ -7,10 +7,9 @@
 <meta charset="utf-8">
 <meta name="viewport"
 	content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-<link href='css/StalinistOne-Regular.css' rel='stylesheet'
-	type='text/css'>
-<link href='css/style.css' rel='stylesheet' type='text/css'>
-<link href='img/levels/level2.gif' rel='icon' type='image/gif' />
+<link href="css/StalinistOne-Regular.css" rel="stylesheet" type="text/css">
+<link href="css/style.css" rel="stylesheet" type="text/css">
+<link href="img/levels/level2.gif" rel="icon" type="image/gif" />
 </head>
 <body>
 	<script src="js/three.min.js"></script>
@@ -76,13 +75,13 @@
 	<script>
 		//Comprobamos que WebGL esta disponible
 		if (!Detector.webgl) {
-			addDynamicComponent("html/webGLnotSupported.html", document.body);
+			addDynamicComponent('html/webGLnotSupported.html', document.body);
 			var WebGLavaible = false
 		} else {
 			var WebGLavaible = true;
 		}
 		//Cargamos dinamicamente el texto de los creditos
-		addDynamicComponent("html/credits.html", document.body);
+		addDynamicComponent('html/credits.html', document.body);
 
 		//Datos para la creacion de un puzzle con 3 soluciones
 		var puzzle3Data;
@@ -104,7 +103,7 @@
 
 		//Controlador del menu principal
 		var menuCtl;
-		
+
 		//Vistas de la aplicacion
 		var pv; //Puzzle
 
@@ -130,7 +129,7 @@
 		function init() {
 			//Realizamos la peticion de los datos para un puzzle de 3 soluciones
 			//Leemos los datos para crear los cubos de un fichero JSON
-			ajaxRequest("data/3SolPuzzle.json", function(resp) {
+			ajaxRequest('data/3SolPuzzle.json', function(resp) {
 				//Transformamos los datos del fichero a notacion JSON
 				puzzle3Data = JSON.parse(resp).data;
 
@@ -138,7 +137,7 @@
 
 			//Realizamos la peticion de los datos para un puzzle de 2 soluciones
 			//Leemos los datos para crear los cubos de un fichero JSON
-			ajaxRequest("data/2SolPuzzle.json", function(resp) {
+			ajaxRequest('data/2SolPuzzle.json', function(resp) {
 				//Transformamos los datos del fichero a notacion JSON
 				puzzle2Data = JSON.parse(resp).data;
 			});
@@ -167,12 +166,12 @@
 
 			//Iniciamos el menu principal
 			//Leemos los datos para crear las letras de un fichero JSON
-			ajaxRequest("data/Letters.json", function(lettersResp) {
+			ajaxRequest('data/Letters.json', function(lettersResp) {
 				//Transformamos los datos del fichero a notacion JSON
 				lettersData = JSON.parse(lettersResp);
 				//Realizamos la peticion de los datos para la informacion de los niveles
 				//Leemos los datos para crear los cubos de un fichero JSON
-				ajaxRequest("data/Levels.json", function(levelsResp) {
+				ajaxRequest('data/Levels.json', function(levelsResp) {
 					//Transformamos los datos del fichero a notacion JSON
 					levelsData = JSON.parse(levelsResp).data;
 					//Iniciamos el sonido
@@ -186,7 +185,7 @@
 			renderer = new THREE.WebGLRenderer();
 			renderer.setSize(windowWidth, windowHeight);
 			//Introduciomos el render en el contenedor
-			renderer.domElement.id = "canvas";
+			renderer.domElement.id = 'canvas';
 			renderer.domElement.style.width = '100%';
 			container.appendChild(renderer.domElement);
 			//Cuando se redimensiona la pantalla

@@ -66,13 +66,13 @@ function MenuView(menuData) {
 			var data = menuData[i][j];
 			entrys[i].dataType = data.type;
 			entrys[i].mode = data.mode;
-			if (data.type == "webgl") {
+			if (data.type == 'webgl') {
 				entrys[i][j] = createMenuEntry(data.txt, new THREE.Vector3(0, data.data, 0));
 				// Marcamos las entradas de atras, ya que tienen un comportamiento diferente
-				if (data.mode == "back") {
+				if (data.mode == 'back') {
 					entrys[i][j].menuIndex = -1;
 				}
-			} else if (data.type == "html") {
+			} else if (data.type == 'html') {
 				entrys[i][j] = document.createElement('div');
 				addDynamicComponent(data.data, entrys[i][j]);
 			}
@@ -90,7 +90,7 @@ function MenuView(menuData) {
 		}
 	}
 
-	ajaxRequest("data/MultiplayerLevels.json", function(resp) {
+	ajaxRequest('data/MultiplayerLevels.json', function(resp) {
 		// Transformamos los datos del fichero a notacion JSON
 		multiplayerLevelsData = JSON.parse(resp).data;
 
@@ -398,12 +398,12 @@ function MenuView(menuData) {
 		}
 
 		// Si el menu a ocultar es de los que tienen entradas de menu
-		if (entrys[currentMenu].dataType == "webgl") {
+		if (entrys[currentMenu].dataType == 'webgl') {
 			// Eliminamos de la escena todas las entradas del menu actual
 			for (var i = 0; i < entrys[currentMenu].length; i++) {
 				scene.remove(entrys[currentMenu][i]);
 			}
-		} else if (entrys[currentMenu].dataType == "html") {
+		} else if (entrys[currentMenu].dataType == 'html') {
 			// Si el menu a ocultar es un formulario lo ocultamos
 			if (entrys[currentMenu][0].parentNode == document.body) {
 				document.body.removeChild(entrys[currentMenu][0]);
@@ -429,13 +429,13 @@ function MenuView(menuData) {
 		}
 
 		// Si el menu seleccionado es de los que tienen entradas de menu
-		if (entrys[currentMenu].dataType == "webgl") {
+		if (entrys[currentMenu].dataType == 'webgl') {
 			container.appendChild(renderer.domElement);
 			// Mostramos las entradas del menu correspondiente
 			for (var i = 0; i < entrys[currentMenu].length; i++) {
 				scene.add(entrys[currentMenu][i]);
 			}
-		} else if (entrys[currentMenu].dataType == "html") {
+		} else if (entrys[currentMenu].dataType == 'html') {
 			// Si el menu a mostrar es un formulario lo ocultamos
 			var child = entrys[currentMenu][0];
 			document.body.appendChild(child);
@@ -471,7 +471,7 @@ function MenuView(menuData) {
 			var i = document.createElement('img');
 			i.style.margin = '0';
 			i.style.width = '20%';
-			i.src = "img/loading.gif";
+			i.src = 'img/loading.gif';
 			// i.style.height = '100px';
 			waitingDialog.appendChild(i);
 			// Creamos el boton

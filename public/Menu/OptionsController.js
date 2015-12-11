@@ -52,7 +52,7 @@ function OptionsController(endAct, opts) {
 	// Creamos un contenedor
 	view = document.createElement('div');
 	// Cargamos la vista en el contenedor y cuando se cargue la mostramos
-	addDynamicComponent("menu/optionsForm.html", view, function() {
+	addDynamicComponent('menu/optionsForm.html', view, function() {
 		form = view.getElementsByTagName('form')[0];
 		show(endAct);
 	});

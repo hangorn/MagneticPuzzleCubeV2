@@ -13,17 +13,17 @@
  *  Fecha: 23-08-2015
  *  Versión: 0.1
  *  */
-var I18N = "i18n";
+var I18N = 'i18n';
 
 exports.getJson = function(req, res) {
 	// Primero obtenemos el fichero JSON
-	var json = require("../public" + req.url);
+	var json = require('../public' + req.url);
 	// Creamos una funcion para recorrer todos los atributos del objeto JSON y poder transformarlos
 	var iterate = function(obj, newObj) {
 		for ( var property in obj) {
 			if (obj.hasOwnProperty(property)) {
 				// Si es un objeto seguimos iterando sobre el
-				if (typeof obj[property] == "object") {
+				if (typeof obj[property] == 'object') {
 					// Si en el nuevo objeto todavia no se ha creado el contenido de la propiedad, la creamos
 					newObj[property] = newObj[property] || {};
 					iterate(obj[property], newObj[property]);

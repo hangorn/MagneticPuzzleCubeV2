@@ -71,7 +71,7 @@ function Multiplayer() {
 	 */
 	function handleMessage(client, game, message) {
 		// Dividimos el mensaje en las partes correspondientes
-		var parts = message.split("#");
+		var parts = message.split('#');
 		// Si el mensaje no tiene cabecera y subcabecera no hacemos nada
 		if (parts.length < 2) {
 			return;
@@ -83,10 +83,10 @@ function Multiplayer() {
 		// Decodificamos el mensaje
 		switch (parts[0]) {
 		// Mensaje del juego
-		case "g":
+		case 'g':
 			switch (parts[1]) {
 			// Pieza seleccionada
-			case "s":
+			case 's':
 				// Si no se trata del modo cooperativo (contrareloj)
 				if (!constants.isCooperativo(game.type)) {
 					// Nos salimos, en el modo contrareloj no nos importan las piezas seleccionadas
@@ -117,7 +117,7 @@ function Multiplayer() {
 				}
 				break;
 			// Pieza movida
-			case "m":
+			case 'm':
 				// Guardamos la posicion de la pieza movida
 				if (constants.isCooperativo(game.type)) {
 					// Si es el tipo de partida cooperativa
@@ -130,7 +130,7 @@ function Multiplayer() {
 				otherClient.socket.send(message);
 				break;
 			// Pieza girada
-			case "r":
+			case 'r':
 				// Guardamos la rotacion de la pieza girada
 				if (constants.isCooperativo(game.type)) {
 					// Si es el tipo de partida cooperativa
@@ -143,7 +143,7 @@ function Multiplayer() {
 				otherClient.socket.send(message);
 				break;
 			// Pieza introducida en el puzzle
-			case "p":
+			case 'p':
 				// Si es el tipo de partida cooperativa
 				if (constants.isCooperativo(game.type)) {
 					// Guardamos la posicion y rotacion
@@ -217,11 +217,11 @@ function Multiplayer() {
 		}
 
 		// Le decimos a los dos jugadores que el puzzle ha sido resuelto
-		game.players.host.socket.emit("onSolvedGame", {
+		game.players.host.socket.emit('onSolvedGame', {
 			time : time,
 			winner : game.players.host.winner
 		});
-		game.players.client.socket.emit("onSolvedGame", {
+		game.players.client.socket.emit('onSolvedGame', {
 			time : time,
 			winner : game.players.client.winner
 		});
@@ -253,7 +253,7 @@ function Multiplayer() {
 		// Si es el tipo de partida cooperativa
 		if (constants.isCooperativo(game.type)) {
 			// Creamos un puzzle pasandole el numero de cubos
-			game.puzzle = require("./Puzzle.js");
+			game.puzzle = require('./Puzzle.js');
 			game.puzzle.createPuzzle(numberOfCubes);
 			// Iniciamos la posicones y rotaciones iniciales de los cubos
 			for (var i = 0; i < Math.pow(numberOfCubes, 3); i++) {
@@ -267,10 +267,10 @@ function Multiplayer() {
 			game.players.host.winner = undefined;
 			game.players.host.winner = undefined;
 			// Creamos un puzzle para el host de la partida
-			game.players.host.puzzle = require("./Puzzle.js");
+			game.players.host.puzzle = require('./Puzzle.js');
 			game.players.host.puzzle.createPuzzle(numberOfCubes);
 			// Creamos un puzzle para el cliente de la partida
-			game.players.client.puzzle = require("./Puzzle.js");
+			game.players.client.puzzle = require('./Puzzle.js');
 			game.players.client.puzzle.createPuzzle(numberOfCubes);
 			// Iniciamos las posicones y rotaciones iniciales de los cubos de ambos puzzles
 			for (var i = 0; i < Math.pow(numberOfCubes, 3); i++) {

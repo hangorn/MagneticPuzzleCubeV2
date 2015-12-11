@@ -25,9 +25,9 @@ DataAccessObject = function() {
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
 
-	var credentials = require("./Credentials.js");
+	var credentials = require('./Credentials.js');
 	// Cliente con el cual nos conectaremos a la base de datos
-	var mongoClient = require("mongodb").MongoClient;
+	var mongoClient = require('mongodb').MongoClient;
 	// Base de datos que se utilizará con MongoDB
 	var database;
 
@@ -121,7 +121,7 @@ DataAccessObject = function() {
 				sort : [ [ 'score', orderModes[mo] ], [ 'date', -1 ] ]
 			}).toArray(function(error, array) {
 				if (error) {
-					console.error("db.collection.find::error", error);
+					console.error('db.collection.find::error', error);
 				}
 				callback(array);
 				console.log("Served " + array.length + " elements for mode " + mo + "  " + sub);

@@ -34,11 +34,11 @@ exports.onConnect =  function(socket) {
 		id : client.ID
 	});
 	if (verbose) {
-		console.log('\t socket.io:: player ' + client.ID + ' connected');
+		console.log("\t socket.io:: player " + client.ID + " connected");
 	}
 
 	// Obtenemos el nucleo de la logica del servidor
-	var server = require("../game/Server.js");
+	var server = require('../game/Server.js');
 
 	/*******************************************************************************************************************
 	 * Registramos los eventos que recibiremos del cliente
@@ -73,7 +73,7 @@ exports.onConnect =  function(socket) {
 	// Evento de cliente desconectado
 	socket.on('disconnect', function() {
 		if (verbose) {
-			console.log('\t socket.io:: disconnected client ' + client.ID);
+			console.log("\t socket.io:: disconnected client " + client.ID);
 		}
 		server.saveLastScore(client);
 		// Si el cliente esta en una partida y es el propietario de esta

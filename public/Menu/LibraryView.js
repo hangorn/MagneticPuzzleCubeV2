@@ -435,8 +435,8 @@ function LibraryView(ty) {
 			size : textSize,
 			height : 40,
 			curveSegments : 4,
-			font : "droid serif",
-			style : "normal",
+			font : 'droid serif',
+			style : 'normal',
 
 			bevelThickness : 4,
 			bevelSize : 1.5,

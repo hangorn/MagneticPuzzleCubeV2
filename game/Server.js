@@ -100,13 +100,13 @@ Server = function() {
 				// Si el cliente que quiere guardar la puntuacion es el ganador lo ponemos primero, si no ponemos
 				// primero al otro jugador
 				if (client.winner) {
-					score.name = 'Anonimo#' + client.lastPartner.score.name;
+					score.name = "Anonimo#" + client.lastPartner.score.name;
 				} else {
-					score.name = client.lastPartner.score.name + '#Anonimo';
+					score.name = client.lastPartner.score.name + "#Anonimo";
 				}
 			} else {
 				// Si se trata del modo cooperativo
-				score.name = client.lastPartner.score.name + '#Anonimo';
+				score.name = client.lastPartner.score.name + "#Anonimo";
 			}
 			// Guardamos la puntuacion en la bb dd
 			dao.saveScore(score);
@@ -184,7 +184,7 @@ Server = function() {
 			}
 		}
 		// Enviamos la respuesta con los datos al cliente
-		client.socket.emit("onSentGames", {
+		client.socket.emit('onSentGames', {
 			games : availableGames
 		});
 	}
@@ -265,7 +265,7 @@ Server = function() {
 			this.saveLastScore(game.players.client);
 			this.saveLastScore(game.players.host);
 			// Iniciamos la partida
-			game.core = new (require("./Multiplayer.js"))();
+			game.core = new (require('./Multiplayer.js'))();
 			game.core.startGame(game, function() {
 				solvedGame(game)
 			});

@@ -308,7 +308,7 @@ LevelsModeController.prototype.previousLevel = function() {
  */
 LevelsModeController.prototype.onNextClick = function(event) {
 	// Confirmamos que se desea pasar al nivel siguiente
-	if (confirm('Esta seguro que desea pasar al nivel siguiente?')) {
+	if (confirm("Esta seguro que desea pasar al nivel siguiente?")) {
 		this.nextLevel();
 	}
 }
@@ -321,7 +321,7 @@ LevelsModeController.prototype.onNextClick = function(event) {
  */
 LevelsModeController.prototype.onPreviousClick = function(event) {
 	// Confirmamos que se desea pasar al nivel anterior
-	if (confirm('Esta seguro que desea pasar al nivel anterior?')) {
+	if (confirm("Esta seguro que desea pasar al nivel anterior?")) {
 		this.previousLevel();
 	}
 }
@@ -336,7 +336,7 @@ LevelsModeController.prototype.getButtonsWithActions = function() {
 	this.form.removeChild(this.form.showSolution);
 	this.form.removeChild(this.form.placeCube);
 	var ctl = this;
-	// Creamos funciones anonimas por que si no javascript se piensa que 'this' es 'window' dentro de las funciones
+	// Creamos funciones anonimas por que si no javascript se piensa que "this" es "window" dentro de las funciones
 	return [ {
 		button : this.form.showSolutions,
 		action : function(event) {

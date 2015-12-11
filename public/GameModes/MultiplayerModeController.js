@@ -88,13 +88,13 @@ MultiplayerModeController.prototype.initOtherPlayerRender = function() {
 	camera.position.z = 3000;
 
 	this.otherPlayerRenderCont = document.createElement('div');
-	this.otherPlayerRenderCont.id = "otherPlayerRenderContainer";
+	this.otherPlayerRenderCont.id = 'otherPlayerRenderContainer';
 
 	// Creamos el render y fijamos su tamaño
 	var otherPlayerRender = new THREE.WebGLRenderer();
 	otherPlayerRender.setSize(windowWidth / 3, windowHeight * 0.4);
 	// Introduciomos el render en el contenedor
-	otherPlayerRender.domElement.id = "otherPlayerRender";
+	otherPlayerRender.domElement.id = 'otherPlayerRender';
 	this.otherPlayerRenderCont.appendChild(otherPlayerRender.domElement);
 	// Cuando se redimensiona la pantalla
 	this.otherPlayerRenderCont.onresize = function() {
@@ -331,7 +331,7 @@ MultiplayerModeController.prototype.getButtonsWithActions = function() {
 	// Ocultamos toda la vista, ya que se iniciara oculta y para mostrarla habra que indicarselo
 	document.body.removeChild(this.view);
 	var ctl = this;
-	// Creamos funciones anonimas por que si no javascript se piensa que 'this' es 'window' dentro de las funciones
+	// Creamos funciones anonimas por que si no javascript se piensa que "this" es "window" dentro de las funciones
 	return [ {
 		button : this.form.menu,
 		action : function(event) {

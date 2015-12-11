@@ -132,7 +132,7 @@ function loadTexture(path, f) {
  */
 function imageToBase64(image) {
 	// Creamos un canvas
-	var canvas = document.createElement("canvas");
+	var canvas = document.createElement('canvas');
 	// Si la imagen es demasido grande la reducimos
 	if (image.height > 256) {
 		canvas.width = 256 * image.width / image.height;
@@ -142,12 +142,12 @@ function imageToBase64(image) {
 		canvas.height = image.height;
 	}
 	// Introducimos la imagen en el canvas
-	var ctx = canvas.getContext("2d");
+	var ctx = canvas.getContext('2d');
 	ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 	// Obtenemos la imagen codificada
-	var dataURL = canvas.toDataURL("image/png");
+	var dataURL = canvas.toDataURL('image/png');
 	// Suministramos solo los datos, no la cabecera
-	return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+	return dataURL.replace(/^data:image\/(png|jpg);base64,/, '');
 }
 
 /**
@@ -167,7 +167,7 @@ Utils.base64ToImage = function(base64, onloadCallback) {
 		i.onload = onloadCallback;
 	}
 	// Indicamos los datos añadiendoles la cabecera necesaria
-	i.src = "data:image/png;base64," + base64;
+	i.src = 'data:image/png;base64,' + base64;
 	return i;
 }
 
@@ -282,7 +282,7 @@ function ajaxRequest(url, callback) {
 			callback(request.responseText);
 		}
 	}
-	request.open("GET", url, true);
+	request.open('GET', url, true);
 	request.send();
 
 }

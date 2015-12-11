@@ -87,7 +87,7 @@ function MenuController() {
 	};
 
 	// Obtenemos los datos para generar el menu
-	ajaxRequest("data/Menu.json", function(menuResp) {
+	ajaxRequest('data/Menu.json', function(menuResp) {
 		var menuData = JSON.parse(menuResp).data;
 
 		view = new MenuView(menuData);
@@ -111,7 +111,7 @@ function MenuController() {
 		event.preventDefault();
 
 		// Si el menu actual no tiene entradas de menu
-		if (menuEntrys[currentMenu].dataType != "webgl") {
+		if (menuEntrys[currentMenu].dataType != 'webgl') {
 			return;
 		}
 
@@ -153,7 +153,7 @@ function MenuController() {
 		event.preventDefault();
 
 		// Si el menu actual no tiene entradas de menu
-		if (menuEntrys[currentMenu].dataType != "webgl") {
+		if (menuEntrys[currentMenu].dataType != 'webgl') {
 			return;
 		}
 
@@ -230,11 +230,11 @@ function MenuController() {
 		// Obtenemos el tipo de biblioteca que se ha de mostrar
 		var libType;
 		// Si la cantidad de imagenes depende del numero de cubos, segun el modo de juego
-		if (menuEntrys[currentMenu].mode == "classic" || menuEntrys[currentMenu].mode == "trial") {
+		if (menuEntrys[currentMenu].mode == 'classic' || menuEntrys[currentMenu].mode == 'trial') {
 			libType = view.getSelectedNumberOfCubes();
 		}
 		// Si se trata del modo multijugador
-		else if (menuEntrys[currentMenu].mode == "multiplayer") {
+		else if (menuEntrys[currentMenu].mode == 'multiplayer') {
 			// Si el ultimo tipo de partida seleccionada es par
 			if ((lastEntrySelected % 2) == 0) {
 				libType = 2; // Es un tipo con 8 cubos
@@ -269,17 +269,17 @@ function MenuController() {
 	 */
 	function onMenuStartClick(event) {
 		// Si se trata del menu de buscar partida multijugador y no hay partidas
-		if (menuEntrys[currentMenu].mode == "findServer"
+		if (menuEntrys[currentMenu].mode == 'findServer'
 				&& menuEntrys[currentMenu][0].getElementsByTagName('tBody')[0].children.length == 0) {
 			// No hacemos nada
 			return;
 		}
 		// Si menu actual es distinto de buscar partida multijugador
-		if (menuEntrys[currentMenu].mode != "findServer") {
+		if (menuEntrys[currentMenu].mode != 'findServer') {
 			var imgsNeeded = 0;
 			var selectedMaterials = materials.length;
 			// Si la cantidad de imagenes depende del numero de cubos, segun el modo de juego
-			if (menuEntrys[currentMenu].mode == "classic" || menuEntrys[currentMenu].mode == "trial") {
+			if (menuEntrys[currentMenu].mode == 'classic' || menuEntrys[currentMenu].mode == 'trial') {
 				imgsNeeded = 6 * view.getSelectedNumberOfCubes();
 			}
 			// Si se trata del modo multijugador
@@ -320,17 +320,17 @@ function MenuController() {
 		container.appendChild(renderer.domElement);
 
 		// Si se trata del modo clasico
-		if (menuEntrys[currentMenu].mode == "classic") {
+		if (menuEntrys[currentMenu].mode == 'classic') {
 			new ClassicModeController(view.getSelectedNumberOfCubes(), materials);
 		}
 
 		// Si se trata del modo niveles
-		if (menuEntrys[currentMenu].mode == "levels") {
+		if (menuEntrys[currentMenu].mode == 'levels') {
 			new LevelsModeController(lastEntrySelected, materials);
 		}
 
 		// Si se trata del modo contrareloj
-		if (menuEntrys[currentMenu].mode == "trial") {
+		if (menuEntrys[currentMenu].mode == 'trial') {
 			// Obtenemos la dificultad
 			var difficulty;
 			for (var i = 0; i < menuEntrys[currentMenu][0].getElementsByTagName('form')[0].difficulty.length; i++) {
@@ -342,7 +342,7 @@ function MenuController() {
 		}
 
 		// Si se trata del modo supervivencia
-		if (menuEntrys[currentMenu].mode == "survival") {
+		if (menuEntrys[currentMenu].mode == 'survival') {
 			// Obtenemos la dificultad
 			var difficulty;
 			for (var i = 0; i < menuEntrys[currentMenu][0].getElementsByTagName('form')[0].difficulty.length; i++) {
@@ -354,7 +354,7 @@ function MenuController() {
 		}
 
 		// Si se trata de crear una partida multijugador
-		if (menuEntrys[currentMenu].mode == "multiplayer") {
+		if (menuEntrys[currentMenu].mode == 'multiplayer') {
 			// Si no tenemos conexion con el servidor la creamos
 			if (socket == undefined) {
 				socket = new Socket();
@@ -422,7 +422,7 @@ function MenuController() {
 		}
 
 		// Si se trata de buscar una partida multijugador
-		if (menuEntrys[currentMenu].mode == "findServer") {
+		if (menuEntrys[currentMenu].mode == 'findServer') {
 			// Si no tenemos conexion con el servidor la creamos
 			if (socket == undefined) {
 				socket = new Socket();
@@ -521,12 +521,12 @@ function MenuController() {
 		var form = menuEntrys[currentMenu][0];
 		var entrys = menuEntrys[currentMenu][0].getElementsByClassName('menuItem');
 		// Si no estamos en un modo con entradas o la entrada indicado no existe
-		if ((menuEntrys[currentMenu].mode != "levels" && menuEntrys[currentMenu].mode != "multiplayer" && menuEntrys[currentMenu].mode != "findServer")
+		if ((menuEntrys[currentMenu].mode != 'levels' && menuEntrys[currentMenu].mode != 'multiplayer' && menuEntrys[currentMenu].mode != 'findServer')
 				|| l >= entrys.length) {
 			return;
 		}
 		// Si el menu tiene descripciones (niveles o multijugador)
-		if (menuEntrys[currentMenu].mode != "findServer") {
+		if (menuEntrys[currentMenu].mode != 'findServer') {
 			// Mostramos la descripcion de la entrada
 			form.getElementsByTagName('form')[0].getElementsByClassName('description')[0].innerHTML = entrys[l]
 					.getElementsByTagName('img')[0].alt;
@@ -570,7 +570,7 @@ function MenuController() {
 	 * Método que elimina el controlador. Lo único que hace es eliminar los manejadores de eventos que tiene registrados
 	 */
 	function remove() {
-		if (menuEntrys[currentMenu].dataType == "webgl") {
+		if (menuEntrys[currentMenu].dataType == 'webgl') {
 			// Borramos receptores de eventos para el raton
 			document.getElementById('canvas').removeEventListener('click', onMenuClick, false);
 			document.getElementById('canvas').removeEventListener('mousemove', onMenuMouseMove, false);
@@ -582,7 +582,7 @@ function MenuController() {
 		var form = menuEntrys[currentMenu][0];
 		// Si esta definido un formulario de configuracion de modo borramos los receptores del formulario
 		if (form != undefined && form.getElementsByTagName != undefined) {
-			if (menuEntrys[currentMenu].mode == "findServer") {
+			if (menuEntrys[currentMenu].mode == 'findServer') {
 				form.getElementsByTagName('form')[0].refresh.removeEventListener('click', onMenuRefreshClick, false);
 			} else {
 				form.getElementsByTagName('form')[0].library.removeEventListener('click', onMenuLibraryClick, false);
@@ -590,8 +590,8 @@ function MenuController() {
 			form.getElementsByTagName('form')[0].start.removeEventListener('click', onMenuStartClick, false);
 			form.getElementsByTagName('form')[0].back.removeEventListener('click', onMenuBack, false);
 			// Si se trata del modo niveles borramos los receptores de eventos para la seleccion de nivel
-			if (menuEntrys[currentMenu].mode == "levels" || menuEntrys[currentMenu].mode == "multiplayer"
-					|| menuEntrys[currentMenu].mode == "findServer") {
+			if (menuEntrys[currentMenu].mode == 'levels' || menuEntrys[currentMenu].mode == 'multiplayer'
+					|| menuEntrys[currentMenu].mode == 'findServer') {
 				var entrys = form.getElementsByClassName('menuItem');
 				for (var i = 0; i < entrys.length; i++) {
 					entrys[i].removeEventListener('click', onEntryClick, false);
@@ -616,7 +616,7 @@ function MenuController() {
 			currentMenu = menu;
 		}
 		// Si el menu seleccionado es de los que tienen entradas de menu
-		if (menuEntrys[currentMenu].dataType == "webgl") {
+		if (menuEntrys[currentMenu].dataType == 'webgl') {
 			// Añadimos receptores de eventos para el raton
 			document.getElementById('canvas').addEventListener('click', onMenuClick, false);
 			document.getElementById('canvas').addEventListener('mousemove', onMenuMouseMove, false);
@@ -624,12 +624,12 @@ function MenuController() {
 			scene.add(plane);
 		}
 		// Si es el menu de un modo de un jugador o el de crear partida multijugador
-		else if (menuEntrys[currentMenu].dataType == "html") {
+		else if (menuEntrys[currentMenu].dataType == 'html') {
 			// Obtenemos el formulario del menu actual
 			var form = menuEntrys[currentMenu][0];
 			// Si es el menu del modo niveles
-			if (menuEntrys[currentMenu].mode == "levels" || menuEntrys[currentMenu].mode == "multiplayer"
-					|| menuEntrys[currentMenu].mode == "findServer") {
+			if (menuEntrys[currentMenu].mode == 'levels' || menuEntrys[currentMenu].mode == 'multiplayer'
+					|| menuEntrys[currentMenu].mode == 'findServer') {
 				// Indicamos que no habia una entrada seleccionada antes
 				lastEntrySelected = undefined;
 				// Seleccionamos la primera entrada
@@ -645,7 +645,7 @@ function MenuController() {
 			// Registramos el evento de la pulsacion del boton de atras
 			form.getElementsByTagName('form')[0].back.addEventListener('click', onMenuBack, false);
 			// Si es el menu de un modo de un jugador o el de crear partida multijugador
-			if (menuEntrys[currentMenu].mode == "findServer") {
+			if (menuEntrys[currentMenu].mode == 'findServer') {
 				// Registramos el evento de la pulsacion del boton de la refrescar las partidas
 				form.getElementsByTagName('form')[0].refresh.addEventListener('click', onMenuRefreshClick, false);
 			} else {
@@ -666,13 +666,13 @@ function MenuController() {
 		enable(menu);
 
 		// Si el menu seleccionado es el menu de opciones
-		if (menuEntrys[currentMenu].dataType == "options") {
+		if (menuEntrys[currentMenu].dataType == 'options') {
 			// Mostramos el dialogo de opciones pasandole la funcion que se ejecutara al para mostrar la vista
 			// correspondiente
 			OptionsController.show(onMenuBack);
 		}
 		// Si el menu seleccionado es el menu de puntuaciones
-		else if (menuEntrys[currentMenu].dataType == "scores") {
+		else if (menuEntrys[currentMenu].dataType == 'scores') {
 			if (scoresCtl == undefined) {
 				scoresCtl = new ScoresController(onMenuBack);
 			} else {
@@ -680,7 +680,7 @@ function MenuController() {
 			}
 		}
 		// Si el menu seleccionado es el menu de ayuda
-		else if (menuEntrys[currentMenu].dataType == "help") {
+		else if (menuEntrys[currentMenu].dataType == 'help') {
 			if (helpCtl == undefined) {
 				helpCtl = new HelpController(onMenuBack);
 			} else {
@@ -688,7 +688,7 @@ function MenuController() {
 			}
 		}
 		// Si el menu seleccionado es el de buscar partida multijugador buscamos partidas
-		else if (menuEntrys[currentMenu].mode == "findServer") {
+		else if (menuEntrys[currentMenu].mode == 'findServer') {
 			onMenuRefreshClick();
 		}
 	}

@@ -27,7 +27,7 @@ function Sound() {
 	 ******************************************************************************************************************/
 
 	// Flag para saber si el sonido esta activado
-	var enabled = localStorage.magPuzCubSound === "false" ? false : true;
+	var enabled = localStorage.magPuzCubSound === 'false' ? false : true;
 	// Canales para sonido
 	var numChannels = 5;
 	var channels = [];
@@ -105,7 +105,7 @@ function Sound() {
 	/**
 	 * Método para cargar el archivo de audio indicado, se debe suministrar solo el nombre del fichero, sin extension,
 	 * ya que se cargara tanto con extensión WAV como MP3, se supondrá que el fichero se encuentra en la carpeta
-	 * '/audio/'.
+	 * "/audio/".
 	 * 
 	 * @param string:file
 	 *            cadena de caracteres con el nombre del fichero de audio.
@@ -119,12 +119,12 @@ function Sound() {
 		// Le añadimos el recurso WAV
 		var source = document.createElement('source');
 		source.src = 'audio/' + file + '.wav';
-		source.type = "audio/wav";
+		source.type = 'audio/wav';
 		s.appendChild(source);
 		// Le añadimos el recurso MP3
 		var source = document.createElement('source');
 		source.src = 'audio/' + file + '.mp3';
-		source.type = "audio/mpeg";
+		source.type = 'audio/mpeg';
 		s.appendChild(source);
 		return s;
 	}

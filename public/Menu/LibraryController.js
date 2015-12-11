@@ -139,8 +139,6 @@ function LibraryController(type, backAction) {
 	inputFile.multiple = true;
 	inputFile.accept = 'image/*';
 	inputFile.addEventListener('change', onLibraryFile, false);
-	// inputFile.style.display = 'none';
-	// container.appendChild(inputFile);
 
 	// Asociamos cada boton con su accion y los guardamos para luego poder hacer el picking sobre ellos
 	view.getAcceptButton().action = onLibraryAccept;

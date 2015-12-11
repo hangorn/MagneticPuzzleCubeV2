@@ -76,7 +76,7 @@ function ClassicModeController(numC, mats) {
 
 	this.init();
 
-	// Hay que guardar esta instancia en una variable, por que 'this' dentro de la funcion anonima no referencia a este
+	// Hay que guardar esta instancia en una variable, por que "this" dentro de la funcion anonima no referencia a este
 	// controlador
 	var ctl = this;
 	// Creamos el contenedor que contendra el formulario para las distintas opciones
@@ -160,7 +160,7 @@ ClassicModeController.prototype.restart = function() {
  *            caracteristicas del evento lanzado.
  */
 ClassicModeController.prototype.onShowSolutionsClick = function(event) {
-	// Creamos tres variables globalesa 'window' para poder pasarle datos a la nueva ventana
+	// Creamos tres variables globalesa "window" para poder pasarle datos a la nueva ventana
 	window.mats = this.materials;
 	window.numC = this.numberOfCubes;
 	window.sensitivity = getOptions().sensitivity;
@@ -349,7 +349,7 @@ ClassicModeController.prototype.getButtonsWithActions = function() {
 	this.form.removeChild(this.form.next);
 	this.form.removeChild(this.form.previous);
 	var ctl = this;
-	// Creamos funciones anonimas por que si no javascript se piensa que 'this' es 'window' dentro de las funciones
+	// Creamos funciones anonimas por que si no javascript se piensa que "this" es "window" dentro de las funciones
 	return [ {
 		button : this.form.showSolutions,
 		action : function(event) {

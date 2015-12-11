@@ -71,16 +71,16 @@ function Socket() {
 
 	// No nos consideramos conectados hasta que no obtenemos nuestro ID
 	socket.on('connect', function() {
-		console.log('connect');
+		console.log("connect");
 	});
 	socket.on('onconnected', function(data) {
 		ID = data.id;
 		connected = true;
-		console.log('conected with server with ID: ' + ID);
+		console.log("conected with server with ID: " + ID);
 	});
 	// Si se desconecta
 	socket.on('disconnect', function() {
-		console.log('disconnect');
+		console.log("disconnect");
 		// Y estabamos en un juego
 		if (gameID) {
 			// Si tenemos una accion de abandono para ejecutar la ejecutamos
@@ -298,7 +298,7 @@ function Socket() {
 			cbJoint(data.game.images, data.game.type, data.game.iniPos, data.game.iniRot);
 			// Borramos la recepcion del evento para que no se reciba mas de una vez
 			socket.removeListener('onJointGame', onJointGame);
-			console.log('conected game ' + gameID + '  ' + data.game.type + '  ' + data.game.name);
+			console.log("conected game " + gameID + "  " + data.game.type + "  " + data.game.name);
 		});
 
 		// Registramos el evento para cuando abandone el otro jugador
