@@ -34,6 +34,8 @@ function Socket() {
 	var gameID;
 	// Acción que se ejecutará cuando se abandone.
 	var leftAct;
+	// Controlador que procesara los eventos recibidos
+	var controller;
 
 	// Función que será ejecutada cuando se cree una partida,
 	// la guardamos para poder borrar su receptor de evento
@@ -69,16 +71,16 @@ function Socket() {
 
 	// No nos consideramos conectados hasta que no obtenemos nuestro ID
 	socket.on('connect', function() {
-		console.log("connect");
+		console.log('connect');
 	});
 	socket.on('onconnected', function(data) {
 		ID = data.id;
 		connected = true;
-		console.log("conected with server with ID: " + ID);
+		console.log('conected with server with ID: ' + ID);
 	});
 	// Si se desconecta
 	socket.on('disconnect', function() {
-		console.log("disconnect");
+		console.log('disconnect');
 		// Y estabamos en un juego
 		if (gameID) {
 			// Si tenemos una accion de abandono para ejecutar la ejecutamos
@@ -103,7 +105,7 @@ function Socket() {
 	 */
 	function onServerUpdate(message) {
 		// Dividimos el mensaje en las partes correspondientes
-		var parts = message.split("#");
+		var parts = message.split('#');
 		// Si el mensaje no tiene cabecera y subcabecera no hacemos nada
 		if (parts.length < 2) {
 			return;
@@ -112,29 +114,29 @@ function Socket() {
 		// Decodificamos el mensaje
 		switch (parts[0]) {
 		// Mensaje del juego
-		case "g":
+		case 'g':
 			switch (parts[1]) {
-			case "s":
+			case 's':
 				if (parts[3] == '-1') {
-					mmv.releasePiece(parseInt(parts[2]));
+					controller.releasePiece(parseInt(parts[2]));
 				} else {
-					mmv.otherSelectedPiece(parseInt(parts[2]), parts[3] == 1 ? true : false);
+					controller.otherSelectedPiece(parseInt(parts[2]), parts[3] == 1 ? true : false);
 				}
 				break;
-			case "m":
-				mmv.otherMovePiece(parts[2], new THREE.Vector3(parseFloat(parts[3]), parseFloat(parts[4]),
+			case 'm':
+				controller.otherMovePiece(parts[2], new THREE.Vector3(parseFloat(parts[3]), parseFloat(parts[4]),
 						parseFloat(parts[5])));
 				break;
-			case "r":
-				mmv.otherRotatePiece(parts[2], new THREE.Vector3(parseFloat(parts[3]), parseFloat(parts[4]),
+			case 'r':
+				controller.otherRotatePiece(parts[2], new THREE.Vector3(parseFloat(parts[3]), parseFloat(parts[4]),
 						parseFloat(parts[5])));
 				break;
-			case "p":
+			case 'p':
 				// Creamos un vector para la posicion y otro para la rotacion
 				var pos = new THREE.Vector3(parseFloat(parts[4]), parseFloat(parts[5]), parseFloat(parts[6]));
 				var rot = new THREE.Vector3(parseFloat(parts[7]), parseFloat(parts[8]), parseFloat(parts[9]));
 				// Indicamos a la vista que se ha introducido una pieza
-				mmv.otherPlacedPiece(parseInt(parts[2]), parts[3] == 1 ? true : false, pos, rot);
+				controller.otherPlacedPiece(parseInt(parts[2]), parts[3] == 1 ? true : false, pos, rot);
 				break;
 			}
 			break;
@@ -150,7 +152,7 @@ function Socket() {
 	function onSolvedGame(data) {
 		// Le indicamos a la vista del modo que se ha resuelto
 		// el puzzle con el tiempo invertido en ello
-		mmv.solvedPuzzle(parseInt(data.time), data.winner);
+		controller.solvedPuzzle(parseInt(data.time), data.winner);
 		// Dejamos de escuchar los mensajes que nos pueda mandar el servidor
 		socket.removeListener('message', onServerUpdate);
 		// Borramos la recepcion del evento para que no se reciba y no duplicarlo
@@ -251,7 +253,7 @@ function Socket() {
 		// Le indicamos al servidor que deseamos obtener los juegos disponibles
 		socket.emit('onGetGames', {});
 		// Esperamos por la respuesta del servidor con los datos
-		socket.on("onSentGames", onSentGames = function(data) {
+		socket.on('onSentGames', onSentGames = function(data) {
 			// Rellenamos el dialogo con las partidas obtenidas
 			callback(data.games);
 			// Borramos la recepcion del evento para que no se reciba mas de una vez
@@ -296,7 +298,7 @@ function Socket() {
 			cbJoint(data.game.images, data.game.type, data.game.iniPos, data.game.iniRot);
 			// Borramos la recepcion del evento para que no se reciba mas de una vez
 			socket.removeListener('onJointGame', onJointGame);
-			console.log("conected game " + gameID + "  " + data.game.type + "  " + data.game.name);
+			console.log('conected game ' + gameID + '  ' + data.game.type + '  ' + data.game.name);
 		});
 
 		// Registramos el evento para cuando abandone el otro jugador
@@ -373,14 +375,14 @@ function Socket() {
 	 */
 	this.selectedPiece = function(ID, isSelected) {
 		// Creamos el mensaje ha enviar
-		var message = "";
+		var message = '';
 		// Añadimos una cabecera para indicar que es un mensaje del juego
-		message += "g";
+		message += 'g';
 		// Añadimos una subcabecera para indicar que tipo de mensaje es
-		message += "#s#";
+		message += '#s#';
 		// Añadimos el cuerpo del mensaje
-		message += ID + "#";
-		message += isSelected ? "1" : "0";
+		message += ID + '#';
+		message += isSelected ? '1' : '0';
 		socket.send(message);
 	}
 
@@ -394,14 +396,14 @@ function Socket() {
 	 */
 	this.movedPiece = function(ID, pos) {
 		// Creamos el mensaje ha enviar
-		var message = "";
+		var message = '';
 		// Añadimos una cabecera para indicar que es un mensaje del juego
-		message += "g";
+		message += 'g';
 		// Añadimos una subcabecera para indicar que tipo de mensaje es
-		message += "#m#";
+		message += '#m#';
 		// Añadimos el cuerpo del mensaje
-		message += ID + "#";
-		message += pos.x.toFixed(4) + "#" + pos.y.toFixed(4) + "#" + pos.z.toFixed(4);
+		message += ID + '#';
+		message += pos.x.toFixed(4) + '#' + pos.y.toFixed(4) + '#' + pos.z.toFixed(4);
 		socket.send(message);
 	}
 
@@ -415,14 +417,14 @@ function Socket() {
 	 */
 	this.rotatedPiece = function(ID, rot) {
 		// Creamos el mensaje ha enviar
-		var message = "";
+		var message = '';
 		// Añadimos una cabecera para indicar que es un mensaje del juego
-		message += "g";
+		message += 'g';
 		// Añadimos una subcabecera para indicar que tipo de mensaje es
-		message += "#r#";
+		message += '#r#';
 		// Añadimos el cuerpo del mensaje
-		message += ID + "#";
-		message += rot.x.toFixed(4) + "#" + rot.y.toFixed(4) + "#" + rot.z.toFixed(4);
+		message += ID + '#';
+		message += rot.x.toFixed(4) + '#' + rot.y.toFixed(4) + '#' + rot.z.toFixed(4);
 		socket.send(message);
 	}
 
@@ -440,16 +442,16 @@ function Socket() {
 	 */
 	this.placedPiece = function(ID, isPlaced, pos, rot) {
 		// Creamos el mensaje ha enviar
-		var message = "";
+		var message = '';
 		// Añadimos una cabecera para indicar que es un mensaje del juego
-		message += "g";
+		message += 'g';
 		// Añadimos una subcabecera para indicar que tipo de mensaje es
-		message += "#p#";
+		message += '#p#';
 		// Añadimos el cuerpo del mensaje
-		message += ID + "#";
-		message += (isPlaced ? "1" : "0");
-		message += "#" + pos.x.toFixed(4) + "#" + pos.y.toFixed(4) + "#" + pos.z.toFixed(4);
-		message += "#" + rot.x.toFixed(4) + "#" + rot.y.toFixed(4) + "#" + rot.z.toFixed(4);
+		message += ID + '#';
+		message += (isPlaced ? '1' : '0');
+		message += '#' + pos.x.toFixed(4) + '#' + pos.y.toFixed(4) + '#' + pos.z.toFixed(4);
+		message += '#' + rot.x.toFixed(4) + '#' + rot.y.toFixed(4) + '#' + rot.z.toFixed(4);
 		socket.send(message);
 	}
 
@@ -475,6 +477,14 @@ function Socket() {
 			mode : mode,
 			submode : submode
 		});
+	}
+
+	/**
+	 * Indica al socket que controlador se encargara de procesar los eventos recibidos
+	 */
+	this.setController = function(ctl)
+	{
+		controller = ctl;
 	}
 
 }

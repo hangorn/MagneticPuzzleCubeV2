@@ -83,8 +83,8 @@ function ClassicModeController(numC, mats) {
 	this.view = document.createElement('div');
 	addDynamicComponent('html/puzzleButtons.html', this.view, function() {
 		ctl.form = ctl.view.getElementsByTagName('form')[0];
-		ctl.buttons = ctl.getButtonsWithActions();
 		document.body.appendChild(ctl.view);
+		ctl.buttons = ctl.getButtonsWithActions();
 		ctl.enable();
 	});
 

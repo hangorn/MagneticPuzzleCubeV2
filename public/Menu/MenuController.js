@@ -56,6 +56,8 @@ function MenuController() {
 	var scoresCtl;
 	// Controlador de la biblioteca de imagenes
 	var libraryCtl;
+	// Controlador del modo multijugador
+	var multiplayerCtl;
 
 	/*******************************************************************************************************************
 	 * Constructor
@@ -367,9 +369,9 @@ function MenuController() {
 				socket.finishedGame();
 			});
 
-			mmv = new MultiplayerModeView(scene, type, materials);
-			var iniPos = mmv.getInitialPositions();
-			var iniRot = mmv.getInitialRotations();
+			multiplayerCtl = new MultiplayerModeController(type, materials);
+			var iniPos = multiplayerCtl.getInitialPositions();
+			var iniRot = multiplayerCtl.getInitialRotations();
 
 			// Esperamos un pequeño tiempo(1 milisegundo) para que de tiempo a mostrar el dialogo de espera
 			setTimeout(function() {
@@ -398,12 +400,12 @@ function MenuController() {
 						// Ocultamos el dialogo de espera de carga
 						view.hideWaitingDialog();
 						// Mostramos la vista del modo multijugador
-						mmv.show();
+						multiplayerCtl.show();
 					});
 				}, function() {
 					alert("El otro jugador ha abandonado la partida. Se finalizara la partida.");
 					// Ocultamos la vista de la partida
-					mmv.hide();
+					multiplayerCtl.hide();
 					view.hideWaitingDialog();
 					// Mostramos el menu del modo multijugador
 					show(currentMenu);
@@ -438,34 +440,37 @@ function MenuController() {
 				setTimeout(function() {
 					// Creamos los materiales con las imagenes suministradas decodificandolas, ya que las obtenemos en
 					// base 64
-					var materials = [];
-					for (var i = 0; i < imgs.length; i++) {
-						var texture = new THREE.Texture(base64ToImage(imgs[i]));
-						texture.needsUpdate = true;
-						materials.push(new THREE.MeshBasicMaterial({
-							map : texture
-						}));
-					}
+					Utils.loadAllBase64Imgs(imgs, function(textures){
+						var materials = [];
+						for (var i = 0; i < textures.length; i++) {
+							var texture = textures[i];
+							texture.needsUpdate = true;
+							materials.push(new THREE.MeshBasicMaterial({
+								map : texture
+							}));
+						}
 
-					// Creamos el puzzle
-					mmv = new MultiplayerModeView(scene, type, materials, iniPos, iniRot);
+						// Creamos el puzzle
+						multiplayerCtl = new MultiplayerModeController(type, materials, iniPos, iniRot);
 
-					// Ocultamos el dialogo de espera de carga
-					view.hideWaitingDialog();
-
-					// Mostramos un dialogo mientras se espera a que se el otro jugador este listo
-					view.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
-						view.showMenu(currentMenu);
-						socket.finishedGame();
-					});
-
-					// Le decimos al servidor que estamos listos para jugar y indicamos la funcion
-					// que se ejecutará cuando todos los jugadores de la partida esten listos
-					socket.readyToPlay(function() {
 						// Ocultamos el dialogo de espera de carga
 						view.hideWaitingDialog();
-						// Mostramos la vista del modo multijugador
-						mmv.show();
+
+						// Mostramos un dialogo mientras se espera a que se el otro jugador este listo
+						view.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
+							view.showMenu(currentMenu);
+							socket.finishedGame();
+						});
+
+						// Le decimos al servidor que estamos listos para jugar y indicamos la funcion
+						// que se ejecutará cuando todos los jugadores de la partida esten listos
+						socket.readyToPlay(function() {
+							// Ocultamos el dialogo de espera de carga
+							view.hideWaitingDialog();
+							// Mostramos la vista del modo multijugador
+							multiplayerCtl.show();
+						});
+						
 					});
 				}, 1);
 			};
@@ -476,7 +481,7 @@ function MenuController() {
 			var discAction = function() {
 				alert("El otro jugador ha abandonado la partida. Se finalizara la partida.");
 				// Ocultamos la vista de la partida
-				mmv.hide();
+				multiplayerCtl.hide();
 				view.hideWaitingDialog();
 				// Mostramos el menu del modo multijugador
 				show(currentMenu);

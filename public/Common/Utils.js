@@ -15,9 +15,11 @@
  *  Versión: 0.1
  *  */
 
-/*****************************************
- *  Funciones Varias
- *****************************************/
+/***********************************************************************************************************************
+ * Funciones Varias
+ **********************************************************************************************************************/
+
+var Utils = {};
 
 /**
  * Función que compara vectores de tres componenetes X, Y, Z. Primero compara X, si son iguales compara Y, y si también
@@ -124,7 +126,7 @@ function loadTexture(path, f) {
 /**
  * Función para combertir una imagen en una cadena de texto codificada en base 64
  * 
- * @param Image:image->
+ * @param Image:image
  *            imagen a codificar.
  * @returns String imagen codificada en base 64.
  */
@@ -151,16 +153,49 @@ function imageToBase64(image) {
 /**
  * Función para combertir una cadena de texto codificada en base 64 en una imagen
  * 
- * @param String:base64->
+ * @param String:base64
  *            cadena de texto a decodificar.
+ * @param Callback:onloadCallback
+ *            si se recibe esta funcion de rellamada opcional, se fijara como manejador del evento onload
  * @returns Image imagen codificada en base 64.
  */
-function base64ToImage(base64) {
+Utils.base64ToImage = function(base64, onloadCallback) {
 	// Creamos una imagen
-	var i = document.createElement('img');
+	var i = new Image();
+	i.crossOrigin = 'anonymous';
+	if (onloadCallback) {
+		i.onload = onloadCallback;
+	}
 	// Indicamos los datos añadiendoles la cabecera necesaria
 	i.src = "data:image/png;base64," + base64;
 	return i;
+}
+
+/**
+ * Metodo para cargar en memoria todas las imagenes que se le pasen codificadas en base 64. Cuando acaba la carga de
+ * todas las imagenes ejecutar la funcion de rellamada que se le indique, pasandole a esta funcion como unico parametro
+ * un array con una textura por cada imagen cargada.
+ * 
+ * @param String[]:base64Imgs
+ *            array de imagenes codificadas en base 64
+ * @param Callback:callback
+ *            funcion de rellamada que se ejecutara cuando todas las imagenes se hayan cargado. Esta funcion recibira
+ *            como unico parametro una array de texturas, una por cada imagen cargada: THREE.Texture
+ */
+Utils.loadAllBase64Imgs = function(base64Imgs, callback) {
+	var count = base64Imgs.length;
+	var loaded = 0;
+	var imgs = [];
+	var onload = function() {
+		loaded++;
+		if (loaded == count) {
+			callback(imgs);
+		}
+	}
+	for (var i = 0; i < count; i++) {
+		var img = Utils.base64ToImage(base64Imgs[i], onload);
+		imgs.push(new THREE.Texture(img));
+	}
 }
 
 /**
