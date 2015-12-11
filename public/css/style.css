@@ -98,12 +98,14 @@ body {
 	position: fixed;
 	top: 90px;
 	left: 0px;
+	pointer-events: none;
 }
 
 #buttonsGameForm input {
 	display: block;
 	margin: 10px;
 	cursor: pointer;
+	pointer-events: auto;
 }
 
 #otherPlayerRenderContainer {
@@ -130,7 +132,7 @@ body {
 .menu {
 	width: 70%;
 	margin: 50px 10%;
-	padding: 50px 5%;
+	padding: 20px 5%;
 	background-color: #dddddd;
 	border-radius: 30px;
 	text-align: center;
@@ -142,7 +144,7 @@ body {
 }
 
 .menu .buttonsMenu input {
-	margin-top: 50px;
+	margin-top: 30px;
 }
 
 .menu fieldset {
