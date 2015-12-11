@@ -75,13 +75,13 @@
 	<script>
 		//Comprobamos que WebGL esta disponible
 		if (!Detector.webgl) {
-			addDynamicComponent('html/webGLnotSupported.html', document.body);
+			Utils.addDynamicComponent('html/webGLnotSupported.html', document.body);
 			var WebGLavaible = false
 		} else {
 			var WebGLavaible = true;
 		}
 		//Cargamos dinamicamente el texto de los creditos
-		addDynamicComponent('html/credits.html', document.body);
+		Utils.addDynamicComponent('html/credits.html', document.body);
 
 		//Datos para la creacion de un puzzle con 3 soluciones
 		var puzzle3Data;
@@ -129,7 +129,7 @@
 		function init() {
 			//Realizamos la peticion de los datos para un puzzle de 3 soluciones
 			//Leemos los datos para crear los cubos de un fichero JSON
-			ajaxRequest('data/3SolPuzzle.json', function(resp) {
+			Utils.ajaxRequest('data/3SolPuzzle.json', function(resp) {
 				//Transformamos los datos del fichero a notacion JSON
 				puzzle3Data = JSON.parse(resp).data;
 
@@ -137,7 +137,7 @@
 
 			//Realizamos la peticion de los datos para un puzzle de 2 soluciones
 			//Leemos los datos para crear los cubos de un fichero JSON
-			ajaxRequest('data/2SolPuzzle.json', function(resp) {
+			Utils.ajaxRequest('data/2SolPuzzle.json', function(resp) {
 				//Transformamos los datos del fichero a notacion JSON
 				puzzle2Data = JSON.parse(resp).data;
 			});
@@ -158,7 +158,7 @@
 			//Creamos un array con todos los materiales, uno por imagen
 			for (var j = 0; j < 18; j++) {
 				//Obtenemos la textura de la imagen
-				texture = loadTexture('img/pictures/img' + (j + 1) + '.gif');
+				texture = Utils.loadTexture('img/pictures/img' + (j + 1) + '.gif');
 				IMAGES.push(new THREE.MeshBasicMaterial({
 					map : texture
 				}));
@@ -166,12 +166,12 @@
 
 			//Iniciamos el menu principal
 			//Leemos los datos para crear las letras de un fichero JSON
-			ajaxRequest('data/Letters.json', function(lettersResp) {
+			Utils.ajaxRequest('data/Letters.json', function(lettersResp) {
 				//Transformamos los datos del fichero a notacion JSON
 				lettersData = JSON.parse(lettersResp);
 				//Realizamos la peticion de los datos para la informacion de los niveles
 				//Leemos los datos para crear los cubos de un fichero JSON
-				ajaxRequest('data/Levels.json', function(levelsResp) {
+				Utils.ajaxRequest('data/Levels.json', function(levelsResp) {
 					//Transformamos los datos del fichero a notacion JSON
 					levelsData = JSON.parse(levelsResp).data;
 					//Iniciamos el sonido

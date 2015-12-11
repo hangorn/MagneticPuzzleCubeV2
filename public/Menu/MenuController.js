@@ -87,7 +87,7 @@ function MenuController() {
 	};
 
 	// Obtenemos los datos para generar el menu
-	ajaxRequest('data/Menu.json', function(menuResp) {
+	Utils.ajaxRequest('data/Menu.json', function(menuResp) {
 		var menuData = JSON.parse(menuResp).data;
 
 		view = new MenuView(menuData);
@@ -379,7 +379,7 @@ function MenuController() {
 				var images = [];
 				var imgsNeeded = (lastEntrySelected % 2) == 0 ? 12 : 18;
 				for (var i = 0; i < imgsNeeded; i++) {
-					images.push(imageToBase64(materials[i].map.image));
+					images.push(Utils.imageToBase64(materials[i].map.image));
 				}
 
 				// Le decimos al servidor que hemos creado una partida y indicamos la accion que se realizara cuando

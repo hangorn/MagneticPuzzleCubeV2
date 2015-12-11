@@ -48,7 +48,7 @@ function ScoresController(backAction) {
 	// Creamos un contenedor
 	view = document.createElement('div');
 	// Cargamos la vista en el contenedor y cuando se cargue la mostramos
-	addDynamicComponent('menu/scoresForm.html', view, function() {
+	Utils.addDynamicComponent('menu/scoresForm.html', view, function() {
 		init();
 		show();
 		showMode(0);
@@ -133,7 +133,7 @@ function ScoresController(backAction) {
 			socket = new Socket();
 		}
 		// Le decimos al servidor que nos proporcione las puntuaciones cuando se consigan se mostraran
-		ajaxRequest('data/Scores.json?mode=' + lastModeSelected + '&submode=' + lastSubmodeSelected, function(scores) {
+		Utils.ajaxRequest('data/Scores.json?mode=' + lastModeSelected + '&submode=' + lastSubmodeSelected, function(scores) {
 			showScores(JSON.parse(scores));
 		});
 
@@ -219,7 +219,7 @@ function ScoresController(backAction) {
 			row.appendChild(makeData(sc));
 		}
 		// Añadimos la fecha
-		row.appendChild(makeData(spanishDate(new Date(Date.parse(score.date)))));
+		row.appendChild(makeData(Utils.spanishDate(new Date(Date.parse(score.date)))));
 
 		return row;
 	}
@@ -356,7 +356,7 @@ ScoresController.saveScoreDialog = function(text, score, mode, submode) {
 	if (!saveScoreCont) {
 		// Creamos un contenedor para todos los elementos del dialogo
 		saveScoreCont = document.createElement('div');
-		addDynamicComponent('html/saveScoreForm.html', saveScoreCont, function() {
+		Utils.addDynamicComponent('html/saveScoreForm.html', saveScoreCont, function() {
 			// Definimos la funcion para cuando se pulse el boton
 			saveScoreCont.getElementsByClassName('saveDialogCancel')[0].onclick = function() {
 				// Ocultamos el dialogo

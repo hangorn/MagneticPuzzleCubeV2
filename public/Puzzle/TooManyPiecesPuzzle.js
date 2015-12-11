@@ -220,7 +220,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 				// Recorremos la lista de posibles posiciones para introducirlo en orden si no esta ya
 				for (var j = 0; j < possiblePositions.length; j++) {
 					// Comparamos la posicion con la posible posicion que se esta recorriendo
-					var comp = compareVector3(pos, possiblePositions[j]);
+					var comp = Utils.compareVector3(pos, possiblePositions[j]);
 					// Si la posicion ya esta no seguimos buscando
 					if (comp == 0) {
 						j = -1; // Utilizamos j como flag ademas de como iterador para indicar que el elemento ya se
@@ -246,8 +246,8 @@ function TooManyPiecesPuzzle(numC, mats) {
 			var buscar = group.children[i].position;
 
 			// Comprobamos que el elemento a buscar esta entre los valores minimo y maximo del vector
-			if (compareVector3(buscar, possiblePositions[min]) == -1
-					|| compareVector3(buscar, possiblePositions[max]) == 1) {
+			if (Utils.compareVector3(buscar, possiblePositions[min]) == -1
+					|| Utils.compareVector3(buscar, possiblePositions[max]) == 1) {
 				// El elemento a buscar no esta contenido en el vector, seguimos con la siguiente figura
 				continue;
 			}
@@ -256,7 +256,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 			while (min <= max) {
 				j = Math.floor((min + max) / 2);
 
-				var comp = compareVector3(buscar, possiblePositions[j]);
+				var comp = Utils.compareVector3(buscar, possiblePositions[j]);
 				// Elemento anterior al indice
 				if (comp == -1) {
 					max = j - 1;
@@ -317,9 +317,9 @@ function TooManyPiecesPuzzle(numC, mats) {
 		rot.setEulerFromRotationMatrix(temp);
 
 		// Redondeamos
-		rot.x = roundAngle(rot.x);
-		rot.y = roundAngle(rot.y);
-		rot.z = roundAngle(rot.z);
+		rot.x = Utils.roundAngle(rot.x);
+		rot.y = Utils.roundAngle(rot.y);
+		rot.z = Utils.roundAngle(rot.z);
 
 		return rot;
 	}
@@ -1217,186 +1217,186 @@ function TooManyPiecesPuzzle(numC, mats) {
 			// Si es la cara derecha no lo giramos por que ya estan en la misma cara
 			// Cara izquierda
 			if (face2 == 2) {
-				rot.y = deg2Rad(180);
+				rot.y = Utils.deg2Rad(180);
 			}
 			// Cara superior
 			if (face2 == 3) {
-				rot.x = deg2Rad(90);
-				rot.z = deg2Rad(270);
+				rot.x = Utils.deg2Rad(90);
+				rot.z = Utils.deg2Rad(270);
 			}
 			// Cara inferior
 			if (face2 == 4) {
-				rot.x = deg2Rad(270);
-				rot.z = deg2Rad(90);
+				rot.x = Utils.deg2Rad(270);
+				rot.z = Utils.deg2Rad(90);
 			}
 			// Cara delantera
 			if (face2 == 5) {
-				rot.y = deg2Rad(90);
+				rot.y = Utils.deg2Rad(90);
 			}
 			if (face2 == 6) {// Cara trasera
-				rot.y = deg2Rad(270);
+				rot.y = Utils.deg2Rad(270);
 			}
 			// Calculamos el giro en X en funcion de las rotaciones de las secciones
-			rot.x += deg2Rad((360 + rot1 - rot2) % 360);
+			rot.x += Utils.deg2Rad((360 + rot1 - rot2) % 360);
 			break;
 		case 2: // Cara izquierda
 			if (face2 == 1) {// Cara derecha
-				rot.y = deg2Rad(180);
+				rot.y = Utils.deg2Rad(180);
 			}
 			// Si es la cara izquierda no lo giramos por que ya estan en la misma cara
 			// Cara superior
 			if (face2 == 3) {
-				rot.x = deg2Rad(90);
-				rot.z = deg2Rad(90);
+				rot.x = Utils.deg2Rad(90);
+				rot.z = Utils.deg2Rad(90);
 			}
 			// Cara inferior
 			if (face2 == 4) {
-				rot.x = deg2Rad(270);
-				rot.z = deg2Rad(270);
+				rot.x = Utils.deg2Rad(270);
+				rot.z = Utils.deg2Rad(270);
 			}
 			// Cara delantera
 			if (face2 == 5) {
-				rot.y = deg2Rad(270);
+				rot.y = Utils.deg2Rad(270);
 			}
 			// Cara trasera
 			if (face2 == 6) {
-				rot.y = deg2Rad(90);
+				rot.y = Utils.deg2Rad(90);
 			}
 			// Calculamos el giro en X en funcion de las rotaciones de las secciones
-			rot.x += deg2Rad((360 - rot1 + rot2) % 360);
+			rot.x += Utils.deg2Rad((360 - rot1 + rot2) % 360);
 			break;
 		case 3: // Cara superior
 			// Cara derecha
 			if (face2 == 1) {
-				rot.y = deg2Rad(270) + deg2Rad((360 + rot1 - rot2) % 360);
+				rot.y = Utils.deg2Rad(270) + Utils.deg2Rad((360 + rot1 - rot2) % 360);
 				;
-				rot.z = deg2Rad(90);
+				rot.z = Utils.deg2Rad(90);
 			}
 			// Cara izquierda
 			if (face2 == 2) {
-				rot.y = deg2Rad(90) + deg2Rad((360 + rot1 - rot2) % 360);
+				rot.y = Utils.deg2Rad(90) + Utils.deg2Rad((360 + rot1 - rot2) % 360);
 				;
-				rot.z = deg2Rad(270);
+				rot.z = Utils.deg2Rad(270);
 			}
 			// Cara superior
 			if (face2 == 3) {
-				rot.y = deg2Rad((360 + rot1 - rot2) % 360);
+				rot.y = Utils.deg2Rad((360 + rot1 - rot2) % 360);
 			}
 			// Cara inferior
 			if (face2 == 4) {
-				rot.x = deg2Rad(180);
-				rot.y = deg2Rad((360 - rot1 + rot2) % 360);
+				rot.x = Utils.deg2Rad(180);
+				rot.y = Utils.deg2Rad((360 - rot1 + rot2) % 360);
 			}
 			// Cara delantera
 			if (face2 == 5) {
-				rot.x = deg2Rad(270);
-				rot.z = deg2Rad((360 + rot1 - rot2) % 360);
+				rot.x = Utils.deg2Rad(270);
+				rot.z = Utils.deg2Rad((360 + rot1 - rot2) % 360);
 			}
 			// Cara trasera
 			if (face2 == 6) {
-				rot.x = deg2Rad(270);
-				rot.y = deg2Rad(180);
-				rot.z = deg2Rad((360 - rot1 + rot2) % 360);
+				rot.x = Utils.deg2Rad(270);
+				rot.y = Utils.deg2Rad(180);
+				rot.z = Utils.deg2Rad((360 - rot1 + rot2) % 360);
 			}
 			break;
 		case 4: // Cara inferior
 			// Cara derecha
 			if (face2 == 1) {
-				rot.y = deg2Rad(270) + deg2Rad((360 - rot1 + rot2) % 360);
+				rot.y = Utils.deg2Rad(270) + Utils.deg2Rad((360 - rot1 + rot2) % 360);
 				;
-				rot.z = deg2Rad(270);
+				rot.z = Utils.deg2Rad(270);
 			}
 			// Cara izquierda
 			if (face2 == 2) {
-				rot.y = deg2Rad(90) + deg2Rad((360 - rot1 + rot2) % 360);
+				rot.y = Utils.deg2Rad(90) + Utils.deg2Rad((360 - rot1 + rot2) % 360);
 				;
-				rot.z = deg2Rad(90);
+				rot.z = Utils.deg2Rad(90);
 			}
 			// Cara superior
 			if (face2 == 3) {
-				rot.x = deg2Rad(180);
-				rot.y = deg2Rad((360 + rot1 - rot2) % 360);
+				rot.x = Utils.deg2Rad(180);
+				rot.y = Utils.deg2Rad((360 + rot1 - rot2) % 360);
 			}
 			// Cara inferior
 			if (face2 == 4) {
-				rot.y = deg2Rad((360 - rot1 + rot2) % 360);
+				rot.y = Utils.deg2Rad((360 - rot1 + rot2) % 360);
 			}
 			// Cara delantera
 			if (face2 == 5) {
-				rot.x = deg2Rad(90);
-				rot.z = deg2Rad((360 + rot1 - rot2) % 360);
+				rot.x = Utils.deg2Rad(90);
+				rot.z = Utils.deg2Rad((360 + rot1 - rot2) % 360);
 			}
 			// Cara trasera
 			if (face2 == 6) {
-				rot.x = deg2Rad(90);
-				rot.y = deg2Rad(180);
-				rot.z = deg2Rad((360 - rot1 + rot2) % 360);
+				rot.x = Utils.deg2Rad(90);
+				rot.y = Utils.deg2Rad(180);
+				rot.z = Utils.deg2Rad((360 - rot1 + rot2) % 360);
 			}
 			break;
 		case 5: // Cara delantera
 			// Cara derecha
 			if (face2 == 1) {
-				rot.x = deg2Rad(270);
-				rot.y = deg2Rad(270) + deg2Rad((360 - rot1 + rot2) % 360);
-				rot.z = deg2Rad(270);
+				rot.x = Utils.deg2Rad(270);
+				rot.y = Utils.deg2Rad(270) + Utils.deg2Rad((360 - rot1 + rot2) % 360);
+				rot.z = Utils.deg2Rad(270);
 			}
 			// Cara izquierda
 			if (face2 == 2) {
-				rot.x = deg2Rad(270);
-				rot.y = deg2Rad(90) + deg2Rad((360 - rot1 + rot2) % 360);
-				rot.z = deg2Rad(90);
+				rot.x = Utils.deg2Rad(270);
+				rot.y = Utils.deg2Rad(90) + Utils.deg2Rad((360 - rot1 + rot2) % 360);
+				rot.z = Utils.deg2Rad(90);
 			}
 			// Cara superior
 			if (face2 == 3) {
-				rot.x = deg2Rad(90);
-				rot.y = deg2Rad((360 + rot1 - rot2) % 360);
+				rot.x = Utils.deg2Rad(90);
+				rot.y = Utils.deg2Rad((360 + rot1 - rot2) % 360);
 			}
 			// Cara inferior
 			if (face2 == 4) {
-				rot.x = deg2Rad(270);
-				rot.y = deg2Rad((360 - rot1 + rot2) % 360);
+				rot.x = Utils.deg2Rad(270);
+				rot.y = Utils.deg2Rad((360 - rot1 + rot2) % 360);
 			}
 			// Cara delantera
 			if (face2 == 5) {
-				rot.z = deg2Rad((360 + rot1 - rot2) % 360);
+				rot.z = Utils.deg2Rad((360 + rot1 - rot2) % 360);
 			}
 			// Cara trasera
 			if (face2 == 6) {
-				rot.y = deg2Rad(180);
-				rot.z = deg2Rad((360 - rot1 + rot2) % 360);
+				rot.y = Utils.deg2Rad(180);
+				rot.z = Utils.deg2Rad((360 - rot1 + rot2) % 360);
 			}
 			break;
 		case 6: // Cara trasera
 			// Cara derecha
 			if (face2 == 1) {
-				rot.x = deg2Rad(90);
-				rot.y = deg2Rad(90) + deg2Rad((360 - rot1 + rot2) % 360);
-				rot.z = deg2Rad(270);
+				rot.x = Utils.deg2Rad(90);
+				rot.y = Utils.deg2Rad(90) + Utils.deg2Rad((360 - rot1 + rot2) % 360);
+				rot.z = Utils.deg2Rad(270);
 			}
 			// Cara izquierda
 			if (face2 == 2) {
-				rot.x = deg2Rad(90);
-				rot.y = deg2Rad(270) + deg2Rad((360 - rot1 + rot2) % 360);
-				rot.z = deg2Rad(90);
+				rot.x = Utils.deg2Rad(90);
+				rot.y = Utils.deg2Rad(270) + Utils.deg2Rad((360 - rot1 + rot2) % 360);
+				rot.z = Utils.deg2Rad(90);
 			}
 			// Cara superior
 			if (face2 == 3) {
-				rot.x = deg2Rad(270);
-				rot.y = deg2Rad(180 + (360 + rot1 - rot2) % 360);
+				rot.x = Utils.deg2Rad(270);
+				rot.y = Utils.deg2Rad(180 + (360 + rot1 - rot2) % 360);
 			}
 			// Cara inferior
 			if (face2 == 4) {
-				rot.x = deg2Rad(90);
-				rot.y = deg2Rad(180 + (360 - rot1 + rot2) % 360);
+				rot.x = Utils.deg2Rad(90);
+				rot.y = Utils.deg2Rad(180 + (360 - rot1 + rot2) % 360);
 			}
 			// Cara delantera
 			if (face2 == 5) {
-				rot.y = deg2Rad(180);
-				rot.z = deg2Rad((360 + rot1 - rot2) % 360);
+				rot.y = Utils.deg2Rad(180);
+				rot.z = Utils.deg2Rad((360 + rot1 - rot2) % 360);
 			}
 			// Cara trasera
 			if (face2 == 6) {
-				rot.z = deg2Rad((360 - rot1 + rot2) % 360);
+				rot.z = Utils.deg2Rad((360 - rot1 + rot2) % 360);
 			}
 			break;
 

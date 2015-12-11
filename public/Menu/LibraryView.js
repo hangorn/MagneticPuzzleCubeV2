@@ -380,7 +380,7 @@ function LibraryView(ty) {
 			var backgroundGeometry = new THREE.CylinderGeometry(height * 3 / 4, height * 3 / 4, width + 40, 20, 20,
 					true);
 			var background = new THREE.Mesh(backgroundGeometry, backgroundMat);
-			background.rotation.z = deg2Rad(90);
+			background.rotation.z = Utils.deg2Rad(90);
 			background.text = button;
 
 			// Creamos un contenedor para el boton de su tamaño
@@ -416,7 +416,7 @@ function LibraryView(ty) {
 	 */
 	function createText(str) {
 		// Creamos un color aletorio
-		var rand = randomColor();
+		var rand = Utils.randomColor();
 
 		// Creamos un material para el texto, con un material para la parte frontal con el
 		// color aleatorio, y otro material para los lados con el color aletorio oscurecido

@@ -74,7 +74,7 @@ function MenuView(menuData) {
 				}
 			} else if (data.type == 'html') {
 				entrys[i][j] = document.createElement('div');
-				addDynamicComponent(data.data, entrys[i][j]);
+				Utils.addDynamicComponent(data.data, entrys[i][j]);
 			}
 		}
 	}
@@ -90,7 +90,7 @@ function MenuView(menuData) {
 		}
 	}
 
-	ajaxRequest('data/MultiplayerLevels.json', function(resp) {
+	Utils.ajaxRequest('data/MultiplayerLevels.json', function(resp) {
 		// Transformamos los datos del fichero a notacion JSON
 		multiplayerLevelsData = JSON.parse(resp).data;
 

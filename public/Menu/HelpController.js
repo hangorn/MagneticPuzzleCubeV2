@@ -40,7 +40,7 @@ function HelpController(backAction) {
 	// Creamos un contenedor
 	view = document.createElement('div');
 	// Cargamos la vista en el contenedor y cuando se cargue la mostramos
-	addDynamicComponent('menu/helpForm.html', view, function() {
+	Utils.addDynamicComponent('menu/helpForm.html', view, function() {
 		show();
 	});
 

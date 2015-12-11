@@ -313,7 +313,7 @@ function LibraryController(type, backAction) {
 				if (intersects[0].object != INTERSECTED) {
 					INTERSECTED = intersects[0].object;
 					// Cambiamos el color de la figura
-					var rand = randomColor();
+					var rand = Utils.randomColor();
 					// Para diferencia entre paginas y botones comprobamos si tienen varios materiales (solo las
 					// letras/paginas tiene dos materiales: frontal y lateral)
 					if (INTERSECTED.material.materials) {
@@ -333,7 +333,7 @@ function LibraryController(type, backAction) {
 				container.style.cursor = 'auto';
 				// Si hay algun objeto con el color cambiado
 				if (INTERSECTED) {
-					var rand = randomColor();
+					var rand = Utils.randomColor();
 					// Para diferencia entre paginas y botones comprobamos si tienen varios materiales (solo las
 					// letras/paginas tiene dos materiales: frontal y lateral)
 					if (INTERSECTED.material.materials) {
@@ -569,7 +569,7 @@ function LibraryController(type, backAction) {
 			// Obtenemos la URL de la imagen
 			var url = window.URL.createObjectURL(files[i]);
 			// Creamos una textura con la imagen y la guardamos en el array de texturas
-			texture.push(loadTexture(url, function() {
+			texture.push(Utils.loadTexture(url, function() {
 				counter += 1;
 
 				// Si se han cargado todas las imagenes

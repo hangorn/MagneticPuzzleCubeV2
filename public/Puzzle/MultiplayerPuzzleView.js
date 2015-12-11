@@ -166,7 +166,7 @@ function MultiplayerPuzzleView(sce, numC, ty, mats, finAct, iniPos, iniRot) {
 			}
 		}
 		// Desordenamos el array
-		shuffle(initialPositions);
+		Utils.shuffle(initialPositions);
 	} else {
 		initialPositions = iniPos;
 	}
@@ -182,8 +182,8 @@ function MultiplayerPuzzleView(sce, numC, ty, mats, finAct, iniPos, iniRot) {
 	for (var i = 0; i < puzzle.getPuzzleCubes().length; i++) {
 		puzzle.getPuzzleCubes()[i].position.copy(initialPositions[i]);
 		if (iniRot == undefined) {
-			puzzle.getPuzzleCubes()[i].rotation.x = roundAngle(Math.random() * Math.PI * 2);
-			puzzle.getPuzzleCubes()[i].rotation.y = roundAngle(Math.random() * Math.PI * 2);
+			puzzle.getPuzzleCubes()[i].rotation.x = Utils.roundAngle(Math.random() * Math.PI * 2);
+			puzzle.getPuzzleCubes()[i].rotation.y = Utils.roundAngle(Math.random() * Math.PI * 2);
 			initialRotations.push(new THREE.Vector3().copy(puzzle.getPuzzleCubes()[i].rotation));
 		} else {
 			puzzle.getPuzzleCubes()[i].rotation.copy(initialRotations[i]);

@@ -31,7 +31,7 @@ var Utils = {};
  *            segundo vector de tres elementos a comparar.
  * @returns Integer -1=menor que, 1=mayor que, 0=igual.
  */
-function compareVector3(a, b) {
+Utils.compareVector3 = function(a, b) {
 	if (a.x < b.x) {// X menor que
 		return -1;
 	} else if (a.x > b.x) {// X mayor que
@@ -57,7 +57,7 @@ function compareVector3(a, b) {
  *            entero que se aproximará a la potencia de dos más cercana.
  * @returns Integer entero aproximado a la potencia de dos mas cercana.
  */
-function round2Power(number) {
+Utils.round2Power = function(number) {
 	var logarithm, rounded, power;
 	logarithm = Math.log(number) / Math.log(2);
 	power = Math.round(logarithm);
@@ -72,7 +72,7 @@ function round2Power(number) {
  *            ángulo en radianes que se aproximará al multiplo de 90 grados / Pi/2 radianes mas cercano.
  * @returns Float ángulo aproximado al multiplo de 90 grados / Pi/2 radianes mas cercano.
  */
-function roundAngle(angle) {
+Utils.roundAngle = function(angle) {
 	var div, rounded;
 	div = angle / (Math.PI / 2);
 	rounded = (Math.PI / 2) * Math.round(div);
@@ -86,7 +86,7 @@ function roundAngle(angle) {
  *            ángulo que se convertirá en radianes.
  * @returns Float ángulo pasado a radianes.
  */
-function deg2Rad(degrees) {
+Utils.deg2Rad = function(degrees) {
 	return degrees * Math.PI / 180;
 }
 /**
@@ -96,7 +96,7 @@ function deg2Rad(degrees) {
  *            ángulo que se convertirá en grados.
  * @returns Float ángulo pasado a grados.
  */
-function rad2Deg(rad) {
+Utils.rad2Deg = function(rad) {
 	return rad / Math.PI * 180;
 }
 
@@ -109,7 +109,7 @@ function rad2Deg(rad) {
  *            funcion que se lanzará cuando se cargue la imagen
  * @returns Texture textura de la imagen suministrada.
  */
-function loadTexture(path, f) {
+Utils.loadTexture = function(path, f) {
 	var image = new Image(), texture = new THREE.Texture(image);
 	image.onload = function() {
 		texture.needsUpdate = true;
@@ -130,7 +130,7 @@ function loadTexture(path, f) {
  *            imagen a codificar.
  * @returns String imagen codificada en base 64.
  */
-function imageToBase64(image) {
+Utils.imageToBase64 = function(image) {
 	// Creamos un canvas
 	var canvas = document.createElement('canvas');
 	// Si la imagen es demasido grande la reducimos
@@ -205,7 +205,7 @@ Utils.loadAllBase64Imgs = function(base64Imgs, callback) {
  *            array a ordenar de forma aleatoria.
  * @Autor: Stephane Roucheray (http://sroucheray.org/blog/2009/11/array-sort-should-not-be-used-to-shuffle-an-array/)
  */
-function shuffle(array) {
+Utils.shuffle = function(array) {
 	var i = array.length, j, temp;
 	if (i == 0) {
 		return;
@@ -224,7 +224,7 @@ function shuffle(array) {
  * 
  * @returns Float decimal entre 0 y 1, ambos exclusive, que se utilizará para crear un color.
  */
-function randomColor() {
+Utils.randomColor = function() {
 	var rand = Math.random();
 	// Comprobamos que el color no sea igual que el anterior o similar
 	if (Math.abs(randomColor.r - rand) < 0.2) {
@@ -256,7 +256,7 @@ function randomColor() {
  *            objeto de la clase Date con los datos de la fecha que se transformará.
  * @returns String cadena de caracteres con la fecha en español.
  */
-function spanishDate(d) {
+Utils.spanishDate = function(d) {
 	var weekday = [ "Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado" ];
 	var monthname = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre",
 			"Octubre", "Noviembre", "Diciembre" ];
@@ -275,7 +275,7 @@ function spanishDate(d) {
  *            función de rellamada que se ejecutara cuando se reciba la respuesta, recibe como un parametro el texto de
  *            la respuesta
  */
-function ajaxRequest(url, callback) {
+Utils.ajaxRequest = function(url, callback) {
 	var request = new XMLHttpRequest();
 	request.onreadystatechange = function() {
 		if (request.readyState == 4 && request.status == 200) {
@@ -300,12 +300,12 @@ function ajaxRequest(url, callback) {
  *            función de rellamada opcional que se ejecutara cuando se cargue el componente
  * 
  */
-function addDynamicComponent(url, domElement, callback) {
+Utils.addDynamicComponent = function(url, domElement, callback) {
 	// Si no es un elemento DOM, salimos
 	if (!domElement.appendChild) {
 		return;
 	}
-	ajaxRequest(url, function(resp) {
+	Utils.ajaxRequest(url, function(resp) {
 		var div = document.createElement('div');
 		div.innerHTML = resp;
 		domElement.appendChild(div);

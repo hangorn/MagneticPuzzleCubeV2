@@ -174,7 +174,7 @@ function MultiplayerPuzzle(numC, mats) {
 				// Recorremos la lista de posibles posiciones para introducirlo en orden si no esta ya
 				for (var j = 0; j < possiblePositions.length; j++) {
 					// Comparamos la posicion con la posible posicion que se esta recorriendo
-					var comp = compareVector3(pos, possiblePositions[j]);
+					var comp = Utils.compareVector3(pos, possiblePositions[j]);
 					// Si la posicion ya esta no seguimos buscando
 					if (comp == 0) {
 						j = -1; // Utilizamos j como flag ademas de como iterador para indicar que el elemento ya se
@@ -200,8 +200,8 @@ function MultiplayerPuzzle(numC, mats) {
 			var buscar = group.children[i].position;
 
 			// Comprobamos que el elemento a buscar esta entre los valores minimo y maximo del vector
-			if (compareVector3(buscar, possiblePositions[min]) == -1
-					|| compareVector3(buscar, possiblePositions[max]) == 1) {
+			if (Utils.compareVector3(buscar, possiblePositions[min]) == -1
+					|| Utils.compareVector3(buscar, possiblePositions[max]) == 1) {
 				// El elemento a buscar no esta contenido en el vector, seguimos con la siguiente figura
 				continue;
 			}
@@ -210,7 +210,7 @@ function MultiplayerPuzzle(numC, mats) {
 			while (min <= max) {
 				j = Math.floor((min + max) / 2);
 
-				var comp = compareVector3(buscar, possiblePositions[j]);
+				var comp = Utils.compareVector3(buscar, possiblePositions[j]);
 				// Elemento anterior al indice
 				if (comp == -1) {
 					max = j - 1;
@@ -271,9 +271,9 @@ function MultiplayerPuzzle(numC, mats) {
 		rot.setEulerFromRotationMatrix(temp);
 
 		// Redondeamos
-		rot.x = roundAngle(rot.x);
-		rot.y = roundAngle(rot.y);
-		rot.z = roundAngle(rot.z);
+		rot.x = Utils.roundAngle(rot.x);
+		rot.y = Utils.roundAngle(rot.y);
+		rot.z = Utils.roundAngle(rot.z);
 
 		return rot;
 	}

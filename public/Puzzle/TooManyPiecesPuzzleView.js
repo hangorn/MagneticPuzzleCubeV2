@@ -106,13 +106,13 @@ function TooManyPiecesPuzzleView(sce, numC, finAct, mats) {
 		}
 	}
 	// Desordenamos el array
-	shuffle(iniPos);
+	Utils.shuffle(iniPos);
 
 	// Colocamos las figuras en sus posiciones iniciales
 	for (var i = 0; i < puzzle.getPuzzleCubes().length; i++) {
 		puzzle.getPuzzleCubes()[i].position.copy(iniPos[i]);
-		puzzle.getPuzzleCubes()[i].rotation.x = roundAngle(Math.random() * Math.PI * 2);
-		puzzle.getPuzzleCubes()[i].rotation.y = roundAngle(Math.random() * Math.PI * 2);
+		puzzle.getPuzzleCubes()[i].rotation.x = Utils.roundAngle(Math.random() * Math.PI * 2);
+		puzzle.getPuzzleCubes()[i].rotation.y = Utils.roundAngle(Math.random() * Math.PI * 2);
 		// Guardamos su colocacion inicial
 		puzzle.getPuzzleCubes()[i].iniPos = iniPos[i];
 		puzzle.getPuzzleCubes()[i].iniRot = new THREE.Vector3().copy(puzzle.getPuzzleCubes()[i].rotation);

@@ -206,7 +206,7 @@ LevelsModeController.prototype.getMaterials = function(imgsNeeded, imgsRepeated)
 			}
 			this.materials = [];
 			for (var i = 0; i < mats.length; i++) {
-				shuffle(mats[i]);
+				Utils.shuffle(mats[i]);
 				this.materials = this.materials.concat(mats[i]);
 			}
 		}
@@ -240,7 +240,7 @@ LevelsModeController.prototype.finish = function() {
 		this.finishedDialog = document.createElement('div');
 		document.body.appendChild(this.finishedDialog);
 		var ctl = this;
-		addDynamicComponent('html/finishedLevelForm.html', this.finishedDialog, function() {
+		Utils.addDynamicComponent('html/finishedLevelForm.html', this.finishedDialog, function() {
 			// Definimos la funcion para cuando se pulse el boton de ver el puzzle
 			ctl.finishedDialog.getElementsByClassName('watch')[0].onclick = function() {
 				document.body.removeChild(ctl.finishedDialog);

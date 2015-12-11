@@ -81,7 +81,7 @@ function ClassicModeController(numC, mats) {
 	var ctl = this;
 	// Creamos el contenedor que contendra el formulario para las distintas opciones
 	this.view = document.createElement('div');
-	addDynamicComponent('html/puzzleButtons.html', this.view, function() {
+	Utils.addDynamicComponent('html/puzzleButtons.html', this.view, function() {
 		ctl.form = ctl.view.getElementsByTagName('form')[0];
 		document.body.appendChild(ctl.view);
 		ctl.buttons = ctl.getButtonsWithActions();
@@ -261,7 +261,7 @@ ClassicModeController.prototype.onPauseClick = function(event) {
 		this.pauseDialog = document.createElement('div');
 		document.body.appendChild(this.pauseDialog);
 		var ctl = this;
-		addDynamicComponent('html/pauseDialog.html', ctl.pauseDialog, function() {
+		Utils.addDynamicComponent('html/pauseDialog.html', ctl.pauseDialog, function() {
 			// Definimos la funcion para cuando se pulse el boton
 			ctl.pauseDialog.getElementsByClassName('pauseDialogContinue')[0].onclick = function() {
 				// Ocultamos el dialogo de pausa
