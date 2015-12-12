@@ -35,12 +35,6 @@ function LibraryController(type, backAction) {
 	var SELECTED;
 	// Objeto 3D sobre el cual se realizarán operaciones (cambiar el color)
 	var INTERSECTED;
-	// Plano para hacer calculos
-	var plane;
-	// Proyector para realizar operaciones
-	var projector;
-	// Rayo que realizará las operaciones de intersección
-	var ray;
 
 	// Array con todos los planos de una determinada página
 	var pagePlanes = [];
@@ -50,10 +44,6 @@ function LibraryController(type, backAction) {
 	// imágenes, 3 -> formar tres cubos con imágenes
 	var typeView;
 
-	// Flag para saber si el botón derecho está pulsado
-	var rightDown;
-	// Flag para saber si el botón izquierdo está pulsado
-	var leftDown;
 	// Coordenadas del ratón en la última vez que se proceso el evento, necesarias para calcular cuanto ha de girar una
 	// figura
 	var lastMouseX;
@@ -100,23 +90,6 @@ function LibraryController(type, backAction) {
 	// Guardamos los planos de la primera pagina
 	currentPage = 0;
 	pagePlanes = view.getCurrentPlanes();
-
-	// Creamos un plano para el picking
-	plane = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000, 8, 8), new THREE.MeshBasicMaterial({
-		color : 0x000000,
-		opacity : 0.25,
-		transparent : true,
-		wireframe : true
-	}));
-	// Hacemos que no sea visible, es para funcionamiento interno, no para mostrarlo
-	plane.visible = false;
-	// Añadimos el plano a la escena
-	scene.add(plane);
-
-	// Creamos un proyector para realizar el picking
-	projector = new THREE.Projector();
-	// Creamos un rayo con origen en la posicion de la camara
-	ray = new THREE.Raycaster(camera.position);
 
 	// Añadimos receptores de eventos para el raton
 	// Si el tipo de vista necesita arrastra el raton registramos los eventos correspondientes
@@ -166,44 +139,29 @@ function LibraryController(type, backAction) {
 			zoomedIn = null;
 		}
 
-		// Calculamos donde esta el raton con el eje de coordenadas en el centro
-		mouse.x = (event.clientX / windowWidth) * 2 - 1;
-		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
-		// Creamos un vector en la direccion del raton hacia la escena
-		var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		projector.unprojectVector(vector, camera);
-		ray.ray.direction = vector.subSelf(camera.position).normalize();
-
 		// Si ya hay un objeto seleccionado seguimos operando con el
 		if (SELECTED) {
 			return;
 		}
 
-		// Obtenemos los planos de las imagenes de la pagina actual que son atravesados por el vector
-		var intersects = ray.intersectObjects(pagePlanes);
-		// Si hay algun objeto
-		if (intersects.length > 0) {
+		// Calculamos donde esta el raton con el eje de coordenadas en el centro
+		mouse.x = (event.clientX / windowWidth) * 2 - 1;
+		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
+
+		// Usamos la utilidad de Utils indicando que hacer si hay hay imagenes
+		ThreeDUtils.intersectObjects(mouse, pagePlanes, 'move', function(intersect) {
 			// Obtenemos el primer objeto atravesado, que sera el seleccionado, el que esta delante
-			SELECTED = intersects[0].object;
-
-			// Cambiamos al cursor de movimiento
-			container.style.cursor = 'move';
-		}
-
-		// Obtenemos los cubos que son atravesados por el vector
-		var intersects = ray.intersectObjects(view.getCubes());
-		// Si hay algun objeto
-		if (intersects.length > 0) {
-			// Obtenemos el primer objeto atravesado, que sera el seleccionado, el que esta delante
-			SELECTED = intersects[0].object;
-
-			// Obtenemos la posicion del raton
-			lastMouseX = event.clientX;
-			lastMouseY = event.clientY;
-
-			// Cambiamos al cursor de movimiento
-			container.style.cursor = 'move';
-		}
+			SELECTED = intersect.object;
+		}, function() {
+			// Usamos la utilidad de Utils indicando que hacer si hay hay cubos
+			ThreeDUtils.intersectObjects(null, view.getCubes(), 'move', function(intersect) {
+				// Obtenemos el primer objeto atravesado, que sera el seleccionado, el que esta delante
+				SELECTED = intersect.object;
+				// Obtenemos la posicion del raton
+				lastMouseX = event.clientX;
+				lastMouseY = event.clientY;
+			});
+		});
 	}
 
 	/**
@@ -224,26 +182,22 @@ function LibraryController(type, backAction) {
 				mouse.x = (event.clientX / windowWidth) * 2 - 1;
 				mouse.y = -(event.clientY / windowHeight) * 2 + 1;
 
-				// Creamos un vector en la direccion del raton hacia la escena
-				var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-				projector.unprojectVector(vector, camera);
-				ray.ray.direction = vector.subSelf(camera.position).normalize();
-
-				// Calculamos la interseccion con el plano
-				var intersects = ray.intersectObject(plane);
-				// Si el raton se encuentra en la zona de movimiento
-				if (event.clientX >= 0 && event.clientX <= windowWidth && event.clientY >= 0
-						&& event.clientY <= windowHeight) {
-					// Movemos la figura seleccionada
-					SELECTED.position.copy(intersects[0].point);
-					// Si esta en la zona de los cubos adelantamos la figura para que se sobreponga a los cubos
-					if (view.isCubeZone(intersects[0].point)) {
-						view.putZBefore(SELECTED);
-					} else {
-						// Ponemos la figura que se esta moviendo delante para que se superponga al resto de planos
-						view.putZ1(SELECTED);
+				// Usamos la utilidad de Utils indicando que hacer cuando se calcule la posicion del raton en la escena
+				ThreeDUtils.intersectObjects(mouse, null, null, function(intersect) {
+					// Si el raton se encuentra en la zona de movimiento
+					if (event.clientX >= 0 && event.clientX <= windowWidth && event.clientY >= 0
+							&& event.clientY <= windowHeight) {
+						// Movemos la figura seleccionada
+						SELECTED.position.copy(intersect.point);
+						// Si esta en la zona de los cubos adelantamos la figura para que se sobreponga a los cubos
+						if (view.isCubeZone(intersect.point)) {
+							view.putZBefore(SELECTED);
+						} else {
+							// Ponemos la figura que se esta moviendo delante para que se superponga al resto de planos
+							view.putZ1(SELECTED);
+						}
 					}
-				}
+				});
 
 				// Y salimos del evento
 				return;
@@ -279,76 +233,55 @@ function LibraryController(type, backAction) {
 		// Calculamos donde esta el raton con el eje de coordenadas en el centro
 		mouse.x = (event.clientX / windowWidth) * 2 - 1;
 		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
-		// Creamos un vector en la direccion del raton hacia la escena
-		var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		projector.unprojectVector(vector, camera);
-		ray.ray.direction = vector.subSelf(camera.position).normalize();
 
-		// Obtenemos los planos de la pagina que son atravesados por el vector
-		var intersects = ray.intersectObjects(pagePlanes);
-		// Si hay objetos atravesados de los planos
-		if (intersects.length > 0) {
-			// Cambiamos al cursor de seleccion
-			container.style.cursor = 'pointer';
-			return;
-		} else {
+		// Usamos la utilidad de Utils para cambiar el cursor si se pasa por las imagenes, si no hay imagenes seguimos
+		// comprobando otros objetos
+		ThreeDUtils.intersectObjects(mouse, pagePlanes, 'pointer', null, function() {
 			if (typeView != 1) {
-				// Obtenemos los planos de la pagina que son atravesados por el vector
-				var intersects = ray.intersectObjects(view.getCubes());
-				// Si hay objetos atravesados de los planos
-				if (intersects.length > 0) {
-					// Cambiamos al cursor de seleccion
-					container.style.cursor = 'pointer';
-					return;
-				}
+				ThreeDUtils.intersectObjects(null, view.getCubes(), 'pointer', null, function() {
+					ThreeDUtils.intersectObjects(null, view.getPages().concat(buttons), 'pointer', function(intersect) {
+						// Si no se le ha cambiado ya el color
+						if (intersect.object != INTERSECTED) {
+							INTERSECTED = intersect.object;
+							// Cambiamos el color de la figura
+							var rand = Utils.randomColor();
+							// Para diferencia entre paginas y botones comprobamos si tienen varios materiales (solo las
+							// letras/paginas tiene dos materiales: frontal y lateral)
+							if (INTERSECTED.material.materials) {
+								INTERSECTED.material.materials[0].color.setHSV(rand, 0.95, 0.85);
+								INTERSECTED.material.materials[1].color.setHSV(rand, 0.95, 0.50);
+							} else {
+								// Color letra frontal
+								INTERSECTED.text.material.materials[0].color.setHSV(rand, 0.95, 0.85);
+								// Color letra lateral
+								INTERSECTED.text.material.materials[1].color.setHSV(rand, 0.95, 0.50);
+								// Color fondo
+								INTERSECTED.material.color.setHex((1 - rand) * 0xffffff);
+							}
+						}
+					}, function() {
+						// Si hay algun objeto con el color cambiado
+						if (INTERSECTED) {
+							var rand = Utils.randomColor();
+							// Para diferencia entre paginas y botones comprobamos si tienen varios materiales (solo las
+							// letras/paginas tiene dos materiales: frontal y lateral)
+							if (INTERSECTED.material.materials) {
+								INTERSECTED.material.materials[0].color.setHSV(rand, 0.95, 0.85);
+								INTERSECTED.material.materials[1].color.setHSV(rand, 0.95, 0.50);
+							} else {
+								// Color letra frontal
+								INTERSECTED.text.material.materials[0].color.setHSV(rand, 0.95, 0.85);
+								// Color letra lateral
+								INTERSECTED.text.material.materials[1].color.setHSV(rand, 0.95, 0.50);
+								// Color fondo
+								INTERSECTED.material.color.setHex((1 - rand) * 0xffffff);
+							}
+							INTERSECTED = null;
+						}
+					});
+				});
 			}
-
-			// Obtenemos los numeros de pagina o los botones que son atravesados por el vector
-			var intersects = ray.intersectObjects(view.getPages().concat(buttons));
-			// Si hay objetos atravesados de los numeros de pagina
-			if (intersects.length > 0) {
-				// Cambiamos al cursor de seleccion
-				container.style.cursor = 'pointer';
-				// Si no se le ha cambiado ya el color
-				if (intersects[0].object != INTERSECTED) {
-					INTERSECTED = intersects[0].object;
-					// Cambiamos el color de la figura
-					var rand = Utils.randomColor();
-					// Para diferencia entre paginas y botones comprobamos si tienen varios materiales (solo las
-					// letras/paginas tiene dos materiales: frontal y lateral)
-					if (INTERSECTED.material.materials) {
-						INTERSECTED.material.materials[0].color.setHSV(rand, 0.95, 0.85);
-						INTERSECTED.material.materials[1].color.setHSV(rand, 0.95, 0.50);
-					} else {
-						INTERSECTED.text.material.materials[0].color.setHSV(rand, 0.95, 0.85); // Color letra frontal
-						INTERSECTED.text.material.materials[1].color.setHSV(rand, 0.95, 0.50); // Color letra lateral
-						INTERSECTED.material.color.setHex((1 - rand) * 0xffffff); // Color fondo
-
-					}
-				}
-			}
-			// Si no hay objetos atravesados
-			else {
-				// Usamos el cursor por defecto
-				container.style.cursor = 'auto';
-				// Si hay algun objeto con el color cambiado
-				if (INTERSECTED) {
-					var rand = Utils.randomColor();
-					// Para diferencia entre paginas y botones comprobamos si tienen varios materiales (solo las
-					// letras/paginas tiene dos materiales: frontal y lateral)
-					if (INTERSECTED.material.materials) {
-						INTERSECTED.material.materials[0].color.setHSV(rand, 0.95, 0.85);
-						INTERSECTED.material.materials[1].color.setHSV(rand, 0.95, 0.50);
-					} else {
-						INTERSECTED.text.material.materials[0].color.setHSV(rand, 0.95, 0.85); // Color letra frontal
-						INTERSECTED.text.material.materials[1].color.setHSV(rand, 0.95, 0.50); // Color letra lateral
-						INTERSECTED.material.color.setHex((1 - rand) * 0xffffff); // Color fondo
-
-					}
-					INTERSECTED = null;
-				}
-			}
-		}
+		});
 	}
 
 	/**
@@ -383,15 +316,29 @@ function LibraryController(type, backAction) {
 						}
 					}
 
-					// Ahora obtenemos la cara del cubo que esta hacia la camara
-					// Primero creamos un vector hacia el cubo
-					var vector = new THREE.Vector3().copy(view.getCubes()[min].position);
-					ray.ray.direction = vector.subSelf(camera.position).normalize();
-					// Obtenemos la interseccion con el cubo
-					var intersects = ray.intersectObject(view.getCubes()[min]);
-
-					// Guardamos el material en la cara con la que intersecciona el vector
-					view.getCubes()[min].material.materials[intersects[0].faceIndex] = SELECTED.material;
+					// Buscamos la cara del cubo que este en la posicion de la imagen, si no hay ninguna buscamos la
+					// cara frontal del cubo (la que este en la posicion del cubo)
+					ThreeDUtils
+							.intersectObjects(
+									SELECTED.position,
+									[ view.getCubes()[min] ],
+									null,
+									function(intersect) {
+										// Guardamos el material en la cara con la que intersecciona el vector
+										view.getCubes()[min].material.materials[intersect.faceIndex] = SELECTED.material;
+									},
+									function() {
+										ThreeDUtils
+												.intersectObjects(
+														view.getCubes()[min].position,
+														[ view.getCubes()[min] ],
+														null,
+														function(intersect) {
+															// Guardamos el material en la cara con la que intersecciona
+															// el vector
+															view.getCubes()[min].material.materials[intersect.faceIndex] = SELECTED.material;
+														});
+									});
 				}
 
 				// Se devuelve a la posicion inicial
@@ -424,17 +371,10 @@ function LibraryController(type, backAction) {
 		// Calculamos donde esta el raton con el eje de coordenadas en el centro
 		mouse.x = (event.clientX / windowWidth) * 2 - 1;
 		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
-		// Creamos un vector en la direccion del raton hacia la escena
-		var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		projector.unprojectVector(vector, camera);
-		ray.ray.direction = vector.subSelf(camera.position).normalize();
 
-		// Obtenemos los numeros de pagina que son atravesados por el vector
-		var intersects = ray.intersectObjects(view.getPages());
-		// Si hay algun objeto
-		if (intersects.length > 0) {
+		ThreeDUtils.intersectObjects(mouse, view.getPages(), null, function(intersect) {
 			// Obtenemos el identificador del texto para saber que tenemos que hacer
-			var ID = intersects[0].object.textID;
+			var ID = intersect.object.textID;
 
 			// Comprobamos que accion hay que realizar
 			if (ID == -2) {// Ir a la primera pagina
@@ -453,39 +393,35 @@ function LibraryController(type, backAction) {
 			}
 			// Guardamos los planos de la pagina seleccionada
 			pagePlanes = view.getCurrentPlanes();
-		}
-
-		// Si el modo de vista es el imagenes seleccionables
-		if (typeView == 1) {
-			// Obtenemos los planos de imagenes que son atravesados por el vector
-			var intersects = ray.intersectObjects(pagePlanes);
-			// Si hay algun objeto
-			if (intersects.length > 0) {
-				// Si la imagen esta seleccionada
-				if (intersects[0].object.selected) {
-					// La deseleccionamos
-					intersects[0].object.selected = !intersects[0].object.selected;
-					scene.remove(intersects[0].object.selectedPlane);
+		}, function() {
+			// Si hay botones donde se ha hecho click, ejecutamos su accion asociada
+			ThreeDUtils.intersectObjects(null, buttons, null, function(intersect) {
+				intersect.object.action();
+			}, function() {
+				// Si el modo de vista es el imagenes seleccionables
+				if (typeView == 1) {
+					// Si hay imagenes donde se ha hecho click, las des/seleccionamos segun corresponda
+					ThreeDUtils.intersectObjects(null, pagePlanes, null, function(intersect) {
+						// Si la imagen esta seleccionada
+						if (intersect.object.selected) {
+							// La deseleccionamos
+							intersect.object.selected = !intersect.object.selected;
+							scene.remove(intersect.object.selectedPlane);
+						}
+						// Si la imagen no esta seleccionada
+						else {
+							// La seleccionamos
+							intersect.object.selected = !intersect.object.selected;
+							scene.add(intersect.object.selectedPlane);
+						}
+						// Se devuelve a la posicion inicial
+						intersect.object.position.x = intersect.object.iniPosX;
+						intersect.object.position.y = intersect.object.iniPosY
+						intersect.object.position.z = 0;
+					});
 				}
-				// Si la imagen no esta seleccionada
-				else {
-					// La seleccionamos
-					intersects[0].object.selected = !intersects[0].object.selected;
-					scene.add(intersects[0].object.selectedPlane);
-				}
-				// Se devuelve a la posicion inicial
-				intersects[0].object.position.x = intersects[0].object.iniPosX;
-				intersects[0].object.position.y = intersects[0].object.iniPosY
-				intersects[0].object.position.z = 0;
-			}
-		}
-
-		// Obtenemos los botones que son atravesados por el vector
-		var intersects = ray.intersectObjects(buttons);
-		// Si hay algun objeto/boton ejecutamos su accion correspondiente
-		if (intersects.length > 0) {
-			intersects[0].object.action();
-		}
+			});
+		});
 	}
 
 	/**
@@ -498,44 +434,20 @@ function LibraryController(type, backAction) {
 		// Impedimos que se produzca la accion por defecto
 		event.preventDefault();
 
-		// Calculamos donde esta el raton con el eje de coordenadas en el centro
-		mouse.x = (event.clientX / windowWidth) * 2 - 1;
-		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
-		// Creamos un vector en la direccion del raton hacia la escena
-		var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		projector.unprojectVector(vector, camera);
-		ray.ray.direction = vector.subSelf(camera.position).normalize();
-
-		// Si es el boton derecho
-		if (event.button == 2) {
-			// Activamos el flag del boton derecho
-			rightDown = true;
-		}
-
-		// Si es el boton central
-		if (event.button == 1) {
-
-		}
-
 		// Si es el boton izquierdo
 		if (event.button == 0) {
-			// Activamos el flag del boton izquierdo
-			leftDown = true;
-			// Usamos el cursor por defecto
-			container.style.cursor = 'auto';
-
-			// Obtenemos los objetos que son atravesados por el vector
-			var intersects = ray.intersectObjects(pagePlanes);
-
-			// Si hay algun objeto
-			if (intersects.length > 0) {
+			// Calculamos donde esta el raton con el eje de coordenadas en el centro
+			mouse.x = (event.clientX / windowWidth) * 2 - 1;
+			mouse.y = -(event.clientY / windowHeight) * 2 + 1;
+			// Comprobamos si hay alguna imagen donde se ha hecho doble click
+			ThreeDUtils.intersectObjects(mouse, pagePlanes, null, function(intersect) {
 				// Guardamos el objeto para poder restaurarlo
-				zoomedIn = intersects[0].object;
+				zoomedIn = intersect.object;
 				// Cambiamos la posicion del objeto, lo ponemos delante
-				intersects[0].object.position.x = 0;
-				intersects[0].object.position.y = 0;
-				intersects[0].object.position.z = 2450;
-			}
+				intersect.object.position.x = 0;
+				intersect.object.position.y = 0;
+				intersect.object.position.z = 2450;
+			});
 		}
 	}
 
@@ -634,8 +546,6 @@ function LibraryController(type, backAction) {
 		document.getElementById('canvas').removeEventListener('click', onLibraryClick, false);
 		document.getElementById('canvas').removeEventListener('dblclick', onLibraryDblClick, false);
 
-		// Quitamos el plano del picking de la escena
-		scene.remove(plane);
 		container.removeChild(renderer.domElement);
 	}
 
@@ -656,9 +566,6 @@ function LibraryController(type, backAction) {
 		document.addEventListener('mousemove', onLibraryMouseMove, false);
 		document.getElementById('canvas').addEventListener('click', onLibraryClick, false);
 		document.getElementById('canvas').addEventListener('dblclick', onLibraryDblClick, false);
-
-		// Añadimos el plano a la escena
-		scene.add(plane);
 
 		// Guardamos la sensibilidad actual
 		sensitivity = getOptions().sensitivity / 100;

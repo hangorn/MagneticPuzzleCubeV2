@@ -26,12 +26,6 @@ function MenuController() {
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
-	// Plano para hacer calculos
-	var plane;
-	// Proyector para realizar operaciones
-	var projector;
-	// Rayo que realizará las operaciones de intersección
-	var ray;
 	// Objeto 3D sobre el cual se realizarán operaciones (cambiar el color)
 	var INTERSECTED;
 	// Vector de 2 coordenadas que almacena la posición actual del ratón
@@ -65,21 +59,6 @@ function MenuController() {
 	/**
 	 * Constructor de la clase MenuController. Cuando este cargado mostrara la vista del menu principal
 	 */
-
-	// Creamos un plano para el picking
-	plane = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000, 8, 8), new THREE.MeshBasicMaterial({
-		color : 0x000000,
-		opacity : 0.25,
-		transparent : true,
-		wireframe : true
-	}));
-	// Hacemos que no sea visible, es para funcionamiento interno, no para mostrarlo
-	plane.visible = false;
-
-	// Creamos un proyector para realizar el picking
-	projector = new THREE.Projector();
-	// Creamos un rayo con origen en la posicion de la camara
-	ray = new THREE.Raycaster(camera.position);
 
 	// Desactivamos el menu contextual del boton derecho
 	document.getElementById('canvas').oncontextmenu = function() {
@@ -118,28 +97,22 @@ function MenuController() {
 		// Calculamos donde esta el raton con el eje de coordenadas en el centro
 		mouse.x = (event.clientX / windowWidth) * 2 - 1;
 		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
-		// Creamos un vector en la direccion del raton hacia la escena
-		var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		projector.unprojectVector(vector, camera);
-		ray.ray.direction = vector.subSelf(camera.position).normalize();
-
-		// Obtenemos los numeros de pagina que son atravesados por el vector
-		var intersects = ray.intersectObjects(menuEntrys[currentMenu]);
-		// Si hay algun objeto
-		if (intersects.length > 0) {
+		
+		// Usamos la utilidad de Utils indicando que hacer si hay o no hay entradas de menu
+		ThreeDUtils.intersectObjects(mouse, menuEntrys[currentMenu], null, function(intersect) {
 			remove();
 			// Realizamos la animacion de explosion de la entrada seleccionada
-			view.explode(intersects[0].object, function() {
+			view.explode(intersect.object, function() {
 				// Las entradas que no tengan indice se comportaran como boton de atras
-				if (intersects[0].object.menuIndex == -1) {
+				if (intersect.object.menuIndex == -1) {
 					onMenuBack();
 				} else {
-					show(intersects[0].object.menuIndex);
+					show(intersect.object.menuIndex);
 				}
 			});
-		} else {
+		}, function() {
 			view.changeAllEntrysColor();
-		}
+		});
 	}
 
 	/**
@@ -160,40 +133,28 @@ function MenuController() {
 		// Calculamos donde esta el raton con el eje de coordenadas en el centro
 		mouse.x = (event.clientX / windowWidth) * 2 - 1;
 		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
-		// Creamos un vector en la direccion del raton hacia la escena
-		var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		projector.unprojectVector(vector, camera);
-		ray.ray.direction = vector.subSelf(camera.position).normalize();
-
-		// Obtenemos los numeros de pagina que son atravesados por el vector
-		var intersects = ray.intersectObjects(menuEntrys[currentMenu]);
-		// Si hay objetos atravesados de los numeros de pagina
-		if (intersects.length > 0) {
-			// Cambiamos al cursor de seleccion
-			container.style.cursor = 'pointer';
+		
+		// Usamos la utilidad de Utils indicando que hacer si hay o no hay entradas de menu
+		ThreeDUtils.intersectObjects(mouse, menuEntrys[currentMenu], 'pointer', function(intersect) {
 			// Si no se le ha cambiado ya el color
-			if (intersects[0].object != INTERSECTED) {
+			if (intersect.object != INTERSECTED) {
 				// Si hay algun objeto con el color cambiado
 				if (INTERSECTED) {
 					view.restoreEntryColor(INTERSECTED);
 				}
 
-				INTERSECTED = intersects[0].object;
+				INTERSECTED = intersect.object;
 				// Cambiamos el color de la figura
 				view.changeEntryColor(INTERSECTED);
 				sound.playMoved();
 			}
-		}
-		// Si no hay objetos atravesados
-		else {
-			// Usamos el cursor por defecto
-			container.style.cursor = 'auto';
+		}, function() {
 			// Si hay algun objeto con el color cambiado
 			if (INTERSECTED) {
 				view.restoreEntryColor(INTERSECTED);
 				INTERSECTED = null;
 			}
-		}
+		});
 	}
 
 	/**
@@ -440,7 +401,7 @@ function MenuController() {
 				setTimeout(function() {
 					// Creamos los materiales con las imagenes suministradas decodificandolas, ya que las obtenemos en
 					// base 64
-					Utils.loadAllBase64Imgs(imgs, function(textures){
+					Utils.loadAllBase64Imgs(imgs, function(textures) {
 						var materials = [];
 						for (var i = 0; i < textures.length; i++) {
 							var texture = textures[i];
@@ -470,7 +431,7 @@ function MenuController() {
 							// Mostramos la vista del modo multijugador
 							multiplayerCtl.show();
 						});
-						
+
 					});
 				}, 1);
 			};
@@ -574,8 +535,6 @@ function MenuController() {
 			// Borramos receptores de eventos para el raton
 			document.getElementById('canvas').removeEventListener('click', onMenuClick, false);
 			document.getElementById('canvas').removeEventListener('mousemove', onMenuMouseMove, false);
-			// Quitamos el plano del picking de la escena
-			scene.remove(plane);
 			return;
 		}
 
@@ -620,8 +579,6 @@ function MenuController() {
 			// Añadimos receptores de eventos para el raton
 			document.getElementById('canvas').addEventListener('click', onMenuClick, false);
 			document.getElementById('canvas').addEventListener('mousemove', onMenuMouseMove, false);
-			// Añadimos el plano a la escena
-			scene.add(plane);
 		}
 		// Si es el menu de un modo de un jugador o el de crear partida multijugador
 		else if (menuEntrys[currentMenu].dataType == 'html') {

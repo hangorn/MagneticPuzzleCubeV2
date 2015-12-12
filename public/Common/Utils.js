@@ -227,23 +227,23 @@ Utils.shuffle = function(array) {
 Utils.randomColor = function() {
 	var rand = Math.random();
 	// Comprobamos que el color no sea igual que el anterior o similar
-	if (Math.abs(randomColor.r - rand) < 0.2) {
+	if (Math.abs(Utils.randomColor.r - rand) < 0.2) {
 		var sum;
-		if (randomColor.r > rand) {
+		if (Utils.randomColor.r > rand) {
 			sum = -0.2;
 		} else {
 			sum = 0.2;
 		}
 
-		if ((rand + sum) >= 1 && randomColor.r < rand) {
-			rand = randomColor.r = rand - 1 + sum;
-		} else if ((rand + sum) <= 0 && randomColor.r > rand) {
-			rand = randomColor.r = rand + 1 + sum;
+		if ((rand + sum) >= 1 && Utils.randomColor.r < rand) {
+			rand = Utils.randomColor.r = rand - 1 + sum;
+		} else if ((rand + sum) <= 0 && Utils.randomColor.r > rand) {
+			rand = Utils.randomColor.r = rand + 1 + sum;
 		} else {
-			rand = randomColor.r = rand + sum;
+			rand = Utils.randomColor.r = rand + sum;
 		}
 	} else {
-		randomColor.r = rand; // Guardamos el color en una variable estatica para la siguiente llamada al metodo
+		Utils.randomColor.r = rand; // Guardamos el color en una variable estatica para la siguiente llamada al metodo
 	}
 
 	return rand;
