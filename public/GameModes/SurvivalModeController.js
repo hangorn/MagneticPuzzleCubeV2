@@ -83,7 +83,7 @@ SurvivalModeController.prototype.init = function() {
 	// Creamos la vista del puzzle
 	container.appendChild(renderer.domElement);
 	var ctl = this;
-	pv = this.puzzle = new PuzzleView(scene, this.numberOfCubes, function() {
+	this.puzzle = new PuzzleController(this.numberOfCubes, function() {
 		ctl.finish();
 	}, this.getMaterials());
 

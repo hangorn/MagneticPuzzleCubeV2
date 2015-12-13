@@ -83,23 +83,8 @@ function LibraryController(type, backAction) {
 	typeView = type;
 	// Creamos la vista
 	view = new LibraryView(typeView);
-
-	// Sensibilidad por defecto
-	sensitivity = getOptions().sensitivity / 100;
-
-	// Guardamos los planos de la primera pagina
-	currentPage = 0;
-	pagePlanes = view.getCurrentPlanes();
-
-	// Añadimos receptores de eventos para el raton
-	// Si el tipo de vista necesita arrastra el raton registramos los eventos correspondientes
-	if (typeView != 1) {
-		document.getElementById('canvas').addEventListener('mousedown', onLibraryMouseDown, false);
-		document.addEventListener('mouseup', onLibraryMouseUp, false);
-	}
-	document.addEventListener('mousemove', onLibraryMouseMove, false);
-	document.getElementById('canvas').addEventListener('click', onLibraryClick, false);
-	document.getElementById('canvas').addEventListener('dblclick', onLibraryDblClick, false);
+	// Activamos el controlador
+	enable();
 
 	// Desactivamos el menu contextual del boton derecho
 	document.getElementById('canvas').oncontextmenu = function() {

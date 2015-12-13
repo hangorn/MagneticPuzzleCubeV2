@@ -6,8 +6,8 @@
  */
 
 /*
- *  Nombre: ColoredPuzzleView.js
- *  Sinopsis: Clase de la vista del puzzle de colores.
+ *  Nombre: ColoredPuzzleController.js
+ *  Sinopsis: Clase del controlador del puzzle de colores.
  *  
  *  Autor: Vaquero Marcos, Javier
  *  Fecha: 17-04-2013
@@ -15,9 +15,9 @@
  *  */
 
 /*
- *  CLASE COLOREDPUZZLEVIEW
+ *  CLASE COLOREDPUZZLECONTROLLER
  *  */
-function ColoredPuzzleView(sce, numC, finAct) {
+function ColoredPuzzleController(numC, finAct) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
@@ -41,7 +41,6 @@ function ColoredPuzzleView(sce, numC, finAct) {
 	 *            función de rellamada que se ejecutará al solucionar el puzzle.
 	 */
 
-	scene = sce;
 	finishedAction = finAct;
 	// Guardamos el numero de cubos que tendra el cubo, comprobamos que sea correcto
 	if (numC != 2 && numC != 3) {
@@ -61,7 +60,7 @@ function ColoredPuzzleView(sce, numC, finAct) {
 	}
 
 	// Llamamos al constructor de PuzzleView para heredar todos sus metodos y atributos
-	PuzzleView.call(this, scene, numberOfCubes, finAct, materials, true);
+	PuzzleController.call(this, numberOfCubes, finAct, materials, true);
 
 	coloredMaterials = materials;
 
@@ -79,3 +78,9 @@ function ColoredPuzzleView(sce, numC, finAct) {
 	}
 
 }
+
+/***********************************************************************************************************************
+ * Heredamos de PuzzleController
+ **********************************************************************************************************************/
+ColoredPuzzleController.prototype = Object.create(PuzzleController.prototype);
+ColoredPuzzleController.prototype.constructor = ColoredPuzzleController;

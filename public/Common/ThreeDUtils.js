@@ -41,8 +41,12 @@ var ThreeDUtils = {};
  *            haya mas de un objeto en la posicion del raton, solo se tendra en cuenta el mas cercano a la camara
  * @param Callback:onNotIntersect
  *            funcion de rellamada que se ejecutara si no hay algun objeto en la posicion
+ * @param Callback:onNoMatter
+ *            funcion de rellamada que sera llamada siempre, haya o no objetos en la posicion indicada. Se le pasara
+ *            como parametro un array con la informacion de la interseccion de todos los objetos que se hayen en esa
+ *            posicion
  */
-ThreeDUtils.intersectObjects = function(mouse, objects, changePointer, onIntersect, onNotIntersect) {
+ThreeDUtils.intersectObjects = function(mouse, objects, changePointer, onIntersect, onNotIntersect, onNoMatter) {
 	// Si no estan iniciados los objectos necesarios, los creamos
 	if (!ThreeDUtils.ray) {
 		// Proyector para realizar operaciones
@@ -94,6 +98,9 @@ ThreeDUtils.intersectObjects = function(mouse, objects, changePointer, onInterse
 		if (onNotIntersect) {
 			onNotIntersect();
 		}
+	}
+	if(onNoMatter) {
+		onNoMatter(intersects);
 	}
 }
 
@@ -215,9 +222,9 @@ ThreeDUtils.createLetterEntry = function(letter, pos, frontColor, backColor, cub
 	plane.position.copy(pos);
 	plane.rotation.x = -0.5;
 	plane.rotation.y = -0.2;
-	
-	if(l != null) {
-		l.position.x -= (l.width-cubeSize) / 2 ;
+
+	if (l != null) {
+		l.position.x -= (l.width - cubeSize) / 2;
 		// Añadimos todas las letras al plano
 		plane.add(l);
 	}

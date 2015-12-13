@@ -25,52 +25,43 @@
 /*
  *  CLASE PUZZLECONTROLLER
  *  */
-function PuzzleController(cam, sce, cub, puz) {
+function PuzzleController(numC, finAct, mats, col) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
 
-	// Cámara de la escena necesaria para realizar los cálculos de la interacción
-	var camera;
-	// Escena en la que se representará el mundo 3D
-	var scene;
-	// Objeto 3D sobre el que se realizarán las operaciones (rotación y traslación)
-	var SELECTED;
-	// Plano para hacer calculos
-	var plane;
-	// Proyector para realizar operaciones
-	var projector;
-	// Rayo que realizará las operaciones de intersección
-	var ray;
+	// Acciones que se ejecutaran con cada evento registrado
+	this.actions = [];
 
+	// Objeto 3D sobre el que se realizarán las operaciones (rotación y traslación)
+	this.SELECTED;
 	// Array con los elementos del puzzle (los cubos y el grupo de piezas que forma el cubo)
-	var objects = [];
+	this.objects = [];
 	// Objeto de la clase puzzle
-	var puzzle;
-	// Booleano para indicar si el puzzle ha sido resuelto
-	var isDone = false;
+	this.puzzle;
 
 	// Flag para saber si el botón de rotación está pulsado
-	var rotDown;
+	this.rotDown;
 	// Flag para saber si el botón de movimiento está pulsado
-	var movDown;
+	this.movDown;
 	// Coordenadas del ratón en la última vez que se proceso el evento, necesarias para calcular cuanto ha de girar una
 	// figura
-	var lastMouseX;
-	var lastMouseY;
-	// Vector de 2 coordenadas que alamacena la posición actual del ratón
-	var mouse = new THREE.Vector2();
+	this.lastMouseX;
+	this.lastMouseY;
 
 	// Sensibilidad de giro, relación entre el movimiento del ratón y la cantidad de giro de una figura
-	var sensitivity;
+	this.sensitivity;
 	// Acumulador de giro para cuando se gira una pieza con la tecla CTRL pulsada
-	var rotationStore = {
+	this.rotationStore = {
 		x : 0,
 		y : 0
 	};
 	// 90 grados en radianes
-	var _90degrees = Math.PI / 2;
+	this._90degrees = Math.PI / 2;
+
+	// Vista del puzzle
+	this.view;
 
 	/*******************************************************************************************************************
 	 * Constructor
@@ -78,46 +69,30 @@ function PuzzleController(cam, sce, cub, puz) {
 	/**
 	 * Constructor de la clase PuzzleController
 	 * 
-	 * @param Camera:cam
-	 *            cámara con la que se realizarán los cálculos de la interacción.
-	 * @param Scene:sce
-	 *            escena en la que se representará el mundo 3D.
-	 * @param Object3D[]:cub
-	 *            array con las piezas del puzzle.
-	 * @param Puzzle:puz
-	 *            objeto de la clase Puzzle.
+	 * @param Integer:numC
+	 *            numero de cubos que tendra el puzzle, para simplicar se indicara mediante el número de cubos en una
+	 *            dimensión, 27 (3x3x3) => 3.
+	 * @param Material[]:mats
+	 *            array con los materiales a usar para crear el puzzle.
+	 * @param Callback:finAct
+	 *            función de rellamada que se ejecutará al solucionar el puzzle.
+	 * @param Boolean:col
+	 *            booleano que indicará si el puzzle es de colores, si no se ignorará.
 	 */
-	camera = cam;
-	scene = sce;
 
-	puzzle = puz;
+	// Guardamos el numero de cubos que tendra el cubo, comprobamos que sea correcto
+	if (numC != 2 && numC != 3) {
+		numC = 3;
+	}
+	// Iniciamos el controlador, y los objetos que sean necesarios (vista,...)
+	this.init(numC, finAct, mats, col);
+
 	// Guardamos los elementos que sufriran la interaccion
-	objects = cub.concat(puzzle.getPuzzle());
+	this.objects = this.puzzle.getPuzzleCubes().concat(this.puzzle.getPuzzle());
 
-	// Sensibilidad por defecto
-	sensitivity = getOptions().sensitivity / 100;
+	// Activamos el controlador
+	this.enable();
 
-	// Creamos un plano para el picking
-	plane = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000, 8, 8), new THREE.MeshBasicMaterial({
-		color : 0x000000,
-		opacity : 0.25,
-		transparent : true,
-		wireframe : true
-	}));
-	// Hacemos que no sea visible, es para funcionamiento interno, no para mostrarlo
-	plane.visible = false;
-	// Añadimos el plano a la escena
-	scene.add(plane);
-
-	// Creamos un proyector para realizar el picking
-	projector = new THREE.Projector();
-	// Creamos un rayo con origen en la posicion de la camara
-	ray = new THREE.Raycaster(camera.position);
-
-	// Añadimos receptores de eventos para el raton
-	document.getElementById('canvas').addEventListener('mousedown', onPuzzleMouseDown, false);
-	document.addEventListener('mousemove', onPuzzleMouseMove, false);
-	document.addEventListener('mouseup', onPuzzleMouseUp, false);
 	// Desactivamos el menu contextual del boton derecho
 	document.getElementById('canvas').oncontextmenu = function() {
 		return false
@@ -127,366 +102,421 @@ function PuzzleController(cam, sce, cub, puz) {
 	 * Métodos Privados
 	 ******************************************************************************************************************/
 
-	/**
-	 * Manejador del evento de botón del ratón pulsado
-	 * 
-	 * @param EventObject:event->
-	 *            caracteristicas del evento lanzado.
-	 */
-	function onPuzzleMouseDown(event) {
-		// Impedimos que se produzca la accion por defecto
-		event.preventDefault();
+}
+PuzzleController.prototype.constructor = PuzzleController;
 
-		// Calculamos donde esta el raton con el eje de coordenadas en el centro
-		mouse.x = (event.clientX / windowWidth) * 2 - 1;
-		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
-		// Creamos un vector en la direccion del raton hacia la escena
-		var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		projector.unprojectVector(vector, camera);
-		ray.ray.direction = vector.subSelf(camera.position).normalize();
+/***********************************************************************************************************************
+ * Métodos Protected (para usar herencia)
+ **********************************************************************************************************************/
 
-		// Si es el boton de giro
-		if (event.button == getOptions().rotButton) {
-			// Activamos el flag del boton de rotacion
-			rotDown = true;
+/**
+ * Realiza las operaciones necesarias para arrancar el puzzle
+ * 
+ * @param Integer:numC
+ *            numero de cubos que tendra el puzzle, para simplicar se indicara mediante el número de cubos en una
+ *            dimensión, 27 (3x3x3) => 3.
+ * @param Callback:finAct
+ *            función de rellamada que se ejecutará al solucionar el puzzle.
+ * @param Material[]:mats
+ *            array con los materiales a usar para crear el puzzle.
+ * @param Callback:finAct
+ *            función de rellamada que se ejecutará al solucionar el puzzle.
+ * @param Boolean:col
+ *            booleano que indicará si el puzzle es de colores, si no se ignorará.
+ */
+PuzzleController.prototype.init = function(numC, finAct, mats, col) {
+	// Creamos el puzzle
+	this.puzzle = new Puzzle(numC, mats, col);
+	this.view = new PuzzleView(this.puzzle, numC, finAct, mats, col);
+}
 
-			// Obtenemos la posicion del raton
-			lastMouseX = event.clientX;
-			lastMouseY = event.clientY;
+/**
+ * Manejador del evento de botón del ratón pulsado
+ * 
+ * @param EventObject:event->
+ *            caracteristicas del evento lanzado.
+ */
+PuzzleController.prototype.onPuzzleMouseDown = function(event) {
+	// Impedimos que se produzca la accion por defecto
+	event.preventDefault();
 
-			plane.position.z = 0;
-			// Obtenemos la interseccion entre el vector y el plano
-			var intersects = ray.intersectObject(plane);
+	// Calculamos donde esta el raton con el eje de coordenadas en el centro
+	var mouse = new THREE.Vector2((event.clientX / windowWidth) * 2 - 1, -(event.clientY / windowHeight) * 2 + 1);
+
+	// Si es el boton de giro
+	if (event.button == getOptions().rotButton) {
+		// Activamos el flag del boton de rotacion
+		this.rotDown = true;
+
+		// Obtenemos la posicion del raton
+		this.lastMouseX = event.clientX;
+		this.lastMouseY = event.clientY;
+		// Restauramos la posicion del plano para picking
+		ThreeDUtils.plane.position.z = 0;
+
+		// Usamos la utilidad de Utils para ver si se ha hecho click en la zona del puzzle
+		var ctl = this;
+		ThreeDUtils.intersectObjects(mouse, null, null, function(intersect) {
 			// Si el raton esta en la zona del puzzle
-			if (puzzle.isPuzzleZone(intersects[0].point)) {
+			if (ctl.puzzle.isPuzzleZone(intersect.point)) {
 				// Si ya estaba pulsado el boton de mover y habia una pieza seleccionada
-				if (movDown && SELECTED) {
+				if (ctl.movDown && ctl.SELECTED) {
 					// Cambiamos la rotacion y traslacion de la figura a la que tendra en el puzzle
-					puzzle.putInCube(SELECTED);
+					ctl.puzzle.putInCube(ctl.SELECTED);
 					// Y añadimos la figura al puzzle
-					puzzle.getPuzzle().add(SELECTED);
+					ctl.puzzle.getPuzzle().add(ctl.SELECTED);
 
 					// Indicamos a la vista que hemos introducido una pieza en el puzzle
-					isDone = pv.cubeInserted();
+					ctl.view.cubeInserted();
 				}
 				// Seleccionamos el grupo para girar este en vez de una figura individual
-				SELECTED = puzzle.getPuzzle();
+				ctl.SELECTED = ctl.puzzle.getPuzzle();
 				// Cambiamos al cursor de movimiento
 				container.style.cursor = 'crosshair';
-				return;
-			}
-
-			// Obtenemos los objetos que son atravesados por el vector
-			var intersects = ray.intersectObjects(objects);
-			// Si hay algun objeto
-			if (intersects.length > 0) {
-				// Obtenemos el primer objeto atravesado, que sera el seleccionado, el que esta delante
-				SELECTED = intersects[0].object;
-
-				// Cambiamos al cursor de movimiento
-				container.style.cursor = 'move';
-			}
-		}
-
-		// Si es el boton de movimiento
-		if (event.button == getOptions().movButton) {
-			// Activamos el flag del boton de movimiento
-			movDown = true;
-			// Si no esta resuelto el puzzle
-			if (!isDone) {
-				// Obtenemos los objetos que son atravesados por el vector
-				var intersects = ray.intersectObjects(objects);
-				// Si hay algun objeto
-				if (intersects.length > 0) {
+			} else {
+				// Usamos la utilidad de Utils para ver si se ha hecho click en algun objeto
+				ThreeDUtils.intersectObjects(null, ctl.objects, 'move', function(intersect) {
 					// Obtenemos el primer objeto atravesado, que sera el seleccionado, el que esta delante
-					SELECTED = intersects[0].object;
-					// Si esta en el puzzle
-					if (SELECTED.parent == puzzle.getPuzzle()) {
-						// Si ya esta pulsado el boton de girar
-						if (rotDown) {
-							SELECTED = puzzle.getPuzzle();
-						} else {
-							// Sacamos la figura del puzzle
-							puzzle.putOutCube(SELECTED);
-							// Añadimos la figura a la escena, con lo cual se borrara tambien del grupo del puzzle
-							scene.add(SELECTED);
-						}
-					}
-					// Cambiamos al cursor de movimiento
-					container.style.cursor = 'move';
-				}
+					ctl.SELECTED = intersect.object;
+				});
 			}
-		}
+		});
 	}
 
-	/**
-	 * Manejador del evento del movimiento del ratón
-	 * 
-	 * @param EventObject:event->
-	 *            caracteristicas del evento lanzado.
-	 */
-	function onPuzzleMouseMove(event) {
-		// Impedimos que se produzca la accion por defecto
-		event.preventDefault();
-
-		// Si hay algun objeto seleccionado
-		if (SELECTED) {
-			// Si esta pulsado el boton de rotacion y no el de movimiento
-			if (rotDown && !movDown) {
-				// Obtenemos la posicion del raton
-				var mouseX = event.clientX;
-				var mouseY = event.clientY;
-
-				// Si no está pulsada la tecla CTRL
-				if (!event.ctrlKey) {
-					rotationStore.x = rotationStore.y = 0;
-					// Giramos la figura segun la sensibilidad
-					pv.rotateShape(SELECTED, sensitivity * (mouseY - lastMouseY), sensitivity * (mouseX - lastMouseX));
-				}
-				// Si esta pulsada la tecla CTRL
-				else {
-					// Calculamos cuanto se ha girado
-					rotationStore.x += sensitivity * (mouseY - lastMouseY);
-					rotationStore.y += sensitivity * (mouseX - lastMouseX);
-					// Si el giro en el eje X ha sido mayor de 90 grados
-					if (rotationStore.x > _90degrees) {
-						pv.rotateShape(SELECTED, _90degrees, 0);
-						rotationStore.x -= _90degrees;
-					}
-					// Si el giro en el eje X ha sido menor de -90 grados
-					if (rotationStore.x < -_90degrees) {
-						pv.rotateShape(SELECTED, -_90degrees, 0);
-						rotationStore.x += _90degrees;
-					}
-					// Si el giro en el eje Y ha sido mayor de 90 grados
-					if (rotationStore.y > _90degrees) {
-						pv.rotateShape(SELECTED, 0, _90degrees);
-						rotationStore.y -= _90degrees;
-					}
-					// Si el giro en el eje Y ha sido menor de -90 grados
-					if (rotationStore.y < -_90degrees) {
-						pv.rotateShape(SELECTED, 0, -_90degrees);
-						rotationStore.y += _90degrees;
+	// Si es el boton de movimiento
+	if (event.button == getOptions().movButton) {
+		// Activamos el flag del boton de movimiento
+		this.movDown = true;
+		// Si no esta resuelto el puzzle
+		if (!this.view.isDone) {
+			// Usamos la utilidad de Utils para ver si se ha hecho click en algun objeto
+			var ctl = this;
+			ThreeDUtils.intersectObjects(mouse, this.objects, 'move', function(intersect) {
+				// Obtenemos el primer objeto atravesado, que sera el seleccionado, el que esta delante
+				ctl.SELECTED = intersect.object;
+				// Si esta en el puzzle
+				if (ctl.SELECTED.parent == ctl.puzzle.getPuzzle()) {
+					// Si ya esta pulsado el boton de girar
+					if (ctl.rotDown) {
+						ctl.SELECTED = ctl.puzzle.getPuzzle();
+					} else {
+						// Sacamos la figura del puzzle
+						ctl.puzzle.putOutCube(ctl.SELECTED);
+						// Añadimos la figura a la escena, con lo cual se borrara tambien del grupo del puzzle
+						scene.add(ctl.SELECTED);
 					}
 				}
+			});
+		}
+	}
+}
 
-				// Guardamos la posicion para la siguiente llamada
-				lastMouseX = mouseX;
-				lastMouseY = mouseY;
-				// Y salimos del evento
-				return;
+/**
+ * Manejador del evento del movimiento del ratón
+ * 
+ * @param EventObject:event->
+ *            caracteristicas del evento lanzado.
+ */
+PuzzleController.prototype.onPuzzleMouseMove = function(event) {
+	// Impedimos que se produzca la accion por defecto
+	event.preventDefault();
+
+	// Si hay algun objeto seleccionado
+	if (this.SELECTED) {
+		// Si esta pulsado el boton de rotacion y no el de movimiento
+		if (this.rotDown && !this.movDown) {
+			// Obtenemos la posicion del raton
+			var rotationX = this.sensitivity * (event.clientX - this.lastMouseX);
+			var rotationY = this.sensitivity * (event.clientY - this.lastMouseY);
+
+			// Si no está pulsada la tecla CTRL
+			if (!event.ctrlKey) {
+				this.rotationStore.x = this.rotationStore.y = 0;
+				// Giramos la figura segun la sensibilidad
+				this.view.rotateShape(this.SELECTED, rotationY, rotationX);
+			} else {
+				// Calculamos cuanto se ha girado
+				this.rotationStore.x += rotationY;
+				this.rotationStore.y += rotationX;
+				// Si el giro en el eje X ha sido mayor de 90 grados
+				if (this.rotationStore.x > this._90degrees) {
+					this.view.rotateShape(this.SELECTED, this._90degrees, 0);
+					this.rotationStore.x -= this._90degrees;
+				}
+				// Si el giro en el eje X ha sido menor de -90 grados
+				if (this.rotationStore.x < -this._90degrees) {
+					this.view.rotateShape(this.SELECTED, -this._90degrees, 0);
+					this.rotationStore.x += this._90degrees;
+				}
+				// Si el giro en el eje Y ha sido mayor de 90 grados
+				if (this.rotationStore.y > this._90degrees) {
+					this.view.rotateShape(this.SELECTED, 0, this._90degrees);
+					this.rotationStore.y -= this._90degrees;
+				}
+				// Si el giro en el eje Y ha sido menor de -90 grados
+				if (this.rotationStore.y < -this._90degrees) {
+					this.view.rotateShape(this.SELECTED, 0, -this._90degrees);
+					this.rotationStore.y += this._90degrees;
+				}
 			}
 
-			// Si esta pulsado el boton de movimiento y no el de rotacion
-			if (movDown && !rotDown) {
-				// Calculamos donde esta el raton con el eje de coordenadas en el centro
-				mouse.x = (event.clientX / windowWidth) * 2 - 1;
-				mouse.y = -(event.clientY / windowHeight) * 2 + 1;
+			// Guardamos la posicion para la siguiente llamada
+			this.lastMouseX = event.clientX;
+			this.lastMouseY = event.clientY;
+			// Y salimos del evento
+			return;
+		}
 
-				// Creamos un vector en la direccion del raton hacia la escena
-				var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-				projector.unprojectVector(vector, camera);
-				ray.ray.direction = vector.subSelf(camera.position).normalize();
-				// Calculamos la interseccion con el plano
-				var intersects = ray.intersectObject(plane);
+		// Si esta pulsado el boton de movimiento y no el de rotacion
+		if (this.movDown && !this.rotDown) {
+			// Calculamos donde esta el raton con el eje de coordenadas en el centro
+			var mouse = new THREE.Vector2((event.clientX / windowWidth) * 2 - 1,
+					-(event.clientY / windowHeight) * 2 + 1);
 
+			// Usamos la utilidad de Utils para ver si el cursor esta en la zona del puzzle
+			var ctl = this;
+			ThreeDUtils.intersectObjects(mouse, null, null, function(intersect) {
 				// Si el objeto seleccionado no es el puzzle ni esta solucionado el puzzle, entonces movemos el objeto
-				if (SELECTED != puzzle.getPuzzle() && !isDone) {
+				if (ctl.SELECTED != ctl.puzzle.getPuzzle() && !ctl.view.isDone) {
 					// Si el raton se encuentra en la zona de movimiento
 					if (event.clientX >= 0 && event.clientX <= windowWidth && event.clientY >= 0
 							&& event.clientY <= windowHeight) {
 						// Movemos la figura seleccionada
-						SELECTED.position.copy(intersects[0].point);
+						ctl.SELECTED.position.copy(intersect.point);
 					}
 
 					// Comprobamos si esta en la zona del puzzle, para mover el cubo hacia
 					// delante en caso de tener uno detras, para que no se solapen
-					if (puzzle.isPuzzleZone(SELECTED.position)) {
-						// Obtenemos el objeto que es atravesado por el vector sin contar la figura seleccionada
-						var intersects = ray.intersectObjects(objects);
-						var intersector = null;
-						for (var i = 0; i < intersects.length; i++) {
-							if (intersects[i].object != SELECTED) {
-								intersector = intersects[i];
-								break;
-							}
-						}
+					if (ctl.puzzle.isPuzzleZone(ctl.SELECTED.position)) {
 
-						// Si hay un objeto
-						if (intersector) {
-							// Movemos tanto el plano de desplazamiento como la figura hacia delante
-							// tanto como este la figura anterior mas la mitad del tamaño de la seleccionada
-							plane.position.z = SELECTED.position.z = intersector.point.z + 200;
-							// Si no hay objetos atravesados sin contar el seleccionado y la figura no esta en Z=0
-						} else if (SELECTED.position.z != 0) {
-							// Movemos tanto la figura como el plano de desplazamiento a Z=0
-							SELECTED.position.z = plane.position.z = 0;
-						}
+						// Usamos la utilidad de Utils para ver si el cursor esta sobre algun objeto
+						ThreeDUtils.intersectObjects(mouse, ctl.objects, null, null, null, function(intersects) {
+							var intersector = null;
+							for (var i = 0; i < intersects.length; i++) {
+								if (intersects[i].object != ctl.SELECTED) {
+									intersector = intersects[i];
+									break;
+								}
+							}
+
+							// Si hay un objeto
+							if (intersector) {
+								// Movemos tanto el plano de desplazamiento como la figura hacia delante
+								// tanto como este la figura anterior mas la mitad del tamaño de la seleccionada
+								ThreeDUtils.plane.position.z = ctl.SELECTED.position.z = intersector.point.z + 200;
+							} else {
+								// Si no hay objetos atravesados sin contar el seleccionado y la figura no esta en Z=0
+								if (ctl.SELECTED.position.z != 0) {
+									// Movemos tanto la figura como el plano de desplazamiento a Z=0
+									ctl.SELECTED.position.z = ThreeDUtils.plane.position.z = 0;
+								}
+							}
+						});
 					}
 					// Si no esta en la zona del puzzle pero no esta en Z=0
-					else if (SELECTED.position.z != 0) {
+					else if (ctl.SELECTED.position.z != 0) {
 						// Movemos tanto la figura como el plano de desplazamiento a Z=0
-						SELECTED.position.z = plane.position.z = 0;
+						ctl.SELECTED.position.z = ThreeDUtils.plane.position.z = 0;
 					}
 				}
 
-				// Y salimos del evento
-				return;
-			}
-
-			// Si esta pulsado el boton de movimiento y el de rotacion
-			if (movDown && rotDown) {
-				// Si la pieza ha girar esta introducida en el puzzle
-				if (SELECTED.parent == puzzle.getPuzzle()) {
-					// Giramos el puzzle
-					SELECTED = puzzle.getPuzzle();
-				}
-
-				// Obtenemos la posicion del raton
-				var mouseX = event.clientX;
-				var mouseY = event.clientY;
-
-				// Si no está pulsada la tecla CTRL
-				if (!event.ctrlKey) {
-					rotationStore.x = rotationStore.y = 0;
-					// Giramos la figura segun la sensibilidad
-					pv.rotateShape(SELECTED, 0, 0, -sensitivity * (mouseY - lastMouseY) - sensitivity
-							* (mouseX - lastMouseX));
-				}
-				// Si esta pulsada la tecla CTRL
-				else {
-					// Calculamos cuanto se ha girado
-					rotationStore.x += sensitivity * (mouseY - lastMouseY);
-					rotationStore.y += sensitivity * (mouseX - lastMouseX);
-					// Si el giro en el eje X o en el eje Y ha sido mayor de 90 grados
-					if (rotationStore.x > _90degrees || rotationStore.y > _90degrees) {
-						pv.rotateShape(SELECTED, 0, 0, -_90degrees);
-						rotationStore.x = rotationStore.x - _90degrees * (Math.floor(rotationStore.x / _90degrees));
-						rotationStore.y = rotationStore.y - _90degrees * (Math.floor(rotationStore.y / _90degrees));
-					}
-					// Si el giro en el eje X ha sido menor de -90 grados
-					if (rotationStore.x < -_90degrees || rotationStore.y < -_90degrees) {
-						pv.rotateShape(SELECTED, 0, 0, +_90degrees);
-						rotationStore.x = rotationStore.x - _90degrees * (Math.floor(rotationStore.x / _90degrees));
-						rotationStore.y = rotationStore.y - _90degrees * (Math.floor(rotationStore.y / _90degrees));
-					}
-				}
-
-				// Guardamos la posicion para la siguiente llamada
-				lastMouseX = mouseX;
-				lastMouseY = mouseY;
-
-				// Y salimos del evento
-				return;
-			}
+			});
+			// Y salimos del evento
+			return;
 		}
 
-		// Si llegamos hasta aqui es que no esta seleccionado ningun objeto
-		// Calculamos donde esta el raton con el eje de coordenadas en el centro
-		mouse.x = (event.clientX / windowWidth) * 2 - 1;
-		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
-		// Creamos un vector en la direccion del raton hacia la escena
-		var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		projector.unprojectVector(vector, camera);
-		ray.ray.direction = vector.subSelf(camera.position).normalize();
-		// Obtenemos los objetos que son atravesados por el vector
-		var intersects = ray.intersectObjects(objects);
+		// Si esta pulsado el boton de movimiento y el de rotacion
+		if (this.movDown && this.rotDown) {
+			// Si la pieza ha girar esta introducida en el puzzle
+			if (this.SELECTED.parent == this.puzzle.getPuzzle()) {
+				// Giramos el puzzle
+				this.SELECTED = this.puzzle.getPuzzle();
+			}
 
-		// Si hay objetos atravesados
-		if (intersects.length > 0) {
-			// Cambiamos al cursor de seleccion
-			container.style.cursor = 'pointer';
-		} else {
+			// Obtenemos la posicion del raton
+			var mouseX = event.clientX;
+			var mouseY = event.clientY;
+
+			// Si no está pulsada la tecla CTRL
+			if (!event.ctrlKey) {
+				this.rotationStore.x = this.rotationStore.y = 0;
+				// Giramos la figura segun la sensibilidad
+				this.view.rotateShape(this.SELECTED, 0, 0, -this.sensitivity * (mouseY - this.lastMouseY)
+						- this.sensitivity * (mouseX - this.lastMouseX));
+			}
+			// Si esta pulsada la tecla CTRL
+			else {
+				// Calculamos cuanto se ha girado
+				this.rotationStore.x += this.sensitivity * (mouseY - this.lastMouseY);
+				this.rotationStore.y += this.sensitivity * (mouseX - this.lastMouseX);
+				// Si el giro en el eje X o en el eje Y ha sido mayor de 90 grados
+				if (this.rotationStore.x > this._90degrees || this.rotationStore.y > this._90degrees) {
+					this.view.rotateShape(this.SELECTED, 0, 0, -this._90degrees);
+					this.rotationStore.x = this.rotationStore.x - this._90degrees
+							* (Math.floor(this.rotationStore.x / this._90degrees));
+					this.rotationStore.y = this.rotationStore.y - this._90degrees
+							* (Math.floor(this.rotationStore.y / this._90degrees));
+				}
+				// Si el giro en el eje X ha sido menor de -90 grados
+				if (this.rotationStore.x < -this._90degrees || this.rotationStore.y < -this._90degrees) {
+					this.view.rotateShape(this.SELECTED, 0, 0, +this._90degrees);
+					this.rotationStore.x = this.rotationStore.x - this._90degrees
+							* (Math.floor(this.rotationStore.x / this._90degrees));
+					this.rotationStore.y = this.rotationStore.y - this._90degrees
+							* (Math.floor(this.rotationStore.y / this._90degrees));
+				}
+			}
+
+			// Guardamos la posicion para la siguiente llamada
+			this.lastMouseX = mouseX;
+			this.lastMouseY = mouseY;
+
+			// Y salimos del evento
+			return;
+		}
+	}
+
+	// Si llegamos hasta aqui es que no esta seleccionado ningun objeto
+	// Calculamos donde esta el raton con el eje de coordenadas en el centro
+	var mouse = new THREE.Vector2((event.clientX / windowWidth) * 2 - 1, -(event.clientY / windowHeight) * 2 + 1);
+	// Usamos la utilidad de Utils para ver si el cursor esta sobre algun objeto
+	ThreeDUtils.intersectObjects(mouse, this.objects, 'pointer');
+}
+
+/**
+ * Manejador del evento de botón del ratón levantado
+ * 
+ * @param EventObject:event->
+ *            caracteristicas del evento lanzado.
+ */
+PuzzleController.prototype.onPuzzleMouseUp = function(event) {
+	// Impedimos que se produzca la accion por defecto
+	event.preventDefault();
+
+	// Si es el boton de giro
+	if (event.button == getOptions().rotButton) {
+		// Desactivamos el flag de boton de rotacion pulsado
+		this.rotDown = false;
+		// Si no esta pulsado el boton de movimiento
+		if (!this.movDown) {
+			// Deseleccionamos el objeto seleccionado
+			this.SELECTED = null;
 			// Usamos el cursor por defecto
 			container.style.cursor = 'auto';
 		}
 	}
 
-	/**
-	 * Manejador del evento de botón del ratón levantado
-	 * 
-	 * @param EventObject:event->
-	 *            caracteristicas del evento lanzado.
-	 */
-	function onPuzzleMouseUp(event) {
-		// Impedimos que se produzca la accion por defecto
-		event.preventDefault();
+	// Si es el boton de movimiento
+	if (event.button == getOptions().movButton) {
+		// Desactivamos el flag de boton de movimiento pulsado
+		this.movDown = false;
+		// Si hay algun objeto seleccionado
+		if (this.SELECTED) {
+			// Si se suelta en la zona del puzzle y no esta resuelto
+			if (this.SELECTED != this.puzzle.getPuzzle() && this.puzzle.isPuzzleZone(this.SELECTED.position)
+					&& !this.view.isDone) {
+				// Cambiamos la rotacion y traslacion de la figura a la que tendra en el puzzle
+				this.puzzle.putInCube(this.SELECTED);
+				// Y añadimos la figura al puzzle
+				this.puzzle.getPuzzle().add(this.SELECTED);
 
-		// Si es el boton de giro
-		if (event.button == getOptions().rotButton) {
-			// Desactivamos el flag de boton de rotacion pulsado
-			rotDown = false;
-			// Si no esta pulsado el boton de movimiento
-			if (!movDown) {
+				// Indicamos a la vista que hemos introducido una pieza en el puzzle
+				this.view.cubeInserted();
+			}
+			// Si no esta pulsado el boton de rotacion
+			if (!this.rotDown) {
 				// Deseleccionamos el objeto seleccionado
-				SELECTED = null;
+				this.SELECTED = null;
 				// Usamos el cursor por defecto
 				container.style.cursor = 'auto';
 			}
 		}
+	}
+}
 
-		// Si es el boton de movimiento
-		if (event.button == getOptions().movButton) {
-			// Desactivamos el flag de boton de movimiento pulsado
-			movDown = false;
-			// Si hay algun objeto seleccionado
-			if (SELECTED) {
-				// Si se suelta en la zona del puzzle y no esta resuelto
-				if (SELECTED != puzzle.getPuzzle() && puzzle.isPuzzleZone(SELECTED.position) && !isDone) {
-					// Cambiamos la rotacion y traslacion de la figura a la que tendra en el puzzle
-					puzzle.putInCube(SELECTED);
-					// Y añadimos la figura al puzzle
-					puzzle.getPuzzle().add(SELECTED);
+/**
+ * Método que elimina el controlador. Lo único que hace es eliminar los manejadores de eventos que tiene registrados
+ */
+PuzzleController.prototype.remove = function() {
+	// Borramos receptores de eventos para el raton
+	document.getElementById('canvas').removeEventListener('mousedown', this.actions[0], false);
+	document.removeEventListener('mousemove', this.actions[1], false);
+	document.removeEventListener('mouseup', this.actions[2], false);
 
-					// Indicamos a la vista que hemos introducido una pieza en el puzzle
-					isDone = pv.cubeInserted();
-				}
-				// Si no esta pulsado el boton de rotacion
-				if (!rotDown) {
-					// Deseleccionamos el objeto seleccionado
-					SELECTED = null;
-					// Usamos el cursor por defecto
-					container.style.cursor = 'auto';
-				}
-			}
-		}
+	// Usamos el cursor por defecto
+	container.style.cursor = 'auto';
+}
+
+/**
+ * Método que habilita el controlador. Registra los eventos necesarios
+ */
+PuzzleController.prototype.enable = function() {
+	if (this.actions.length == 0) {
+		var ctl = this;
+		this.actions[0] = function(event) {
+			ctl.onPuzzleMouseDown(event);
+		};
+		this.actions[1] = function(event) {
+			ctl.onPuzzleMouseMove(event);
+		};
+		this.actions[2] = function(event) {
+			ctl.onPuzzleMouseUp(event);
+		};
 	}
 
-	/*******************************************************************************************************************
-	 * Métodos Públicos
-	 ******************************************************************************************************************/
+	// Registramos de nuevo los receptores de eventos para el raton
+	document.getElementById('canvas').addEventListener('mousedown', this.actions[0], false);
+	document.addEventListener('mousemove', this.actions[1], false);
+	document.addEventListener('mouseup', this.actions[2], false);
 
-	/**
-	 * Método que elimina el controlador. Lo único que hace es eliminar los manejadores de eventos que tiene registrados
-	 */
-	this.remove = function() {
-		// Borramos receptores de eventos para el raton
-		document.getElementById('canvas').removeEventListener('mousedown', onPuzzleMouseDown, false);
-		document.removeEventListener('mousemove', onPuzzleMouseMove, false);
-		document.removeEventListener('mouseup', onPuzzleMouseUp, false);
+	// Obtenemos la sensibilidad con la que se debe girar
+	this.sensitivity = getOptions().sensitivity / 100;
+}
 
-		// Usamos el cursor por defecto
-		container.style.cursor = 'auto';
-	}
+/**
+ * Método para mostrar en la interfaz todos los elementos de la vista
+ */
+PuzzleController.prototype.show = function() {
+	// Mostramos el puzzle
+	this.view.show();
+	// Activamos las acciones
+	this.enable();
+};
 
-	/**
-	 * Método que habilita el controlador. Registra los eventos necesarios
-	 */
-	this.enable = function() {
-		// Registramos de nuevo los receptores de eventos para el raton
-		document.getElementById('canvas').addEventListener('mousedown', onPuzzleMouseDown, false);
-		document.addEventListener('mousemove', onPuzzleMouseMove, false);
-		document.addEventListener('mouseup', onPuzzleMouseUp, false);
+/**
+ * Método para eliminar de la interfaz todos los elementos de la vista, ocultarlos
+ */
+PuzzleController.prototype.hide = function() {
+	// Deshabilitamos el controlador asociado
+	this.remove();
+	// Ocultamos el puzzle
+	this.view.hide();
+};
 
-		// Obtenemos la sensibilidad con la que se debe girar
-		sensitivity = getOptions().sensitivity / 100;
-	}
+/**
+ * Método para mostrar la solución al puzzle como se encuentre el momento de llamar a este método
+ */
+PuzzleController.prototype.showSolution = function() {
+	this.view.showSolution();
+}
 
-	/**
-	 * Método para indicar al controlador que el puzzle ha sido resuelto
-	 */
-	this.setIsDone = function() {
-		isDone = true;
-	}
+/**
+ * Método para ocultar la solución al puzzle
+ */
+PuzzleController.prototype.hideSolution = function() {
+	this.view.hideSolution();
+}
 
+/**
+ * Método para colocar automáticamente un cubo en el puzzle de manera correcta
+ */
+PuzzleController.prototype.placeCube = function() {
+	this.view.placeCube();
+}
+
+/**
+ * Método para saber si el puzzle ha sido resuelto
+ */
+PuzzleController.prototype.isDone = function() {
+	this.view.isDone;
 }

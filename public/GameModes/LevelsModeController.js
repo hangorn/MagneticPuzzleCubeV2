@@ -57,21 +57,21 @@ function LevelsModeController(l, mats) {
 	this.levelsData = {};
 	// Nivel 1-2: 8-27 cubos (2-3 soluciones) con 12-18 imagenes
 	this.levelsData[0] = {
-		puzzle : PuzzleView
+		puzzle : PuzzleController
 	};
 	// Nivel 3-4: 8-27 cubos (2-3 soluciones) con imagenes repetidas 2 veces (6-9 imagenes distintas)
 	this.levelsData[1] = {
-		puzzle : PuzzleView,
+		puzzle : PuzzleController,
 		imgsRepeated : 2
 	};
 	// Nivel 5-6: 8-27 cubos (2-3 soluciones) con colores
 	this.levelsData[2] = {
-		puzzle : ColoredPuzzleView,
+		puzzle : ColoredPuzzleController,
 		noMaterials : true
 	};
 	// Nivel 7-8: 8-9 cubos (2-3 soluciones) con imagenes repetidas 3 veces (4-6 imagenes distintas)
 	this.levelsData[3] = {
-		puzzle : PuzzleView,
+		puzzle : PuzzleController,
 		imgsRepeated : 3
 	};
 	// Nivel 9-10: 8-27 cubos (2-3 soluciones) mas 4-6 cubos con secciones aleatorias
@@ -80,7 +80,7 @@ function LevelsModeController(l, mats) {
 	};
 	// Nivel 11-12: 8-27 cubos (2-3 soluciones) con imagenes repetidas 6 veces (2-3 imagenes distintas)
 	this.levelsData[5] = {
-		puzzle : PuzzleView,
+		puzzle : PuzzleController,
 		imgsRepeated : 6
 	};
 	// Nivel 13-14: 8-27 cubos (2-3 soluciones) en movimiento
@@ -89,7 +89,7 @@ function LevelsModeController(l, mats) {
 	};
 	// Nivel 15-16: 8-27 cubos (2-3 soluciones) con imagenes repetidas 12-18 veces (1 imagen distinta)
 	this.levelsData[7] = {
-		puzzle : PuzzleView,
+		puzzle : PuzzleController,
 		imgsRepeated : 18
 	};
 
@@ -145,7 +145,7 @@ LevelsModeController.prototype.startLevel = function() {
 	// Obtenemos las imagenes necesarias para iniciar el nivel
 	var imgs = this.getMaterials(imgsNeeded, levelData.imgsRepeated);
 	var ctl = this;
-	var puzzle = new levelData.puzzle(scene, this.numberOfCubes, function() {
+	var puzzle = new levelData.puzzle(this.numberOfCubes, function() {
 		ctl.finish()
 	}, imgs);
 	// Si al puzzle no hay que pasarle los materiales, los obtenemos de el para poder mostrar la pantalla con todas las

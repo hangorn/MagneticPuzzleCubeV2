@@ -21,32 +21,27 @@
 /*
  *  CLASE PUZZLEVIEW
  *  */
-function PuzzleView(sce, numC, finAct, mats, col) {
+function PuzzleView(puzz, numberOfCubes, finAct, mats) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
 
-	// Escena en la que se mostrarán la vista
-	var scene;
-
 	// Objeto de la clase puzzle con el cual se realizara la logica de negocio
-	var puzzle;
-	// Numero de cubos que tendrá el puzzle
-	var numberOfCubes;
+	this.puzzle;
 	// Posiciones iniciales
-	var iniPos = [];
+	this.iniPos = [];
 
 	// Solucion que se mostrara si el usuario lo indica
-	var solution = undefined;
+	this.solution = undefined;
 
 	// Linea para delimitar el area del puzzle
-	var puzzleArea;
+	this.puzzleArea;
 
 	// Función de rellamada que se ejecutará al solucionar el puzzle.
-	var finishedAction;
+	this.finishedAction;
 	// Booleano para saber si el puzzle está resuelto
-	var isDone = false;
+	this.isDone = false;
 
 	/*******************************************************************************************************************
 	 * Constructor
@@ -54,8 +49,6 @@ function PuzzleView(sce, numC, finAct, mats, col) {
 	/**
 	 * Constructor de la clase PuzzleView
 	 * 
-	 * @param Scene:sce
-	 *            escena en la que se representará el mundo 3D.
 	 * @param Integer:numC
 	 *            numero de cubos que tendra el puzzle, para simplicar se indicara mediante el número de cubos en una
 	 *            dimensión, 27 (3x3x3) => 3.
@@ -63,22 +56,10 @@ function PuzzleView(sce, numC, finAct, mats, col) {
 	 *            array con los materiales a usar para crear el puzzle.
 	 * @param Callback:finAct
 	 *            función de rellamada que se ejecutará al solucionar el puzzle.
-	 * @param Boolean:col
-	 *            booleano que indicará si el puzzle es de colores, si no se ignorará.
 	 */
 
-	scene = sce;
-	finishedAction = finAct;
-
-	// Guardamos el numero de cubos que tendra el cubo, comprobamos que sea correcto
-	if (numC != 2 && numC != 3) {
-		numberOfCubes = 3;
-	} else {
-		numberOfCubes = numC;
-	}
-
-	// Creamos el puzzle
-	puzzle = new Puzzle(numberOfCubes, mats, col);
+	this.finishedAction = finAct;
+	this.puzzle = puzz;
 
 	// Creamos las posiciones iniciales dependiendo del numero de cubos
 	var separation = 50;
@@ -86,261 +67,225 @@ function PuzzleView(sce, numC, finAct, mats, col) {
 		// Posiciones laterales
 		for (var i = 0; i < 24; i++) {
 			var v = new THREE.Vector3();
-			v.x = (puzzle.getCubeSize() + separation)
+			v.x = (this.puzzle.getCubeSize() + separation)
 					* (Math.floor(i / 6))
-					+ (((Math.floor(i / 6)) < 2) ? -(puzzle.getPuzzleAreaSize() / 2 + (puzzle.getCubeSize() * 1.5 + separation * 3))
-							: (puzzle.getPuzzleAreaSize() / 2 - puzzle.getCubeSize() * 1.5));
-			v.y = (puzzle.getCubeSize() + separation) * (i % 6) - (separation + puzzle.getCubeSize()) * 5 / 2;
-			iniPos.push(v);
+					+ (((Math.floor(i / 6)) < 2) ? -(this.puzzle.getPuzzleAreaSize() / 2 + (this.puzzle.getCubeSize() * 1.5 + separation * 3))
+							: (this.puzzle.getPuzzleAreaSize() / 2 - this.puzzle.getCubeSize() * 1.5));
+			v.y = (this.puzzle.getCubeSize() + separation) * (i % 6) - (separation + this.puzzle.getCubeSize()) * 5 / 2;
+			this.iniPos.push(v);
 		}
 		// Posiciones inferiores
 		for (var i = -1; i < 2; i++) {
 			var v = new THREE.Vector3();
-			v.x = (puzzle.getCubeSize() + separation * 2) * i;
-			v.y = -(separation + puzzle.getCubeSize()) * 5 / 2;
-			iniPos.push(v);
+			v.x = (this.puzzle.getCubeSize() + separation * 2) * i;
+			v.y = -(separation + this.puzzle.getCubeSize()) * 5 / 2;
+			this.iniPos.push(v);
 		}
 	} else {
 		for (var i = 0; i < 8; i++) {
 			var v = new THREE.Vector3();
-			v.x = (puzzle.getCubeSize() + separation)
+			v.x = (this.puzzle.getCubeSize() + separation)
 					* (Math.floor(i / 4))
-					+ (((Math.floor(i / 4)) < 1) ? -(puzzle.getPuzzleAreaSize() / 2 + (puzzle.getCubeSize() + separation))
-							: (puzzle.getPuzzleAreaSize() / 2));
-			v.y = (puzzle.getCubeSize() + separation) * (i % 4) - (separation + puzzle.getCubeSize()) * 3 / 2;
-			iniPos.push(v);
+					+ (((Math.floor(i / 4)) < 1) ? -(this.puzzle.getPuzzleAreaSize() / 2 + (this.puzzle.getCubeSize() + separation))
+							: (this.puzzle.getPuzzleAreaSize() / 2));
+			v.y = (this.puzzle.getCubeSize() + separation) * (i % 4) - (separation + this.puzzle.getCubeSize()) * 3 / 2;
+			this.iniPos.push(v);
 		}
 	}
 	// Desordenamos el array
-	Utils.shuffle(iniPos);
+	Utils.shuffle(this.iniPos);
 
 	// Colocamos las figuras en sus posiciones iniciales
-	for (var i = 0; i < puzzle.getPuzzleCubes().length; i++) {
-		puzzle.getPuzzleCubes()[i].position.copy(iniPos[i]);
-		puzzle.getPuzzleCubes()[i].rotation.x = Utils.roundAngle(Math.random() * Math.PI * 2);
-		puzzle.getPuzzleCubes()[i].rotation.y = Utils.roundAngle(Math.random() * Math.PI * 2);
+	for (var i = 0; i < this.puzzle.getPuzzleCubes().length; i++) {
+		this.puzzle.getPuzzleCubes()[i].position.copy(this.iniPos[i]);
+		this.puzzle.getPuzzleCubes()[i].rotation.x = Utils.roundAngle(Math.random() * Math.PI * 2);
+		this.puzzle.getPuzzleCubes()[i].rotation.y = Utils.roundAngle(Math.random() * Math.PI * 2);
 		// Guardamos su colocacion inicial
-		puzzle.getPuzzleCubes()[i].iniPos = iniPos[i];
-		puzzle.getPuzzleCubes()[i].iniRot = new THREE.Vector3().copy(puzzle.getPuzzleCubes()[i].rotation);
+		this.puzzle.getPuzzleCubes()[i].iniPos = this.iniPos[i];
+		this.puzzle.getPuzzleCubes()[i].iniRot = new THREE.Vector3().copy(this.puzzle.getPuzzleCubes()[i].rotation);
 	}
 
 	// Creamos un cuadrado para delimitar el area del puzzle
 	var geometry = new THREE.Geometry();
 	var vertice;
-	vertice = new THREE.Vector3(-puzzle.getPuzzleAreaSize() / 2, -puzzle.getPuzzleAreaSize() / 2, 0);
+	vertice = new THREE.Vector3(-this.puzzle.getPuzzleAreaSize() / 2, -this.puzzle.getPuzzleAreaSize() / 2, 0);
 	geometry.vertices.push(vertice);
-	vertice = new THREE.Vector3(puzzle.getPuzzleAreaSize() / 2, -puzzle.getPuzzleAreaSize() / 2, 0);
+	vertice = new THREE.Vector3(this.puzzle.getPuzzleAreaSize() / 2, -this.puzzle.getPuzzleAreaSize() / 2, 0);
 	geometry.vertices.push(vertice);
-	vertice = new THREE.Vector3(puzzle.getPuzzleAreaSize() / 2, puzzle.getPuzzleAreaSize() / 2, 0);
+	vertice = new THREE.Vector3(this.puzzle.getPuzzleAreaSize() / 2, this.puzzle.getPuzzleAreaSize() / 2, 0);
 	geometry.vertices.push(vertice);
-	vertice = new THREE.Vector3(-puzzle.getPuzzleAreaSize() / 2, puzzle.getPuzzleAreaSize() / 2, 0);
+	vertice = new THREE.Vector3(-this.puzzle.getPuzzleAreaSize() / 2, this.puzzle.getPuzzleAreaSize() / 2, 0);
 	geometry.vertices.push(vertice);
-	vertice = new THREE.Vector3(-puzzle.getPuzzleAreaSize() / 2, -puzzle.getPuzzleAreaSize() / 2, 0);
+	vertice = new THREE.Vector3(-this.puzzle.getPuzzleAreaSize() / 2, -this.puzzle.getPuzzleAreaSize() / 2, 0);
 	geometry.vertices.push(vertice);
-	var puzzleArea = new THREE.Line(geometry, new THREE.LineBasicMaterial({
+	this.puzzleArea = new THREE.Line(geometry, new THREE.LineBasicMaterial({
 		color : 0xff0000
 	}));
 
 	// Añadimos todos los objetos a la escena
 	// Añadimos los cubos a la escena
-	for (var i = 0; i < puzzle.getPuzzleCubes().length; i++) {
+	for (var i = 0; i < this.puzzle.getPuzzleCubes().length; i++) {
 		// Si no estan encajados en el puzzle
-		if (puzzle.getPuzzleCubes()[i].parent != puzzle.getPuzzle()) {
-			scene.add(puzzle.getPuzzleCubes()[i]);
+		if (this.puzzle.getPuzzleCubes()[i].parent != this.puzzle.getPuzzle()) {
+			scene.add(this.puzzle.getPuzzleCubes()[i]);
 		}
 	}
 	// Añadimos el puzzle
-	scene.add(puzzle.getPuzzle());
+	scene.add(this.puzzle.getPuzzle());
 	// Añadimos el indicador del area del puzzle
-	scene.add(puzzleArea);
-
-	// Creamos el controlador
-	var puzC = new PuzzleController(camera, scene, puzzle.getPuzzleCubes(), puzzle);
+	scene.add(this.puzzleArea);
 
 	/*******************************************************************************************************************
 	 * Métodos Publicos
 	 ******************************************************************************************************************/
 
-	/**
-	 * Método para girar la figura suministrada los angulos indicados en X e Y
-	 * 
-	 * @param Object3D:shape
-	 *            figura a rotar.
-	 * @param Float:rotX
-	 *            angulo en radianes a rotar la figura en el eje X
-	 * @param Float:rotY
-	 *            angulo en radianes a rotar la figura en el eje Y
-	 * @param Float:rotZ
-	 *            angulo en radianes a rotar la figura en el eje Z
-	 */
-	this.rotateShape = function(shape, rotX, rotY, rotZ) {
-		// Creamos una variable para guardar la figura que se va a girar
-		var toRotate;
-		// Si no recibimos la rotacion en el eje Z no giramos en el eje Z
-		rotZ = rotZ || 0;
+}
+PuzzleView.prototype.constructor = PuzzleView;
 
-		// Comprobamos que la figura no esta en el puzzle
-		if (shape.parent == puzzle.getPuzzle()) {
-			toRotate = puzzle.getPuzzle();
-		} else {
-			toRotate = shape;
+/***********************************************************************************************************************
+ * Métodos Protected (para usar herencia)
+ **********************************************************************************************************************/
+
+/**
+ * Método para eliminar de la interfaz todos los elementos de la vista, ocultarlos
+ */
+PuzzleView.prototype.hide = function() {
+	// Quitamos los cubos a la escena
+	for (var i = 0; i < this.puzzle.getPuzzleCubes().length; i++) {
+		// Si no estan encajados en el puzzle
+		if (this.puzzle.getPuzzleCubes()[i].parent != this.puzzle.getPuzzle()) {
+			scene.remove(this.puzzle.getPuzzleCubes()[i]);
 		}
+	}
 
-		// Giramos la figura
-		// Creamos una matriz temporal para hacer transformaciones
-		var temp = new THREE.Matrix4();
-		// Introducimos la nueva rotacion
+	// Quitamos el puzzle
+	scene.remove(this.puzzle.getPuzzle());
+
+	// Si se esta mostrando la solucion la ocultamos
+	if (this.solution != undefined) {
+		scene.remove(this.solution);
+	}
+
+	// Quitamos el indicador del area del puzzle
+	scene.remove(this.puzzleArea);
+}
+
+/**
+ * Método para mostrar la vista del puzzle
+ */
+PuzzleView.prototype.show = function() {
+	// Añadimos los cubos a la escena
+	for (var i = 0; i < this.puzzle.getPuzzleCubes().length; i++) {
+		// Si no estan encajados en el puzzle
+		if (this.puzzle.getPuzzleCubes()[i].parent != this.puzzle.getPuzzle()) {
+			scene.add(this.puzzle.getPuzzleCubes()[i]);
+		}
+	}
+
+	// Añadimos el puzzle
+	scene.add(this.puzzle.getPuzzle());
+
+	// Si se esta mostrando la solucion la ocultamos
+	if (this.solution != undefined) {
+		scene.add(this.solution);
+	}
+
+	// Añadimos el indicador del area del puzzle
+	scene.add(this.puzzleArea);
+}
+
+/**
+ * Método para girar la figura suministrada los angulos indicados en X e Y
+ * 
+ * @param Object3D:shape
+ *            figura a rotar.
+ * @param Float:rotX
+ *            angulo en radianes a rotar la figura en el eje X
+ * @param Float:rotY
+ *            angulo en radianes a rotar la figura en el eje Y
+ * @param Float:rotZ
+ *            angulo en radianes a rotar la figura en el eje Z
+ */
+PuzzleView.prototype.rotateShape = function(shape, rotX, rotY, rotZ) {
+	// Creamos una variable para guardar la figura que se va a girar
+	var toRotate;
+	// Si no recibimos la rotacion en el eje Z no giramos en el eje Z
+	rotZ = rotZ || 0;
+
+	// Comprobamos que la figura no esta en el puzzle
+	if (shape.parent == this.puzzle.getPuzzle()) {
+		toRotate = this.puzzle.getPuzzle();
+	} else {
+		toRotate = shape;
+	}
+
+	// Giramos la figura
+	// Creamos una matriz temporal para hacer transformaciones
+	var temp = new THREE.Matrix4();
+	// Introducimos la nueva rotacion
+	temp.setRotationFromEuler(new THREE.Vector3(rotX, rotY, rotZ));
+	// La transformamos segun la rotacion de la figura
+	toRotate.updateMatrix();
+	temp.multiply(temp, toRotate.matrix);
+	// Extraemos la rotacion de la matriz y la guardamos en el vector
+	toRotate.rotation.setEulerFromRotationMatrix(temp);
+
+	// Comprobamos si se esta mostrando la solucion y si se esta girando el puzzle
+	if (this.solution && toRotate == this.puzzle.getPuzzle()) {
+		// Girarmos la solucion igual que el puzzle
 		temp.setRotationFromEuler(new THREE.Vector3(rotX, rotY, rotZ));
-		// La transformamos segun la rotacion de la figura
-		toRotate.updateMatrix();
-		temp.multiply(temp, toRotate.matrix);
-		// Extraemos la rotacion de la matriz y la guardamos en el vector
-		toRotate.rotation.setEulerFromRotationMatrix(temp);
+		this.solution.updateMatrix();
+		temp.multiply(temp, this.solution.matrix);
+		this.solution.rotation.setEulerFromRotationMatrix(temp);
+	}
+}
 
-		// Comprobamos si se esta mostrando la solucion y si se esta girando el puzzle
-		if (solution && toRotate == puzzle.getPuzzle()) {
-			// Girarmos la solucion igual que el puzzle
-			temp.setRotationFromEuler(new THREE.Vector3(rotX, rotY, rotZ));
-			solution.updateMatrix();
-			temp.multiply(temp, solution.matrix);
-			solution.rotation.setEulerFromRotationMatrix(temp);
+/**
+ * Método que será llamado cada vez que se inserte/encaje un cubo en el puzzle
+ * 
+ * @returns Boolean booleano que indicará si el puzzle ha sido resuelto al encajar la pieza
+ */
+PuzzleView.prototype.cubeInserted = function() {
+	this.isDone = false;
+	// Si se han introducido todas las piezas en el puzzle y no se habia resuelto
+	if (this.puzzle.getPuzzle().children.length == this.puzzle.getNumberOfCubes()) {
+		if (this.puzzle.isSolved()) {
+			this.isDone = true;
+			this.finishedAction();
 		}
 	}
-
-	/**
-	 * Método para eliminar de la interfaz todos los elementos de la vista, ocultarlos
-	 */
-	this.hide = function() {
-		// Quitamos los cubos a la escena
-		for (var i = 0; i < puzzle.getPuzzleCubes().length; i++) {
-			// Si no estan encajados en el puzzle
-			if (puzzle.getPuzzleCubes()[i].parent != puzzle.getPuzzle()) {
-				scene.remove(puzzle.getPuzzleCubes()[i]);
-			}
-		}
-
-		// Quitamos el puzzle
-		scene.remove(puzzle.getPuzzle());
-
-		// Si se esta mostrando la solucion la ocultamos
-		if (solution != undefined) {
-			scene.remove(solution);
-		}
-
-		// Quitamos el indicador del area del puzzle
-		scene.remove(puzzleArea);
-		// Desactivamos el controlador asociado
-		puzC.remove();
-	}
-
-	/**
-	 * Método para mostrar la vista del puzzle
-	 */
-	this.show = function() {
-		// Añadimos los cubos a la escena
-		for (var i = 0; i < puzzle.getPuzzleCubes().length; i++) {
-			// Si no estan encajados en el puzzle
-			if (puzzle.getPuzzleCubes()[i].parent != puzzle.getPuzzle()) {
-				scene.add(puzzle.getPuzzleCubes()[i]);
-			}
-		}
-
-		// Añadimos el puzzle
-		scene.add(puzzle.getPuzzle());
-
-		// Si se esta mostrando la solucion la ocultamos
-		if (solution != undefined) {
-			scene.add(solution);
-		}
-
-		// Añadimos el indicador del area del puzzle
-		scene.add(puzzleArea);
-
-		// Activamos el controlador asociado
-		puzC.enable();
-	}
-
-	/**
-	 * Método para mostrar la solución al puzzle como se encuentre el momento de llamar a este método
-	 */
-	this.showSolution = function() {
-		solution = puzzle.getSolution();
-		scene.add(solution);
-	}
-
-	/**
-	 * Método para ocultar la solución al puzzle
-	 */
-	this.hideSolution = function() {
-		scene.remove(solution);
-		solution = undefined;
-	}
-
-	/**
-	 * Método que será llamado cada vez que se inserte/encaje un cubo en el puzzle
-	 * 
-	 * @returns Boolean booleano que indicará si el puzzle ha sido resuelto al encajar la pieza
-	 */
-	this.cubeInserted = function() {
-		isDone = false;
-		// Si se han introducido todas las piezas en el puzzle y no se habia resuelto
-		if (puzzle.getPuzzle().children.length == puzzle.getNumberOfCubes()) {
-			if (puzzle.isSolved()) {
-				isDone = true;
-				finishedAction();
-			}
-		}
-		if (!isDone) {
-			if (puzzle.isLastCubeRigthPlaced()) {
-				sound.playRigthPlaced();
-			} else {
-				sound.playWrongPlaced();
-			}
-		}
-		return isDone;
-	}
-
-	/**
-	 * Método para colocar automáticamente un cubo en el puzzle de manera correcta
-	 */
-	this.placeCube = function() {
-		// Si no esta solucionado, se intenta insertar un cubo, si se consigue, se realizan las acciones indicadas
-		if (!isDone && puzzle.placeCube()) {
-			if (this.cubeInserted()) {
-				puzC.setIsDone();
-			}
+	if (!this.isDone) {
+		if (this.puzzle.isLastCubeRigthPlaced()) {
+			sound.playRigthPlaced();
+		} else {
+			sound.playWrongPlaced();
 		}
 	}
+	return this.isDone;
+}
 
-	/**
-	 * Método para activar el controlador asociado a la vista
-	 */
-	this.enableController = function() {
-		puzC.enable();
+/**
+ * Método para mostrar la solución al puzzle como se encuentre el momento de llamar a este método
+ */
+PuzzleView.prototype.showSolution = function() {
+	this.solution = this.puzzle.getSolution();
+	scene.add(this.solution);
+}
+
+/**
+ * Método para ocultar la solución al puzzle
+ */
+PuzzleView.prototype.hideSolution = function() {
+	scene.remove(this.solution);
+	this.solution = undefined;
+}
+
+/**
+ * Método para colocar automáticamente un cubo en el puzzle de manera correcta
+ */
+PuzzleView.prototype.placeCube = function() {
+	// Si no esta solucionado, se intenta insertar un cubo, si se consigue, se realizan las acciones indicadas
+	if (!this.isDone && this.puzzle.placeCube()) {
+		this.cubeInserted();
 	}
-
-	/**
-	 * Método para desactivar el controlador asociado a la vista
-	 */
-	this.disableController = function() {
-		puzC.remove();
-	}
-
-	/**
-	 * Método para saber si el puzzle está resuelto
-	 * 
-	 * @returns Boolean booleano que indicará si el puzzle está resuelto
-	 */
-	this.isDone = function() {
-		return isDone;
-	}
-
-	/**
-	 * Método para indicar que el puzzle no se seguira resolviendo
-	 */
-	this.setDone = function() {
-		isDone = true;
-		puzC.setIsDone();
-	}
-
 }

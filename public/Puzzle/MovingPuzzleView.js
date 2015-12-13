@@ -17,14 +17,11 @@
 /*
  *  CLASE MOVINGPUZZLEVIEW
  *  */
-function MovingPuzzleView(sce, numC, finAct, mats, col) {
+function MovingPuzzleView(numC, finAct, mats, col) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
-
-	// Escena en la que se mostrarán la vista
-	var scene;
 
 	// Objeto de la clase puzzle con el cual se realizara la logica de negocio
 	var puzzle;
@@ -63,7 +60,6 @@ function MovingPuzzleView(sce, numC, finAct, mats, col) {
 	 *            booleano que indicará si el puzzle es de colores, si no se ignorará.
 	 */
 
-	scene = sce;
 	finishedAction = finAct;
 
 	// Guardamos el numero de cubos que tendra el cubo, comprobamos que sea correcto

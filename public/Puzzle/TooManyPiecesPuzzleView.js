@@ -17,14 +17,11 @@
 /*
  *  CLASE TOOMANYPIECESPUZZLEVIEW
  *  */
-function TooManyPiecesPuzzleView(sce, numC, finAct, mats) {
+function TooManyPiecesPuzzleView(numC, finAct, mats) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
-
-	// Escena en la que se mostrarán la vista
-	var scene;
 
 	// Objeto de la clase puzzle con el cual se realizara la logica de negocio
 	var puzzle;
@@ -50,8 +47,6 @@ function TooManyPiecesPuzzleView(sce, numC, finAct, mats) {
 	/**
 	 * Constructor de la clase TooManyPiecesPuzzleView
 	 * 
-	 * @param Scene:sce
-	 *            escena en la que se representará el mundo 3D.
 	 * @param Integer:numC
 	 *            numero de cubos que tendra el puzzle, para simplicar se indicara mediante el número de cubos en una
 	 *            dimensión, 27 (3x3x3) => 3.
@@ -61,7 +56,6 @@ function TooManyPiecesPuzzleView(sce, numC, finAct, mats) {
 	 *            función de rellamada que se ejecutará al solucionar el puzzle.
 	 */
 
-	scene = sce;
 	finishedAction = finAct;
 
 	// Guardamos el numero de cubos que tendra el cubo, comprobamos que sea correcto
