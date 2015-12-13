@@ -126,7 +126,7 @@ function LibraryController(type, backAction) {
 	/**
 	 * Manejador del evento de botón del ratón pulsado
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onLibraryMouseDown(event) {
@@ -167,7 +167,7 @@ function LibraryController(type, backAction) {
 	/**
 	 * Manejador del evento del movimiento del ratón
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onLibraryMouseMove(event) {
@@ -242,40 +242,19 @@ function LibraryController(type, backAction) {
 					ThreeDUtils.intersectObjects(null, view.getPages().concat(buttons), 'pointer', function(intersect) {
 						// Si no se le ha cambiado ya el color
 						if (intersect.object != INTERSECTED) {
+							// Si hay algun objeto con el color cambiado
+							if (INTERSECTED) {
+								INTERSECTED.restoreEntryColor();
+							}
 							INTERSECTED = intersect.object;
 							// Cambiamos el color de la figura
-							var rand = Utils.randomColor();
-							// Para diferencia entre paginas y botones comprobamos si tienen varios materiales (solo las
-							// letras/paginas tiene dos materiales: frontal y lateral)
-							if (INTERSECTED.material.materials) {
-								INTERSECTED.material.materials[0].color.setHSV(rand, 0.95, 0.85);
-								INTERSECTED.material.materials[1].color.setHSV(rand, 0.95, 0.50);
-							} else {
-								// Color letra frontal
-								INTERSECTED.text.material.materials[0].color.setHSV(rand, 0.95, 0.85);
-								// Color letra lateral
-								INTERSECTED.text.material.materials[1].color.setHSV(rand, 0.95, 0.50);
-								// Color fondo
-								INTERSECTED.material.color.setHex((1 - rand) * 0xffffff);
-							}
+							INTERSECTED.changeEntryColor();
+							sound.playMoved();
 						}
 					}, function() {
 						// Si hay algun objeto con el color cambiado
 						if (INTERSECTED) {
-							var rand = Utils.randomColor();
-							// Para diferencia entre paginas y botones comprobamos si tienen varios materiales (solo las
-							// letras/paginas tiene dos materiales: frontal y lateral)
-							if (INTERSECTED.material.materials) {
-								INTERSECTED.material.materials[0].color.setHSV(rand, 0.95, 0.85);
-								INTERSECTED.material.materials[1].color.setHSV(rand, 0.95, 0.50);
-							} else {
-								// Color letra frontal
-								INTERSECTED.text.material.materials[0].color.setHSV(rand, 0.95, 0.85);
-								// Color letra lateral
-								INTERSECTED.text.material.materials[1].color.setHSV(rand, 0.95, 0.50);
-								// Color fondo
-								INTERSECTED.material.color.setHex((1 - rand) * 0xffffff);
-							}
+							INTERSECTED.restoreEntryColor();
 							INTERSECTED = null;
 						}
 					});
@@ -287,7 +266,7 @@ function LibraryController(type, backAction) {
 	/**
 	 * Manejador del evento de botón del ratón levantado
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onLibraryMouseUp(event) {
@@ -318,27 +297,17 @@ function LibraryController(type, backAction) {
 
 					// Buscamos la cara del cubo que este en la posicion de la imagen, si no hay ninguna buscamos la
 					// cara frontal del cubo (la que este en la posicion del cubo)
-					ThreeDUtils
-							.intersectObjects(
-									SELECTED.position,
-									[ view.getCubes()[min] ],
-									null,
-									function(intersect) {
-										// Guardamos el material en la cara con la que intersecciona el vector
-										view.getCubes()[min].material.materials[intersect.faceIndex] = SELECTED.material;
-									},
-									function() {
-										ThreeDUtils
-												.intersectObjects(
-														view.getCubes()[min].position,
-														[ view.getCubes()[min] ],
-														null,
-														function(intersect) {
-															// Guardamos el material en la cara con la que intersecciona
-															// el vector
-															view.getCubes()[min].material.materials[intersect.faceIndex] = SELECTED.material;
-														});
-									});
+					var cube = view.getCubes()[min];
+					ThreeDUtils.intersectObjects(SELECTED.position, [ cube ], null, function(intersect) {
+						// Guardamos el material en la cara con la que intersecciona el vector
+						cube.material.materials[intersect.faceIndex] = SELECTED.material;
+					}, function() {
+						ThreeDUtils.intersectObjects(cube.position, [ cube ], null, function(intersect) {
+							// Guardamos el material en la cara con la que intersecciona
+							// el vector
+							cube.material.materials[intersect.faceIndex] = SELECTED.material;
+						});
+					});
 				}
 
 				// Se devuelve a la posicion inicial
@@ -355,7 +324,7 @@ function LibraryController(type, backAction) {
 	/**
 	 * Manejador del evento de click
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onLibraryClick(event) {
@@ -373,30 +342,44 @@ function LibraryController(type, backAction) {
 		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
 
 		ThreeDUtils.intersectObjects(mouse, view.getPages(), null, function(intersect) {
-			// Obtenemos el identificador del texto para saber que tenemos que hacer
-			var ID = intersect.object.textID;
+			intersect.object.explode(function() {
+				// Obtenemos el identificador del texto para saber que tenemos que hacer
+				var ID = intersect.object.textID;
 
-			// Comprobamos que accion hay que realizar
-			if (ID == -2) {// Ir a la primera pagina
-				view.showPage(currentPage = 0);
-			} else if (ID == -1) {// Ir a la pagina anterior
-				view.showPage(currentPage = (currentPage == 0 ? 0 : currentPage - 1));
-			} else if (ID == view.getNumberOfPages()) {// Ir a la pagina siguiente
-				view.showPage(currentPage = (currentPage == view.getNumberOfPages() - 1 ? view.getNumberOfPages() - 1
-						: currentPage + 1));
-			} else if (ID == view.getNumberOfPages() + 1) {// Ir a la ultima pagina
-				view.showPage(currentPage = (view.getNumberOfPages() - 1));
-			} else if (ID >= 0 && ID <= view.getNumberOfPages() - 1) {// Ir a la pagina seleccionada
-				view.showPage(currentPage = ID);
-			} else { // A este punto no deberia llegar nunca
-				console.error("ID de pagina de la biblioteca de imagenes desconocido");
-			}
-			// Guardamos los planos de la pagina seleccionada
-			pagePlanes = view.getCurrentPlanes();
+				// Comprobamos que accion hay que realizar
+				if (ID == -2) {// Ir a la primera pagina
+					view.showPage(currentPage = 0);
+				} else if (ID == -1) {// Ir a la pagina anterior
+					view.showPage(currentPage = (currentPage == 0 ? 0 : currentPage - 1));
+				} else if (ID == view.getNumberOfPages()) {// Ir a la pagina siguiente
+					view
+							.showPage(currentPage = (currentPage == view.getNumberOfPages() - 1 ? view
+									.getNumberOfPages() - 1 : currentPage + 1));
+				} else if (ID == view.getNumberOfPages() + 1) {// Ir a la ultima pagina
+					view.showPage(currentPage = (view.getNumberOfPages() - 1));
+				} else if (ID >= 0 && ID <= view.getNumberOfPages() - 1) {// Ir a la pagina seleccionada
+					view.showPage(currentPage = ID);
+				} else { // A este punto no deberia llegar nunca
+					console.error("ID de pagina de la biblioteca de imagenes desconocido");
+				}
+				// Guardamos los planos de la pagina seleccionada
+				pagePlanes = view.getCurrentPlanes();
+			});
 		}, function() {
 			// Si hay botones donde se ha hecho click, ejecutamos su accion asociada
 			ThreeDUtils.intersectObjects(null, buttons, null, function(intersect) {
-				intersect.object.action();
+				// Por razones de seguridad de los exploradores, no puede transcurrir tiempo entre el click de raton y
+				// abrir el dialogo de seleccion de archivos, asi que no podemos usar la animacion de explosion para el
+				// boton de añadir imagen, la lanzamos despues de que se ejecute su accion
+				if (intersect.object == view.getAddImgButton()) {
+					// Obtenemos la entrada de archivos y ejecutamos su evento click
+					inputFile.click();
+				}
+				remove();
+				intersect.object.explode(function() {
+					enable();
+					intersect.object.action();
+				});
 			}, function() {
 				// Si el modo de vista es el imagenes seleccionables
 				if (typeView == 1) {
@@ -427,7 +410,7 @@ function LibraryController(type, backAction) {
 	/**
 	 * Manejador del evento de doble click
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onLibraryDblClick(event) {
@@ -452,20 +435,19 @@ function LibraryController(type, backAction) {
 	}
 
 	/**
-	 * Método que realiza la acción necesaria cuando se pulsa el botón de añadir imagen
+	 * Método que realiza la acción necesaria cuando se pulsa el botón de añadir imagen. Como la accion se realiza antes
+	 * de mostrar la animacion de explosion, ahora no hacemos nada
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onLibraryAddImage(event) {
-		// Obtenemos la entrada de archivos y ejecutamos su evento click
-		inputFile.click();
 	}
 
 	/**
 	 * Método que realiza la acción necesaria para obtener un archivo del tipo imagen
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onLibraryFile(event) {
@@ -498,6 +480,8 @@ function LibraryController(type, backAction) {
 							IMAGES.push(material);
 						} else {
 							alert("No caben mas imágenes en la biblioteca.");
+							// No seguimos añadiendo imagenes
+							k = texture.length;
 						}
 						// Guardamos los planos de la pagina seleccionada
 						pagePlanes = view.getCurrentPlanes();
@@ -510,7 +494,7 @@ function LibraryController(type, backAction) {
 	/**
 	 * Método que realiza la acción necesaria cuando se pulsa el botón de aceptar
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onLibraryAccept(event) {
@@ -525,7 +509,7 @@ function LibraryController(type, backAction) {
 	/**
 	 * Método que realiza la acción necesaria cuando se pulsa el botón de aceptar
 	 * 
-	 * @param EventObject:event->
+	 * @param EventObject:event
 	 *            caracteristicas del evento lanzado.
 	 */
 	function onLibraryBack(event) {
@@ -545,8 +529,6 @@ function LibraryController(type, backAction) {
 		document.removeEventListener('mousemove', onLibraryMouseMove, false);
 		document.getElementById('canvas').removeEventListener('click', onLibraryClick, false);
 		document.getElementById('canvas').removeEventListener('dblclick', onLibraryDblClick, false);
-
-		container.removeChild(renderer.domElement);
 	}
 
 	/**
@@ -556,7 +538,6 @@ function LibraryController(type, backAction) {
 	 *            tipo de la vista con la que se activa el controlador.
 	 */
 	function enable() {
-		container.appendChild(renderer.domElement);
 		// Añadimos receptores de eventos para el raton
 		// Si el tipo de vista necesita arrastra el raton registramos los eventos correspondientes
 		if (typeView != 1) {
@@ -579,6 +560,7 @@ function LibraryController(type, backAction) {
 		// Desactivamos el controlador
 		remove();
 		// Ocultamos la vista
+		container.removeChild(renderer.domElement);
 		view.hide();
 	}
 
@@ -588,6 +570,7 @@ function LibraryController(type, backAction) {
 
 		// Mostramos la vista
 		view.show(typeView);
+		container.appendChild(renderer.domElement);
 		// Activamos el controlador
 		enable();
 	}

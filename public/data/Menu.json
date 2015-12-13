@@ -7,15 +7,15 @@
 	{"type":"webgl",	"txt":"puntuaciones",		"data":-280},
 	{"type":"webgl",	"txt":"ayuda",				"data":-590}],
 	
-	[{"type":"webgl",	"txt":"modo clasico",		"data":510},
+	[{"type":"webgl",	"txt":"modo clásico",		"data":510},
 	{"type":"webgl",	"txt":"niveles",			"data":250},
 	{"type":"webgl",	"txt":"contrareloj",		"data":-20},
 	{"type":"webgl",	"txt":"supervivencia",		"data":-310},
-	{"type":"webgl",	"txt":"< atras",			"data":-600, "mode":"back"}],
+	{"type":"webgl",	"txt":"- atrás",			"data":-600, "mode":"back"}],
 	
 	[{"type":"webgl",	"txt":"crear partida",		"data":250},
 	{"type":"webgl",	"txt":"buscar partida",		"data":-20},
-	{"type":"webgl",	"txt":"< atras",			"data":-290, "mode":"back"}],
+	{"type":"webgl",	"txt":"- atrás",			"data":-290, "mode":"back"}],
 	
 	[{"type":"options"}],
 	[{"type":"scores"}],

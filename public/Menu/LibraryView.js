@@ -59,6 +59,10 @@ function LibraryView(ty) {
 	var margins;
 	// Tamaño del texto
 	var textSize;
+	// Separacion vertical de los numeros de pagina
+	var verTextSep = 150;
+	// Separacion horizontal de los numeros de pagina
+	var horTextSep = 50;
 	// Tipo de vista que se tendrá, 1 -> imágenes seleccionables, 2 -> formar dos cubos con imágenes, 3 -> formar tres
 	// cubos con imágenes
 	var type;
@@ -282,17 +286,13 @@ function LibraryView(ty) {
 		var textSpace = {
 			bottom : -margins.y,
 			top : margins.y,
-			left : margins.x + 80, // Dejamos espacio para el icono del sonido
+			left : margins.x + 300, // Dejamos espacio para el icono del sonido
 			rigth : -margins.x
-		};// Tamaño del texto
-		// Separacion vertical de los numeros de pagina
-		var verTextSep = 200;
-		// Separacion horizontal de los numeros de pagina
-		var horTextSep = 150;
+		};
 		// Ultima posicion horizontal en la que se ha colocado un numero
 		var pos = textSpace.left;
 
-		var letters = [ "<<", "<", ">", ">>" ];
+		var letters = [ "{", "<", ">", "}" ];
 		// Recorremos cada pagina
 		for (var i = -2; i < pagesIndex.length + 2; i++) {
 			var letter;
@@ -304,159 +304,40 @@ function LibraryView(ty) {
 				letter = (i + 1).toString();
 			}
 
-			var text = createText(letter);
-
-			// Colocamos la figura en el lugar que le corresponde
-			text.position.x = pos + horTextSep;
-			text.position.y = textSpace.top - verTextSep;
+			var text = ThreeDUtils.createTextEntry(letter, new THREE.Vector3(0, textSpace.top - verTextSep, 0), 30);
+			text.implode = true;
+			text.position.x = pos + horTextSep + text.width / 2;
 			// Guardamos una propiedad para saber a que pagina corresponde
 			text.textID = i;
-			pos += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x) + horTextSep;
-
+			pos += text.width + horTextSep;
 			scene.add(text);
 			pages.push(text);
 		}
 
-		// Creamos un canvas para crear un degradado en el marcador de pagina
-		var canvas = document.createElement('canvas');
-		canvas.width = 128;
-		canvas.height = 128;
-		// Creamos un degradado en el canvas
-		var context = canvas.getContext('2d');
-		var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0 / 4, canvas.width / 2,
-				canvas.height / 2, canvas.width / 2);
-		gradient.addColorStop(0.5, '#' + backgroundColor.toString(16));
-		gradient.addColorStop(0.7, '#9fabc9');
-		gradient.addColorStop(1, '#' + backgroundColor.toString(16));
-		context.fillStyle = gradient;
-		context.fillRect(0, 0, canvas.width, canvas.height);
-		// Creamos la textura y el material con el degradado
-		var shadowTexture = new THREE.Texture(canvas);
-		shadowTexture.needsUpdate = true;
-		var shadowMaterial = new THREE.MeshBasicMaterial({
-			map : shadowTexture
-		});
-
-		// Creamos un circulo que marcara la pagina en la que se esta utilizando el degradado
-		pageMark = new THREE.Mesh(new THREE.PlaneGeometry(textSize + 250, textSize + 250, 1, 1), shadowMaterial);
+		// Creamos una marca para señala que pagina esta marcada
+		pageMark = ThreeDUtils.createLetterEntry("_", pages[2].position, pages[2].frontColor, pages[2].backColor, 30);
 		scene.add(pageMark);
-		// Lo colocamos en el numero de pagina correspondiente
-		pageMark.position.x = pages[2].position.x
-				+ (pages[2].geometry.boundingBox.max.x - pages[2].geometry.boundingBox.min.x) / 2 - 10;
-		pageMark.position.y = pages[2].position.y
-				+ (pages[2].geometry.boundingBox.max.y - pages[2].geometry.boundingBox.min.y) / 2 + 10;
-		pageMark.position.z = -40;
-		pageMark.rotation.x = -0.5;
 	}
 
 	/**
 	 * Método encargado de construir los botones
 	 */
 	function buildButtons() {
-		// Tenemos que guardar la altura maxima de entre todos los botones para poder centrarlos verticalmente
-		var maxHeight = 0;
 		// Creamos un metodo generico para crear cada boton
 		var createButton = function(text, position) {
 			var rand = Math.random();
 			// Creamos el texto del boton
-			var button = createText(text);
-			// Calculamos su tamaño
-			var width = Math.abs(button.geometry.boundingBox.max.x - button.geometry.boundingBox.min.x);
-			var height = Math.abs(button.geometry.boundingBox.max.y - button.geometry.boundingBox.min.y);
-			if (height > maxHeight) {
-				maxHeight = height;
-			}
-			// Posicionamos el texto
-			button.position.x = -width / 2;
-			button.position.z = height;
-
-			// Creamos un fondo con forma de cilindro
-			// Creamos el material con dos colores, uno para las caras planas y otro para la curva
-			var backgroundMat = new THREE.MeshBasicMaterial({
-				color : rand * 0xffffff,
-				overdraw : true
-			});
-			// Creamos la geometria algo mas alta y ancha que el texto
-			var backgroundGeometry = new THREE.CylinderGeometry(height * 3 / 4, height * 3 / 4, width + 40, 20, 20,
-					true);
-			var background = new THREE.Mesh(backgroundGeometry, backgroundMat);
-			background.rotation.z = Utils.deg2Rad(90);
-			background.text = button;
-
-			// Creamos un contenedor para el boton de su tamaño
-			var mat = new THREE.MeshBasicMaterial({
-				color : (1 - rand) * 0xffffff,
-				overdraw : true,
-				visible : false
-			});
-			var container = new THREE.Mesh(new THREE.PlaneGeometry(width, height, 1, 1), mat);
-			// Añadimos el boton al contenedor y el fondo
-			container.add(button);
-			container.add(background);
-			container.background = background;
-			// Movemos el contenedor
-			container.position.x = position - 150; // Un poco descentrado hacia la izquierda para no ponerlo encima de
-													// los cubos
-			container.position.z = 10;
-			scene.add(container);
-			return container;
+			var yPosition = -margins.y + 10 + 30 * 7 / 2
+			var button = ThreeDUtils.createTextEntry(text, new THREE.Vector3(0, yPosition, 0), 20);
+			// Posicionamos el texto: Un poco descentrado hacia la izquierda para no ponerlo encima de los cubos
+			button.position.x = position;
+			scene.add(button);
+			return button;
 		}
-		acceptButton = createButton("Aceptar", -margins.x / 2);
-		addImgButton = createButton("Añadir imagen", 0);
-		backButton = createButton("Atrás", margins.x / 2);
-		acceptButton.position.y = addImgButton.position.y = backButton.position.y = -margins.y + 30 + maxHeight / 2;
-	}
-
-	/**
-	 * Método que crea un objeto 3D con el texto suministrado
-	 * 
-	 * @param String:str
-	 *            cadena de texto con la que se creará la figura.
-	 * @returns Mesh objeto 3D creado con el texto suministrado.
-	 */
-	function createText(str) {
-		// Creamos un color aletorio
-		var rand = Utils.randomColor();
-
-		// Creamos un material para el texto, con un material para la parte frontal con el
-		// color aleatorio, y otro material para los lados con el color aletorio oscurecido
-		var material = new THREE.MeshFaceMaterial([ new THREE.MeshBasicMaterial({
-			color : new THREE.Color().setHSV(rand, 0.95, 0.85).getHex(),
-			overdraw : true
-		}),// front
-		new THREE.MeshBasicMaterial({
-			color : new THREE.Color().setHSV(rand, 0.95, 0.50).getHex(),
-			overdraw : true
-		}) // side
-		]);
-
-		// Creamos la geometria del texto
-		var textGeo = new THREE.TextGeometry(str, {
-			size : textSize,
-			height : 40,
-			curveSegments : 4,
-			font : 'droid serif',
-			style : 'normal',
-
-			bevelThickness : 4,
-			bevelSize : 1.5,
-			bevelEnabled : true,
-
-			material : 0,
-			extrudeMaterial : 1
-		});
-
-		// Calculamos el rectangulo que contiene a la geometria
-		textGeo.computeBoundingBox();
-
-		// Creamos la figura
-		text = new THREE.Mesh(textGeo, material);
-
-		// Giramos la figura para que se pueda apreciar mejor el efecto 3D
-		text.rotation.y = 0;
-		text.rotation.x = -0.5;
-
-		return text;
+		acceptButton = createButton("Aceptar", -margins.x / 2 - 200);
+		addImgButton = createButton("Añadir imagen", -450);
+		addImgButton.implode = true;
+		backButton = createButton("Atrás", margins.x / 2 - 500);
 	}
 
 	/*******************************************************************************************************************
@@ -477,10 +358,9 @@ function LibraryView(ty) {
 		}
 		// Colocamos la marca de la pagina actual donde corresponda
 		var j = index + 2;
-		pageMark.position.x = pages[j].position.x
-				+ (pages[j].geometry.boundingBox.max.x - pages[j].geometry.boundingBox.min.x) / 2 - 10;
-		pageMark.position.y = pages[j].position.y
-				+ (pages[j].geometry.boundingBox.max.y - pages[j].geometry.boundingBox.min.y) / 2 + 10;
+		pageMark.position.copy(pages[j].position);
+		pageMark.children[0].children[0].material.materials[4].color.setHex(pages[j].frontColor);
+		pageMark.children[0].children[0].material.materials[5].color.setHex(pages[j].backColor);
 
 		// Eliminamos los planos de la escena
 		for (var i = 0; i < planes.length; i++) {
@@ -621,34 +501,27 @@ function LibraryView(ty) {
 		pagesIndex[pagesIndex.length - 1].push(planes.length - 1);
 
 		if (createPage) {
-			// Separacion vertical de los numeros de pagina
-			var verTextSep = 200;
-			// Separacion horizontal de los numeros de pagina
-			var horTextSep = 150;
-
 			// Creamos el numero de la pagina
-			var text = createText(pagesIndex.length.toString())
+			var text = ThreeDUtils.createTextEntry(pagesIndex.length.toString(), new THREE.Vector3(0, margins.y
+					- verTextSep, 0), 30);
+			text.implode = true;
+
 			// Comprobamos que no se salga de la pantalla
-			if (pages[pages.length - 1].position.x
-					+ (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x) + horTextSep > -margins.x) {
+			if (pages[pages.length - 1].position.x + pages[pages.length - 1].width / 2 + text.width + horTextSep > -margins.x) {
 				pagesIndex.pop();
 				planes.pop();
 				return false;
 			}
 
 			// Obtenemos la posicion del ultimo numero de pagina
-			var lastPosition = new THREE.Vector3().copy(pages[pagesIndex.length - 2 + 2].position);
+			var lastPage = pages[pagesIndex.length - 2 + 2];
 			// Calculamos su posicion
-			text.position.x = (pages[pagesIndex.length - 2 + 2].geometry.boundingBox.max.x - pages[pagesIndex.length - 2 + 2].geometry.boundingBox.min.x)
-					+ lastPosition.x + horTextSep;
-			text.position.y = lastPosition.y;
+			text.position.x = lastPage.width / 2 + text.width / 2 + lastPage.position.x + horTextSep;
 			text.textID = pagesIndex.length - 1;
 
 			// Movemos los dos siguientes simbolos (pag siguiente y ultima pag)
-			pages[pages.length - 1].position.x += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x)
-					+ horTextSep;
-			pages[pages.length - 2].position.x += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x)
-					+ horTextSep;
+			pages[pages.length - 1].position.x += text.width + horTextSep;
+			pages[pages.length - 2].position.x += text.width + horTextSep;
 			// Incrementamos en uno los identificadores, ya que hay una nueva pagina
 			pages[pages.length - 1].textID++;
 			pages[pages.length - 2].textID++;
@@ -806,27 +679,20 @@ function LibraryView(ty) {
 				}
 				// Si habia menos
 				if (pages.length - 4 < pagesIndex.length) {
-					// Separacion vertical de los numeros de pagina
-					var verTextSep = 200;
-					// Separacion horizontal de los numeros de pagina
-					var horTextSep = 150;
-
 					// Creamos el numero de la pagina
-					var text = createText((pagesIndex.length).toString())
+					var text = ThreeDUtils.createTextEntry(pagesIndex.length.toString(), new THREE.Vector3(0, margins.y
+							- verTextSep, 0), 30);
+					text.implode = true;
 
 					// Obtenemos la posicion del ultimo numero de pagina
-					var lastPosition = new THREE.Vector3().copy(pages[pagesIndex.length - 2 + 2].position);
+					var lastPage = pages[pagesIndex.length - 2 + 2];
 					// Calculamos su posicion
-					text.position.x = (pages[pagesIndex.length - 2 + 2].geometry.boundingBox.max.x - pages[pagesIndex.length - 2 + 2].geometry.boundingBox.min.x)
-							+ lastPosition.x + horTextSep;
-					text.position.y = lastPosition.y;
+					text.position.x = lastPage.width / 2 + text.width / 2 + lastPage.position.x + horTextSep;
 					text.textID = pagesIndex.length - 1;
 
 					// Movemos los dos siguientes simbolos (pag siguiente y ultima pag)
-					pages[pages.length - 1].position.x += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x)
-							+ horTextSep;
-					pages[pages.length - 2].position.x += (text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x)
-							+ horTextSep;
+					pages[pages.length - 1].position.x += text.width + horTextSep;
+					pages[pages.length - 2].position.x += text.width + horTextSep;
 					// Incrementamos en uno los identificadores, ya que hay una nueva pagina
 					pages[pages.length - 1].textID++;
 					pages[pages.length - 2].textID++;
@@ -910,10 +776,7 @@ function LibraryView(ty) {
 		currentPage = 0;
 		// Colocamos la marca de la pagina actual donde corresponda
 		var j = currentPage + 2;
-		pageMark.position.x = pages[j].position.x
-				+ (pages[j].geometry.boundingBox.max.x - pages[j].geometry.boundingBox.min.x) / 2 - 10;
-		pageMark.position.y = pages[j].position.y
-				+ (pages[j].geometry.boundingBox.max.y - pages[j].geometry.boundingBox.min.y) / 2 + 10;
+		pageMark.position.copy(pages[2].position)
 		scene.add(pageMark);
 
 		// Mostramos los cubos si corresponde
@@ -998,13 +861,13 @@ function LibraryView(ty) {
 		return cubes;
 	}
 	this.getAcceptButton = function() {
-		return acceptButton.background;
+		return acceptButton;
 	}
 	this.getBackButton = function() {
-		return backButton.background;
+		return backButton;
 	}
 	this.getAddImgButton = function() {
-		return addImgButton.background;
+		return addImgButton;
 	}
 
 }

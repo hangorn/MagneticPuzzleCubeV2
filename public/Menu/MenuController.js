@@ -102,14 +102,14 @@ function MenuController() {
 		ThreeDUtils.intersectObjects(mouse, menuEntrys[currentMenu], null, function(intersect) {
 			remove();
 			// Realizamos la animacion de explosion de la entrada seleccionada
-			view.explode(intersect.object, function() {
+			intersect.object.explode(function() {
 				// Las entradas que no tengan indice se comportaran como boton de atras
 				if (intersect.object.menuIndex == -1) {
 					onMenuBack();
 				} else {
 					show(intersect.object.menuIndex);
 				}
-			});
+			})
 		}, function() {
 			view.changeAllEntrysColor();
 		});
@@ -140,18 +140,18 @@ function MenuController() {
 			if (intersect.object != INTERSECTED) {
 				// Si hay algun objeto con el color cambiado
 				if (INTERSECTED) {
-					view.restoreEntryColor(INTERSECTED);
+					INTERSECTED.restoreEntryColor();
 				}
 
 				INTERSECTED = intersect.object;
 				// Cambiamos el color de la figura
-				view.changeEntryColor(INTERSECTED);
+				INTERSECTED.changeEntryColor();
 				sound.playMoved();
 			}
 		}, function() {
 			// Si hay algun objeto con el color cambiado
 			if (INTERSECTED) {
-				view.restoreEntryColor(INTERSECTED);
+				INTERSECTED.restoreEntryColor();
 				INTERSECTED = null;
 			}
 		});

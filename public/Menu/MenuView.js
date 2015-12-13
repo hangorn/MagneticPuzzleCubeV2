@@ -57,7 +57,7 @@ function MenuView(menuData) {
 	 */
 
 	// Iniciamos los cubos al tamaño por defecto
-	var cubesSize = 40;
+	cubesSize = 40;
 
 	entrys = [];
 	for (var i = 0; i < menuData.length; i++) {
@@ -67,7 +67,7 @@ function MenuView(menuData) {
 			entrys[i].dataType = data.type;
 			entrys[i].mode = data.mode;
 			if (data.type == 'webgl') {
-				entrys[i][j] = createMenuEntry(data.txt, new THREE.Vector3(0, data.data, 0));
+				entrys[i][j] = ThreeDUtils.createTextEntry(data.txt, new THREE.Vector3(0, data.data, 0), cubesSize);
 				// Marcamos las entradas de atras, ya que tienen un comportamiento diferente
 				if (data.mode == 'back') {
 					entrys[i][j].menuIndex = -1;
@@ -99,151 +99,6 @@ function MenuView(menuData) {
 	/*******************************************************************************************************************
 	 * Métodos Privados
 	 ******************************************************************************************************************/
-
-	/**
-	 * Método que crea un objeto 3D formado por cubos representando la letra suministrada
-	 * 
-	 * @param String:letter
-	 *            cadena de texto con la letra que se creará.
-	 * @param Vector3:pos
-	 *            posicion inicial en la que se colocará la letra, esquina inferior izquierda.
-	 * @param Material:frontMat
-	 *            material con el cual se creará la cara del frente de la letra.
-	 * @param Material:backMat->
-	 *            material con el cual se creará la cara de atrás de la letra.
-	 * @returns Mesh objeto 3D creado con la letra o null si no es una letra conocida (un espacio, ...).
-	 */
-	function createLetter(letter, pos, frontMat, backMat) {
-		// Creamos una variable estatica al metodo para el material de los lados y si no esta definido la iniciamos, asi
-		// no creamos un material para cada letra (ahorramos recursos)
-		if (createLetter.sidesMaterial === undefined) {
-			createLetter.sidesMaterial = new THREE.MeshBasicMaterial({
-				color : 0x000000,
-				overdraw : true,
-				wireframe : true,
-				wireframeLinewidth : 1
-			});
-		}
-		var faceMat = new THREE.MeshFaceMaterial([ createLetter.sidesMaterial, createLetter.sidesMaterial,
-				createLetter.sidesMaterial, createLetter.sidesMaterial, frontMat, backMat ]);
-
-		// Creamos una variable estatica al metodo para la geometria de los cubos y si no esta definido la iniciamos,
-		// asi no creamos una geometria para cada cubo de cada letra (ahorramos recursos)
-		if (createLetter.geom === undefined) {
-			createLetter.geom = new THREE.CubeGeometry(cubesSize, cubesSize, cubesSize, 1, 1, 1);
-		}
-
-		// Obtenemos los datos de las letras si estan cargados
-		if (lettersData) {
-			var data = lettersData[letter];
-		} else {
-			console.error("los datos de las letras no se han cargado");
-		}
-
-		// Obtenmos los datos de la letra correspondiente
-		if (data == undefined) {
-			return null;
-		}
-
-		// Creamos un objeto 3D para juntar los cubos de la letra
-		var letterMesh = new THREE.Object3D();
-		// Recorremos cada dato de la letra
-		for (var i = 0; i < data.length; i++) {
-			var cub = new THREE.Mesh(createLetter.geom, faceMat);
-			cub.iniPosX = cub.position.x = data[i][0] * cubesSize;
-			cub.iniPosY = cub.position.y = data[i][1] * cubesSize;
-			letterMesh.add(cub);
-		}
-
-		// Ponemos la letra en su posicion inicial
-		letterMesh.position.copy(pos);
-		// Calculamos la anchura de la letra
-		letterMesh.width = letterMesh.children[letterMesh.children.length - 1].position.x + cubesSize;
-
-		return letterMesh;
-	}
-
-	/**
-	 * Método que crea un objeto 3D para una entrada en el menú
-	 * 
-	 * @param String:sentence
-	 *            cadena de texto con la frase que contendrá la entrada del menú.
-	 * @param Vector3:pos
-	 *            posicion inicial en la que se colocará el boton, esquina inferior izquierda.
-	 * @returns Mesh objeto 3D creado con la frase.
-	 */
-	function createMenuEntry(sentence, pos) {
-		// Creamos un array para guardar todas la letras de la frase
-		var letters = [];
-		var sentenceWidth = cubesSize;
-
-		// Pasamos las letras a minusculas, ya que es lo que reconoce la funcion de crear letras
-		var sent = sentence.toLowerCase();
-
-		var rand = Math.random();
-		var frontMat = new THREE.MeshBasicMaterial({
-			color : rand * 0xffffff,
-			overdraw : true,
-			side : THREE.DoubleSide
-		});
-		var backMat = new THREE.MeshBasicMaterial({
-			color : Math.random() * 0xffffff,
-			overdraw : true,
-			side : THREE.DoubleSide
-		});
-
-		// Recorremos las letras de la frase
-		for (var i = 0; i < sent.length; i++) {
-			// Creamos la letra
-			var l = createLetter(sent[i], new THREE.Vector3(sentenceWidth, -cubesSize * 2, cubesSize / 2 + 1),
-					frontMat, backMat);
-
-			// Si se ha podido crear la letra
-			if (l != null) {
-				// Actualizamos la anchura de la frase
-				sentenceWidth += l.width + cubesSize * 2;
-				letters.push(l);
-			} else {
-				// Añadimos un espacio
-				sentenceWidth += cubesSize * 3;
-			}
-		}
-		// Añadimos el espacio final
-		sentenceWidth += cubesSize;
-
-		// Recolocamos las letra para que queden centradas
-		for (var i = 0; i < letters.length; i++) {
-			letters[i].position.x -= sentenceWidth / 2 - cubesSize;
-		}
-
-		// Creamos un plano como fondo de la entrada de menu y como contenedor de todas las letras
-		var geometry = new THREE.PlaneGeometry(sentenceWidth, cubesSize * 7, 1, 1);
-		var mat = new THREE.MeshBasicMaterial({
-			color : (1 - rand) * 0xffffff,
-			overdraw : true
-		});
-		// Comprobamos que el color no sea demasiado claro
-		if (mat.color.r > 0.87 && mat.color.g > 0.87 && mat.color.b > 0.87) {
-			mat.color.setHex(Math.random() * mat.color.getHex());
-		}
-		var plane = new THREE.Mesh(geometry, mat);
-		// Añadimos todas las letras al plano
-		for (var i = 0; i < letters.length; i++) {
-			plane.add(letters[i]);
-		}
-
-		// Colocamos la frase y guardamos su anchura
-		plane.position.copy(pos);
-		plane.rotation.x = -0.5;
-		plane.rotation.y = -0.2;
-		plane.width = sentenceWidth;
-		// Guardamos los colores
-		plane.frontColor = frontMat.color.getHex();
-		plane.backColor = backMat.color.getHex();
-		plane.backgroundColor = mat.color.getHex();
-
-		return plane;
-	}
 
 	/**
 	 * Método para añadir al diálogo de configuración de buscar partidas multijugador una partida
@@ -278,80 +133,9 @@ function MenuView(menuData) {
 		return row;
 	}
 
-	/**
-	 * Método recursivo que realiza la animación de explosión de una entrada del menú
-	 * 
-	 * @param Object3D:entry
-	 *            objeto 3D que sufrirá la animación.
-	 */
-	function explode(entry, callback) {
-		// Comprobamos si no se ha iniciado la animacion
-		if (explode.frameCount == undefined) {
-			// Iniciamos la cuenta de frames
-			explode.frameCount = 1;
-			// Reproducimos el sonido de la explosion
-			sound.playExplosion();
-		}
-
-		// Si no se ha llegado al final de la animacion
-		if (explode.frameCount < 10) {
-			// Recorremos todas las letras de la entrada del menu
-			for (var i = 0; i < entry.children.length; i++) {
-				// Recorremos todos los cubos de cada letra
-				for (var j = 0; j < entry.children[i].children.length; j++) {
-					// Movemos el cubo en la direccion de su vector aleatorio correspondiente
-					entry.children[i].children[j].position.addSelf(entry.children[i].children[j].randVec);
-					// Giramos el cubo
-					entry.children[i].children[j].rotation.x += 0.4;
-					entry.children[i].children[j].rotation.y += 0.4;
-				}
-			}
-			// Incrementamos el numero de frames de la animacion que se han mostrado
-			explode.frameCount++;
-			// Llamamos a esta misma funcion pero con un retardo de 50 milisegundos
-			setTimeout(explode, 50, entry, callback);
-		} else {
-			// Llamamos a la funcion callback de fin de la animacion
-			callback();
-
-			// Restauramos el estado por defecto de la entrada del menu
-			for (var i = 0; i < entry.children.length; i++) {
-				for (var j = 0; j < entry.children[i].children.length; j++) {
-					entry.children[i].children[j].position.x = entry.children[i].children[j].iniPosX;
-					entry.children[i].children[j].position.y = entry.children[i].children[j].iniPosY;
-					entry.children[i].children[j].position.z = 0;
-					entry.children[i].children[j].rotation.x = 0;
-					entry.children[i].children[j].rotation.y = 0;
-				}
-			}
-		}
-	}
-
 	/*******************************************************************************************************************
 	 * Métodos Publicos
 	 ******************************************************************************************************************/
-
-	/**
-	 * Método público que realiza la animación de explosión de una entrada del menú
-	 * 
-	 * @param Object3D:entry
-	 *            objeto 3D que sufrirá la animación.
-	 * @param Callback:callback
-	 *            funcion callback que será llamada cuando acabe la animación.
-	 */
-	this.explode = function(entry, callback) {
-		// Recorremos todos los cubos, creando para cada uno un vector aleatorio normalizado
-		// y posteriormente escalado que indicara la direccion del cubo en la animacion de explosion
-		for (var i = 0; i < entry.children.length; i++) {
-			for (var j = 0; j < entry.children[i].children.length; j++) {
-				entry.children[i].children[j].randVec = new THREE.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1,
-						Math.random()).normalize().multiplyScalar(60);
-			}
-		}
-		// Iniciamos la animacion
-		explode.frameCount = undefined;
-		explode(entry, callback);
-	}
 
 	/**
 	 * Método para para cambiar el color de todas las entradas del menu actual
@@ -369,24 +153,6 @@ function MenuView(menuData) {
 			entrys[currentMenu][i].backColor = entrys[currentMenu][i].children[0].children[0].material.materials[5].color
 					.setHex(Math.random() * 0xffffff).getHex();
 		}
-	}
-
-	/**
-	 * Método para para cambiar el color de la entrada indicada
-	 */
-	this.changeEntryColor = function(entry) {
-		entry.children[0].children[0].material.materials[4].color.setHex(Math.random() * 0xffffff);
-		entry.material.wireframe = true;
-		entry.material.wireframeLinewidth = 10;
-	}
-
-	/**
-	 * Método para para restaurar los colores de la entrada indicada
-	 */
-	this.restoreEntryColor = function(entry) {
-		entry.children[0].children[0].material.materials[4].color.setHex(entry.frontColor);
-		entry.material.wireframe = false;
-		entry.material.wireframeLinewidth = 1;
 	}
 
 	/**
@@ -461,7 +227,7 @@ function MenuView(menuData) {
 			}
 			document.body.appendChild(waitingDialog);
 		}
-		
+
 		if (waitingDialog == undefined) {
 			// Creamos el contenedor
 			waitingDialog = document.createElement('div');
