@@ -85,7 +85,7 @@ function LevelsModeController(l, mats) {
 	};
 	// Nivel 13-14: 8-27 cubos (2-3 soluciones) en movimiento
 	this.levelsData[6] = {
-		puzzle : MovingPuzzleView
+		puzzle : MovingPuzzleController
 	};
 	// Nivel 15-16: 8-27 cubos (2-3 soluciones) con imagenes repetidas 12-18 veces (1 imagen distinta)
 	this.levelsData[7] = {
