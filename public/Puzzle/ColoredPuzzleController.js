@@ -24,7 +24,7 @@ function ColoredPuzzleController(numC, finAct) {
 	 ******************************************************************************************************************/
 
 	// Array con los materiales de colores
-	var coloredMaterials;
+	this.coloredMaterials;
 
 	/*******************************************************************************************************************
 	 * Constructor
@@ -32,8 +32,6 @@ function ColoredPuzzleController(numC, finAct) {
 	/**
 	 * Constructor de la clase PuzzleView
 	 * 
-	 * @param Scene:sce
-	 *            escena en la que se representará el mundo 3D.
 	 * @param Integer:numC
 	 *            numero de cubos que tendra el puzzle, para simplicar se indicara mediante el número de cubos en una
 	 *            dimensión, 27 (3x3x3) => 3.
@@ -41,41 +39,24 @@ function ColoredPuzzleController(numC, finAct) {
 	 *            función de rellamada que se ejecutará al solucionar el puzzle.
 	 */
 
-	finishedAction = finAct;
-	// Guardamos el numero de cubos que tendra el cubo, comprobamos que sea correcto
-	if (numC != 2 && numC != 3) {
-		numberOfCubes = 3;
-	} else {
-		numberOfCubes = numC;
-	}
-
 	// Creamos los materiales de colores
-	colors = [ 0xff0000, 0xffff00, 0x00c000, 0x0080ff, 0xff00ff, 0x804000, 0xff8000, 0xffc000, 0x005000, 0x00ffff,
+	var colors = [ 0xff0000, 0xffff00, 0x00c000, 0x0080ff, 0xff00ff, 0x804000, 0xff8000, 0xffc000, 0x005000, 0x00ffff,
 			0x8000ff, 0x000000, 0x800000, 0x808000, 0x80ff00, 0x0000ff, 0xff8080, 0x808080 ];
-	materials = [];
-	for (var i = 0; i < numberOfCubes * 6; i++) {
+	var materials = [];
+	for (var i = 0; i < numC * 6; i++) {
 		materials.push(new THREE.MeshBasicMaterial({
 			color : colors[i]
 		}));
 	}
 
 	// Llamamos al constructor de PuzzleView para heredar todos sus metodos y atributos
-	PuzzleController.call(this, numberOfCubes, finAct, materials, true);
+	PuzzleController.call(this, numC, finAct, materials, true);
 
-	coloredMaterials = materials;
+	this.coloredMaterials = materials;
 
 	/*******************************************************************************************************************
 	 * Métodos Públicos
 	 ******************************************************************************************************************/
-
-	/**
-	 * Método que devuelve un array con los materiales de colores que formarán el puzzle
-	 * 
-	 * @returns Material[] array con los materiales de colores que formarán el puzzle.
-	 */
-	this.getMaterials = function() {
-		return coloredMaterials;
-	}
 
 }
 
@@ -84,3 +65,16 @@ function ColoredPuzzleController(numC, finAct) {
  **********************************************************************************************************************/
 ColoredPuzzleController.prototype = Object.create(PuzzleController.prototype);
 ColoredPuzzleController.prototype.constructor = ColoredPuzzleController;
+
+/***********************************************************************************************************************
+ * Métodos Protected (para usar herencia)
+ **********************************************************************************************************************/
+
+/**
+ * Método que devuelve un array con los materiales de colores que formarán el puzzle
+ * 
+ * @returns Material[] array con los materiales de colores que formarán el puzzle.
+ */
+ColoredPuzzleController.prototype.getMaterials = function() {
+	return this.coloredMaterials;
+}

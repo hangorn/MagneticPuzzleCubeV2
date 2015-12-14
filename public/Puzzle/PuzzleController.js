@@ -133,7 +133,7 @@ PuzzleController.prototype.init = function(numC, finAct, mats, col) {
 /**
  * Manejador del evento de botón del ratón pulsado
  * 
- * @param EventObject:event->
+ * @param EventObject:event
  *            caracteristicas del evento lanzado.
  */
 PuzzleController.prototype.onPuzzleMouseDown = function(event) {
@@ -214,7 +214,7 @@ PuzzleController.prototype.onPuzzleMouseDown = function(event) {
 /**
  * Manejador del evento del movimiento del ratón
  * 
- * @param EventObject:event->
+ * @param EventObject:event
  *            caracteristicas del evento lanzado.
  */
 PuzzleController.prototype.onPuzzleMouseMove = function(event) {
@@ -386,7 +386,7 @@ PuzzleController.prototype.onPuzzleMouseMove = function(event) {
 /**
  * Manejador del evento de botón del ratón levantado
  * 
- * @param EventObject:event->
+ * @param EventObject:event
  *            caracteristicas del evento lanzado.
  */
 PuzzleController.prototype.onPuzzleMouseUp = function(event) {
@@ -433,6 +433,10 @@ PuzzleController.prototype.onPuzzleMouseUp = function(event) {
 		}
 	}
 }
+
+/*******************************************************************************************************************
+ * Métodos Publicos
+ ******************************************************************************************************************/
 
 /**
  * Método que elimina el controlador. Lo único que hace es eliminar los manejadores de eventos que tiene registrados

@@ -253,7 +253,7 @@ ClassicModeController.prototype.onPauseClick = function(event) {
 	// Pausamos el reloj
 	this.clock.pause();
 	// Desactivamos el controlador del puzzle
-	this.puzzle.disableController();
+	this.puzzle.remove();
 
 	// Creamos un dialogo para mostrar mientras el juego este pausado
 	if (this.pauseDialog == undefined) {
@@ -272,7 +272,7 @@ ClassicModeController.prototype.onPauseClick = function(event) {
 					ctl.clock.start();
 				}
 				// Activamos el controlador del puzzle
-				ctl.puzzle.enableController();
+				ctl.puzzle.enable();
 			}
 		});
 	} else {
@@ -300,42 +300,6 @@ ClassicModeController.prototype.enable = function() {
 	for (var i = 0; i < this.buttons.length; i++) {
 		this.buttons[i].button.addEventListener('click', this.buttons[i].action, false);
 
-	}
-};
-
-/**
- * Método para mostrar en la interfaz todos los elementos de la vista
- */
-ClassicModeController.prototype.show = function() {
-	document.body.appendChild(this.clock.getDomElement());
-	// Si no se ha acabado el tiempo activamos el reloj
-	if (!this.finished) {
-		this.clock.start();
-	}
-	container.appendChild(renderer.domElement);
-	// Mostramos el puzzle
-	this.puzzle.show();
-	// Mostramos la interfaz en el cuerpo del documento HTML
-	document.body.appendChild(this.view);
-	// Activamos las acciones
-	this.enable();
-};
-
-/**
- * Método para eliminar de la interfaz todos los elementos de la vista, ocultarlos
- */
-ClassicModeController.prototype.hide = function() {
-	// Pausamos el reloj
-	this.clock.pause();
-	document.body.removeChild(this.clock.getDomElement());
-	// Ocultamos el puzzle
-	this.puzzle.hide();
-	// Borramos la interfaz del cuerpo del documento HTML
-	document.body.removeChild(this.view);
-	// Deshabilitamos el controlador asociado
-	this.remove();
-	if (renderer.domElement.parentNode == container) {
-		container.removeChild(renderer.domElement);
 	}
 };
 
@@ -386,4 +350,44 @@ ClassicModeController.prototype.getButtonsWithActions = function() {
 			ctl.onPauseClick();
 		}
 	} ];
+};
+
+/*******************************************************************************************************************
+ * Métodos Publicos
+ ******************************************************************************************************************/
+
+/**
+ * Método para mostrar en la interfaz todos los elementos de la vista
+ */
+ClassicModeController.prototype.show = function() {
+	document.body.appendChild(this.clock.getDomElement());
+	// Si no se ha acabado el tiempo activamos el reloj
+	if (!this.finished) {
+		this.clock.start();
+	}
+	container.appendChild(renderer.domElement);
+	// Mostramos el puzzle
+	this.puzzle.show();
+	// Mostramos la interfaz en el cuerpo del documento HTML
+	document.body.appendChild(this.view);
+	// Activamos las acciones
+	this.enable();
+};
+
+/**
+ * Método para eliminar de la interfaz todos los elementos de la vista, ocultarlos
+ */
+ClassicModeController.prototype.hide = function() {
+	// Pausamos el reloj
+	this.clock.pause();
+	document.body.removeChild(this.clock.getDomElement());
+	// Ocultamos el puzzle
+	this.puzzle.hide();
+	// Borramos la interfaz del cuerpo del documento HTML
+	document.body.removeChild(this.view);
+	// Deshabilitamos el controlador asociado
+	this.remove();
+	if (renderer.domElement.parentNode == container) {
+		container.removeChild(renderer.domElement);
+	}
 };
