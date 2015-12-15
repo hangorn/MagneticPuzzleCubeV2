@@ -31,6 +31,8 @@ function PuzzleView(puzz, numberOfCubes, finAct, mats) {
 	this.puzzle;
 	// Posiciones iniciales
 	this.iniPos = [];
+	// Separacion entre cubos en la posiciones iniciales
+	this.separation;
 
 	// Solucion que se mostrara si el usuario lo indica
 	this.solution = undefined;
@@ -49,7 +51,9 @@ function PuzzleView(puzz, numberOfCubes, finAct, mats) {
 	/**
 	 * Constructor de la clase PuzzleView
 	 * 
-	 * @param Integer:numC
+	 * @param Puzzle:puzz
+	 *            objeto de la clase puzzle con la logica
+	 * @param Integer:numberOfCubes
 	 *            numero de cubos que tendra el puzzle, para simplicar se indicara mediante el número de cubos en una
 	 *            dimensión, 27 (3x3x3) => 3.
 	 * @param Material[]:mats
@@ -60,40 +64,9 @@ function PuzzleView(puzz, numberOfCubes, finAct, mats) {
 
 	this.finishedAction = finAct;
 	this.puzzle = puzz;
+	this.separation = 50;
 
-	// Creamos las posiciones iniciales dependiendo del numero de cubos
-	var separation = 50;
-	if (numberOfCubes == 3) {
-		// Posiciones laterales
-		for (var i = 0; i < 24; i++) {
-			var v = new THREE.Vector3();
-			v.x = (this.puzzle.getCubeSize() + separation)
-					* (Math.floor(i / 6))
-					+ (((Math.floor(i / 6)) < 2) ? -(this.puzzle.getPuzzleAreaSize() / 2 + (this.puzzle.getCubeSize() * 1.5 + separation * 3))
-							: (this.puzzle.getPuzzleAreaSize() / 2 - this.puzzle.getCubeSize() * 1.5));
-			v.y = (this.puzzle.getCubeSize() + separation) * (i % 6) - (separation + this.puzzle.getCubeSize()) * 5 / 2;
-			this.iniPos.push(v);
-		}
-		// Posiciones inferiores
-		for (var i = -1; i < 2; i++) {
-			var v = new THREE.Vector3();
-			v.x = (this.puzzle.getCubeSize() + separation * 2) * i;
-			v.y = -(separation + this.puzzle.getCubeSize()) * 5 / 2;
-			this.iniPos.push(v);
-		}
-	} else {
-		for (var i = 0; i < 8; i++) {
-			var v = new THREE.Vector3();
-			v.x = (this.puzzle.getCubeSize() + separation)
-					* (Math.floor(i / 4))
-					+ (((Math.floor(i / 4)) < 1) ? -(this.puzzle.getPuzzleAreaSize() / 2 + (this.puzzle.getCubeSize() + separation))
-							: (this.puzzle.getPuzzleAreaSize() / 2));
-			v.y = (this.puzzle.getCubeSize() + separation) * (i % 4) - (separation + this.puzzle.getCubeSize()) * 3 / 2;
-			this.iniPos.push(v);
-		}
-	}
-	// Desordenamos el array
-	Utils.shuffle(this.iniPos);
+	this.initInitialPositions();
 
 	// Colocamos las figuras en sus posiciones iniciales
 	for (var i = 0; i < this.puzzle.getPuzzleCubes().length; i++) {
@@ -142,9 +115,49 @@ PuzzleView.prototype.constructor = PuzzleView;
  * Métodos Protected (para usar herencia)
  **********************************************************************************************************************/
 
-/*******************************************************************************************************************
+/**
+ * Método para crear las posiciones iniciales que tendran los cubos
+ */
+PuzzleView.prototype.initInitialPositions = function() {
+	// Creamos las posiciones iniciales dependiendo del numero de cubos
+	if (numberOfCubes == 3) {
+		// Posiciones laterales
+		for (var i = 0; i < 24; i++) {
+			var v = new THREE.Vector3();
+			v.x = (this.puzzle.getCubeSize() + this.separation)
+					* (Math.floor(i / 6))
+					+ (((Math.floor(i / 6)) < 2) ? -(this.puzzle.getPuzzleAreaSize() / 2 + (this.puzzle.getCubeSize() * 1.5 + this.separation * 3))
+							: (this.puzzle.getPuzzleAreaSize() / 2 - this.puzzle.getCubeSize() * 1.5));
+			v.y = (this.puzzle.getCubeSize() + this.separation) * (i % 6)
+					- (this.separation + this.puzzle.getCubeSize()) * 5 / 2;
+			this.iniPos.push(v);
+		}
+		// Posiciones inferiores
+		for (var i = -1; i < 2; i++) {
+			var v = new THREE.Vector3();
+			v.x = (this.puzzle.getCubeSize() + this.separation * 2) * i;
+			v.y = -(this.separation + this.puzzle.getCubeSize()) * 5 / 2;
+			this.iniPos.push(v);
+		}
+	} else {
+		for (var i = 0; i < 8; i++) {
+			var v = new THREE.Vector3();
+			v.x = (this.puzzle.getCubeSize() + this.separation)
+					* (Math.floor(i / 4))
+					+ (((Math.floor(i / 4)) < 1) ? -(this.puzzle.getPuzzleAreaSize() / 2 + (this.puzzle.getCubeSize() + this.separation))
+							: (this.puzzle.getPuzzleAreaSize() / 2));
+			v.y = (this.puzzle.getCubeSize() + this.separation) * (i % 4)
+					- (this.separation + this.puzzle.getCubeSize()) * 3 / 2;
+			this.iniPos.push(v);
+		}
+	}
+	// Desordenamos el array
+	Utils.shuffle(this.iniPos);
+}
+
+/***********************************************************************************************************************
  * Métodos Publicos
- ******************************************************************************************************************/
+ **********************************************************************************************************************/
 
 /**
  * Método para eliminar de la interfaz todos los elementos de la vista, ocultarlos

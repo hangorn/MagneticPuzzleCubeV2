@@ -101,13 +101,13 @@ function Puzzle(numC, mats, col) {
 		}
 	}
 	// Comprobamos si hay imagenes repetidas
-	var repeatedIndex = [];
-	var repeated = false;
+	this.repeatedIndex = [];
+	this.repeated = false;
 	for (var i = this.materials.length - 1; i >= 0; i--) {
 		for (var j = 0; j < i; j++) {
 			if (this.materials[i] == this.materials[j]) {
-				repeated = true;
-				repeatedIndex.push([ i, j ]);
+				this.repeated = true;
+				this.repeatedIndex.push([ i, j ]);
 				break;
 			}
 		}
@@ -115,7 +115,7 @@ function Puzzle(numC, mats, col) {
 
 	for (var i = 0; i < data.length; i++) {
 		// Creamos un array con las secciones
-		sections = [];
+		var sections = [];
 		for (var j = 0; j < 6; j++) {
 			sections.push(new THREE.Vector3(data[i].sectionImgs[j][0], data[i].sectionImgs[j][1],
 					data[i].sectionImgs[j][2]));
@@ -123,14 +123,14 @@ function Puzzle(numC, mats, col) {
 
 		var imgs;
 		// Si hay imagenes repetidas
-		if (repeated) {
+		if (this.repeated) {
 			imgs = [];
 			var found;
 			for (var k = 0; k < data[i].imgs.length; k++) {
 				found = false;
-				for (var j = 0; j < repeatedIndex.length; j++) {
-					if (data[i].imgs[k] == repeatedIndex[j][0]) {
-						imgs.push(repeatedIndex[j][1]);
+				for (var j = 0; j < this.repeatedIndex.length; j++) {
+					if (data[i].imgs[k] == this.repeatedIndex[j][0]) {
+						imgs.push(this.repeatedIndex[j][1]);
 						found = true;
 						break;
 					}

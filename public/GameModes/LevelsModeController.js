@@ -76,7 +76,7 @@ function LevelsModeController(l, mats) {
 	};
 	// Nivel 9-10: 8-27 cubos (2-3 soluciones) mas 4-6 cubos con secciones aleatorias
 	this.levelsData[4] = {
-		puzzle : TooManyPiecesPuzzleView
+		puzzle : TooManyPiecesPuzzleController
 	};
 	// Nivel 11-12: 8-27 cubos (2-3 soluciones) con imagenes repetidas 6 veces (2-3 imagenes distintas)
 	this.levelsData[5] = {
