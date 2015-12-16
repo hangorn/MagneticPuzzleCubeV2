@@ -1,0 +1,17 @@
+{
+	"lang.es": "Spanish",
+	"lang.en": "English",
+
+	"menu.onePlayer": 	"Single player",
+	"menu.multiPlayer": "Multiplayer",
+	"menu.options": 	"Options",
+	"menu.scores": 		"Scores",
+	"menu.help": 		"Help",
+	"menu.back": 		"- Back",
+	"menu.classicMode": 	"Classic mode",
+	"menu.levelsMode": 		"Levels",
+	"menu.trialMode": 		"Trial",
+	"menu.survivalMode": 	"Survival",
+	"menu.createServer": 	"Create game",
+	"menu.findServer": 		"Search game"
+}

@@ -1,0 +1,18 @@
+{
+	"lang.es": "Español",
+	"lang.en": "Inglés",
+	
+	"menu.onePlayer": 	"Un jugador",
+	"menu.multiPlayer": "Varios jugadores",
+	"menu.options": 	"Opciones",
+	"menu.scores": 		"Puntuaciones",
+	"menu.help": 		"Ayuda",
+	"menu.back":		"- Atrás",
+	"menu.classicMode":		"Modo clásico",
+	"menu.levelsMode":		"Niveles",
+	"menu.trialMode":		"Contrareloj",
+	"menu.survivalMode":	"Supervivencia",
+	"menu.createServer":	"Crear partida",
+	"menu.findServer":		"Buscar partida"
+	
+}

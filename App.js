@@ -26,7 +26,9 @@ var app = express();
 var http = require('http');
 var server = http.createServer(app);
 var path = require('path');
+var cookieParser = require('cookie-parser');
 
+var i18n = require('./controllers/I18nCtl');
 var socketCtl = require('./controllers/SocketCtl');
 
 /***********************************************************************************************************************
@@ -40,16 +42,20 @@ if (process.env.SUBDOMAIN == 'magneticube') {
 	gameport = 8080;
 }
 
-//view engine setup
+// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+// Añadimos el middleware de internacionalizacion
+app.use(cookieParser());
+app.use(i18n);
 
 // Para el resto de peticiones delegamos en el enrutador
 app.use('/', require('./Router'));
 // La mayoria de los recursos se obtendran estaticamente del directorio publico
 app.use(express.static(path.join(__dirname, 'public')));
 
-//Hacemos que el servidor escuche en el puerto indicado
+// Hacemos que el servidor escuche en el puerto indicado
 server.listen(gameport);
 console.log('\t :: Express :: Listening on port ' + gameport);
 

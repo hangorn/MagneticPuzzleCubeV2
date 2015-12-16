@@ -309,3 +309,30 @@ body {
 .dialogContainer img {
 	width: 20%;
 }
+
+/*****************************************
+ *  menu de seleccion de idioma
+ *****************************************/
+.langMenu {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	pointer-events: none;
+}
+
+.langMenu li {
+	float: lefT;
+	display: Inline;
+	list-style: none outside none;
+}
+
+.langMenuItem {
+	pointer-events: auto;
+	-webkit-transition: transform 0.5s; /* Safari */
+	transition: transform 1s;
+}
+
+.langMenuItem:hover {
+	-webkit-transform: rotate(360deg); /* Chrome, Safari, Opera */
+	transform: rotate(360deg);
+}

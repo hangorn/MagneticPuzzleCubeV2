@@ -16,14 +16,17 @@
 
 exports.getMenu = function(req, res) {
 	var template = 'menu/commonsLayout.ejs';
+	
 	var data = {
 		menu : req.url.replace('.html', '.ejs').replace('/menu/', '')
 	};
 	// Si es la vista de los niveles necesitamos los datos de los niveles
 	if (req.url.indexOf('levelsModeForm') != -1) {
-		data.levelsData = require('../public/data/Levels.json').data;
+		var jsonCtl = require('./JsonCtl');
+		data.levelsData = jsonCtl.translateJson(res, require('../public/data/Levels.json')).data;
 	} else if (req.url.indexOf('createServerModeForm') != -1) {
-		data.levelsData = require('../public/data/MultiplayerLevels.json').data;
+		var jsonCtl = require('./JsonCtl');
+		data.levelsData = jsonCtl.translateJson(res, require('../public/data/MultiplayerLevels.json')).data;
 	}
 	// Si es la vista de buscar partidas multijugador, ayuda, puntuaciones, opciones, no podemos usar la plantilla comun
 	if (req.url.indexOf('Mode') == -1) {

@@ -80,8 +80,9 @@
 		} else {
 			var WebGLavaible = true;
 		}
-		//Cargamos dinamicamente el texto de los creditos
+		//Cargamos dinamicamente el texto de los creditos y los botones de seleccion de idioma
 		Utils.addDynamicComponent('html/credits.html', document.body);
+		Utils.addDynamicComponent('html/langButtons.html', document.body);
 
 		//Datos para la creacion de un puzzle con 3 soluciones
 		var puzzle3Data;
@@ -89,8 +90,6 @@
 		var puzzle2Data;
 		//Datos para crear letras con cubos
 		var lettersData;
-		//Datos para crear la informacion de los niveles con cubos
-		var levelsData;
 
 		//Elementos html
 		var container;
@@ -166,16 +165,10 @@
 			Utils.ajaxRequest('data/Letters.json', function(lettersResp) {
 				//Transformamos los datos del fichero a notacion JSON
 				lettersData = JSON.parse(lettersResp);
-				//Realizamos la peticion de los datos para la informacion de los niveles
-				//Leemos los datos para crear los cubos de un fichero JSON
-				Utils.ajaxRequest('data/Levels.json', function(levelsResp) {
-					//Transformamos los datos del fichero a notacion JSON
-					levelsData = JSON.parse(levelsResp).data;
-					//Iniciamos el sonido
-					sound = new Sound();
-					//Cremos el controlador del menu y mostramos el menu principal (0)
-					menuCtl = new MenuController();
-				})
+				//Iniciamos el sonido
+				sound = new Sound();
+				//Cremos el controlador del menu y mostramos el menu principal (0)
+				menuCtl = new MenuController();
 			});
 
 			//Creamos el render y fijamos su tamaño

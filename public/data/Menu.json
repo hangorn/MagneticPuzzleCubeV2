@@ -1,21 +1,21 @@
 {
 "data":
 [
-	[{"type":"webgl",	"txt":"un jugador",			"data":540},
-	{"type":"webgl",	"txt":"varios jugadores",	"data":280},
-	{"type":"webgl",	"txt":"opciones",			"data":10},
-	{"type":"webgl",	"txt":"puntuaciones",		"data":-280},
-	{"type":"webgl",	"txt":"ayuda",				"data":-590}],
+	[{"type":"webgl",	"i18ntxt":"menu.onePlayer",		"data":540},
+	{"type":"webgl",	"i18ntxt":"menu.multiPlayer",	"data":280},
+	{"type":"webgl",	"i18ntxt":"menu.options",		"data":10},
+	{"type":"webgl",	"i18ntxt":"menu.scores",		"data":-280},
+	{"type":"webgl",	"i18ntxt":"menu.help",			"data":-590}],
 	
-	[{"type":"webgl",	"txt":"modo clásico",		"data":510},
-	{"type":"webgl",	"txt":"niveles",			"data":250},
-	{"type":"webgl",	"txt":"contrareloj",		"data":-20},
-	{"type":"webgl",	"txt":"supervivencia",		"data":-310},
-	{"type":"webgl",	"txt":"- atrás",			"data":-600, "mode":"back"}],
+	[{"type":"webgl",	"i18ntxt":"menu.classicMode",	"data":510},
+	{"type":"webgl",	"i18ntxt":"menu.levelsMode",	"data":250},
+	{"type":"webgl",	"i18ntxt":"menu.trialMode",		"data":-20},
+	{"type":"webgl",	"i18ntxt":"menu.survivalMode",	"data":-310},
+	{"type":"webgl",	"i18ntxt":"menu.back",			"data":-600, "mode":"back"}],
 	
-	[{"type":"webgl",	"txt":"crear partida",		"data":250},
-	{"type":"webgl",	"txt":"buscar partida",		"data":-20},
-	{"type":"webgl",	"txt":"- atrás",			"data":-290, "mode":"back"}],
+	[{"type":"webgl",	"i18ntxt":"menu.createServer",	"data":250},
+	{"type":"webgl",	"i18ntxt":"menu.findServer",	"data":-20},
+	{"type":"webgl",	"i18ntxt":"menu.back",			"data":-290, "mode":"back"}],
 	
 	[{"type":"options"}],
 	[{"type":"scores"}],

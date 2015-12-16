@@ -18,14 +18,20 @@ var router = require('express').Router();
 
 var jsonCtl = require('./controllers/JsonCtl');
 var menuCtl = require('./controllers/MenuCtl');
+var compCtl = require('./controllers/ComponentsCtl');
 
 /***********************************************************************************************************************
  * Peticiones de datos JSON
  **********************************************************************************************************************/
 
 // JSON con los datos de los niveles
-router.get('/data/Levels.json', jsonCtl.getJson);
+router.get('/data/Menu.json', jsonCtl.getJson);
 router.get('/data/Scores.json', jsonCtl.getScores);
 router.get('/menu/*.html', menuCtl.getMenu);
+router.get('/html/*.html', compCtl);
+router.get('/lang/:locale', function(req, res) {
+	res.cookie('locale', req.params.locale);
+	res.redirect('back');
+});
 
 module.exports = router;
