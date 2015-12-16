@@ -54,7 +54,7 @@ function LevelsModeController(l, mats) {
 	// Creamos un mapeo para asociar cada nivel con el puzzle correspondiente, para cada nivel tenemos que definir el
 	// constructor del puzzle, si hay imagenes repetidas y si no tiene materiales. Se definira una entrada para cada dos
 	// niveles. ya que son iguales cambiando el numero de piezas
-	this.levelsData = {};
+	this.levelsData = [];
 	// Nivel 1-2: 8-27 cubos (2-3 soluciones) con 12-18 imagenes
 	this.levelsData[0] = {
 		puzzle : PuzzleController
@@ -153,9 +153,6 @@ LevelsModeController.prototype.startLevel = function() {
 	if (levelData.noMaterials) {
 		this.materials = puzzle.getMaterials();
 	}
-
-	// TODO borrar esto cuando esten refactorizados las clases de los puzzles
-	pv = puzzle;
 
 	return puzzle;
 }
@@ -275,7 +272,7 @@ LevelsModeController.prototype.finish = function() {
  */
 LevelsModeController.prototype.nextLevel = function() {
 	// Si estamos en el ultimo nivel
-	if (this.level == levelsData.length - 1) {
+	if (this.level == this.levelsData.length*2 - 1) {
 		alert("No hay mas niveles.");
 		return;
 	}

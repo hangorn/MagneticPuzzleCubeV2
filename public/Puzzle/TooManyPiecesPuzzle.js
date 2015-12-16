@@ -45,7 +45,7 @@ function TooManyPiecesPuzzle(numC, mats) {
 		for (var j = 0; j < 6; j++) {
 			if (this.numberOfCubes == 2) {
 				sections.push(new THREE.Vector3(Math.round(Math.random()), Math.round(Math.random()), 0));
-			} else if (numberOfCubes == 3) {
+			} else if (this.numberOfCubes == 3) {
 				sections.push(new THREE.Vector3(Math.floor(Math.random() * 3), Math.floor(Math.random() * 3), 0));
 			}
 		}

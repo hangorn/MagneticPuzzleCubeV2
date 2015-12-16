@@ -181,9 +181,9 @@ MultiplayerModeController.prototype.init = function() {
 	// Creamos la vista del puzzle
 	container.appendChild(renderer.domElement);
 	var ctl = this;
-	pv = this.puzzle = new MultiplayerPuzzleView(scene, this.numberOfCubes, this.type, this.materials, function() {
+	this.puzzle = new MultiplayerPuzzleController(this.numberOfCubes, function() {
 		socket.solvedGame();
-	}, this.iniPos, this.iniRot);
+	}, this.materials, this.type, this.iniPos, this.iniRot);
 	// Ocultamos el puzzle, ya que se iniciara oculta y para mostrarla habra que indicarselo
 	this.puzzle.hide();
 	// Si es el modo contrareloj
@@ -305,7 +305,9 @@ MultiplayerModeController.prototype.hide = function() {
 		this.otherPlayerAnimationStopped = true;
 	}
 	// Borramos la interfaz del cuerpo del documento HTML
-	document.body.removeChild(this.view);
+	if (this.view.parentNode == document.body) {
+		document.body.removeChild(this.view);
+	}
 	// Deshabilitamos el controlador asociado
 	this.remove();
 	if (renderer.domElement.parentNode == container) {

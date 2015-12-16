@@ -74,6 +74,7 @@ body {
 }
 
 .clockComponentContainer {
+	pointer-events: none;
 	margin-top: 10px;
 	width: 100%;
 	text-align: center;

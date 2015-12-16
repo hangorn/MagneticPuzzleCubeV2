@@ -73,6 +73,8 @@ function Puzzle(numC, mats, col) {
 	this.cubeSize = 200;
 	// Creamos un nuevo objeto 3D del framework three.js para contener las piezas encajadas
 	this.group = new THREE.Object3D();
+	// Asignamos un ID al grupo
+	this.group.ID = 0;
 
 	// Guardamos el numero de cubos que tendra el cubo, comprobamos que sea correcto
 	if (numC != 2 && numC != 3) {
@@ -146,6 +148,8 @@ function Puzzle(numC, mats, col) {
 
 		// Creamos el cubo
 		var cube = new Cube(this.materials, this.cubeSize, imgs, sections, this.numberOfCubes);
+		// Guardamos un ID para cada cubo
+		cube.ID = i + 1;
 		// Lo introducimos en el array de los cubos
 		this.cubes.push(cube);
 	}

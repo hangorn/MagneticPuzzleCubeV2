@@ -73,7 +73,7 @@ TooManyPiecesPuzzleController.prototype.constructor = TooManyPiecesPuzzleControl
  * @param Boolean:col
  *            booleano que indicará si el puzzle es de colores, si no se ignorará.
  */
-PuzzleController.prototype.init = function(numC, finAct, mats, col) {
+TooManyPiecesPuzzleController.prototype.init = function(numC, finAct, mats, col) {
 	// Creamos el puzzle
 	this.puzzle = new TooManyPiecesPuzzle(numC, mats, col);
 	this.view = new TooManyPiecesPuzzleView(this.puzzle, numC, finAct, mats);

@@ -159,8 +159,8 @@ PuzzleController.prototype.onPuzzleMouseDown = function(event) {
 		ThreeDUtils.intersectObjects(mouse, null, null, function(intersect) {
 			// Si el raton esta en la zona del puzzle
 			if (ctl.puzzle.isPuzzleZone(intersect.point)) {
-				// Si ya estaba pulsado el boton de mover y habia una pieza seleccionada
-				if (ctl.movDown && ctl.SELECTED) {
+				// Si ya estaba pulsado el boton de mover y habia una pieza seleccionada y no es el puzzle
+				if (ctl.movDown && ctl.SELECTED && ctl.SELECTED != ctl.puzzle.getPuzzle()) {
 					// Cambiamos la rotacion y traslacion de la figura a la que tendra en el puzzle
 					ctl.puzzle.putInCube(ctl.SELECTED);
 					// Y añadimos la figura al puzzle
@@ -434,9 +434,9 @@ PuzzleController.prototype.onPuzzleMouseUp = function(event) {
 	}
 }
 
-/*******************************************************************************************************************
+/***********************************************************************************************************************
  * Métodos Publicos
- ******************************************************************************************************************/
+ **********************************************************************************************************************/
 
 /**
  * Método que elimina el controlador. Lo único que hace es eliminar los manejadores de eventos que tiene registrados
@@ -523,4 +523,11 @@ PuzzleController.prototype.placeCube = function() {
  */
 PuzzleController.prototype.isDone = function() {
 	this.view.isDone;
+}
+
+/**
+ * Indica que que el puzzle ha sido resuelto
+ */
+PuzzleController.prototype.setDone = function() {
+	this.view.isDone = true;
 }

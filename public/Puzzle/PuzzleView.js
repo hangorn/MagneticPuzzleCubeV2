@@ -21,7 +21,7 @@
 /*
  *  CLASE PUZZLEVIEW
  *  */
-function PuzzleView(puzz, numberOfCubes, finAct, mats) {
+function PuzzleView(puzz, numC, finAct, mats) {
 
 	/*******************************************************************************************************************
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
@@ -30,7 +30,9 @@ function PuzzleView(puzz, numberOfCubes, finAct, mats) {
 	// Objeto de la clase puzzle con el cual se realizara la logica de negocio
 	this.puzzle;
 	// Posiciones iniciales
-	this.iniPos = [];
+	this.initialPositions;
+	// Rotaciones iniciales
+	this.initialRotations;
 	// Separacion entre cubos en la posiciones iniciales
 	this.separation;
 
@@ -53,7 +55,7 @@ function PuzzleView(puzz, numberOfCubes, finAct, mats) {
 	 * 
 	 * @param Puzzle:puzz
 	 *            objeto de la clase puzzle con la logica
-	 * @param Integer:numberOfCubes
+	 * @param Integer:numC
 	 *            numero de cubos que tendra el puzzle, para simplicar se indicara mediante el número de cubos en una
 	 *            dimensión, 27 (3x3x3) => 3.
 	 * @param Material[]:mats
@@ -65,17 +67,18 @@ function PuzzleView(puzz, numberOfCubes, finAct, mats) {
 	this.finishedAction = finAct;
 	this.puzzle = puzz;
 	this.separation = 50;
+	this.numberOfCubes = numC;
 
 	this.initInitialPositions();
+	this.initInitialRotations();
 
 	// Colocamos las figuras en sus posiciones iniciales
 	for (var i = 0; i < this.puzzle.getPuzzleCubes().length; i++) {
-		this.puzzle.getPuzzleCubes()[i].position.copy(this.iniPos[i]);
-		this.puzzle.getPuzzleCubes()[i].rotation.x = Utils.roundAngle(Math.random() * Math.PI * 2);
-		this.puzzle.getPuzzleCubes()[i].rotation.y = Utils.roundAngle(Math.random() * Math.PI * 2);
+		this.puzzle.getPuzzleCubes()[i].position.copy(this.initialPositions[i]);
+		this.puzzle.getPuzzleCubes()[i].rotation.copy(this.initialRotations[i]);
 		// Guardamos su colocacion inicial
-		this.puzzle.getPuzzleCubes()[i].iniPos = this.iniPos[i];
-		this.puzzle.getPuzzleCubes()[i].iniRot = new THREE.Vector3().copy(this.puzzle.getPuzzleCubes()[i].rotation);
+		this.puzzle.getPuzzleCubes()[i].iniPos = this.initialPositions[i];
+		this.puzzle.getPuzzleCubes()[i].iniRot = this.initialRotations[i];
 	}
 
 	// Creamos un cuadrado para delimitar el area del puzzle
@@ -116,11 +119,12 @@ PuzzleView.prototype.constructor = PuzzleView;
  **********************************************************************************************************************/
 
 /**
- * Método para crear las posiciones iniciales que tendran los cubos
+ * Método para crear las posiciones iniciales iniciales que tendran los cubos
  */
 PuzzleView.prototype.initInitialPositions = function() {
+	this.initialPositions = [];
 	// Creamos las posiciones iniciales dependiendo del numero de cubos
-	if (numberOfCubes == 3) {
+	if (this.numberOfCubes == 3) {
 		// Posiciones laterales
 		for (var i = 0; i < 24; i++) {
 			var v = new THREE.Vector3();
@@ -130,14 +134,14 @@ PuzzleView.prototype.initInitialPositions = function() {
 							: (this.puzzle.getPuzzleAreaSize() / 2 - this.puzzle.getCubeSize() * 1.5));
 			v.y = (this.puzzle.getCubeSize() + this.separation) * (i % 6)
 					- (this.separation + this.puzzle.getCubeSize()) * 5 / 2;
-			this.iniPos.push(v);
+			this.initialPositions.push(v);
 		}
 		// Posiciones inferiores
 		for (var i = -1; i < 2; i++) {
 			var v = new THREE.Vector3();
 			v.x = (this.puzzle.getCubeSize() + this.separation * 2) * i;
 			v.y = -(this.separation + this.puzzle.getCubeSize()) * 5 / 2;
-			this.iniPos.push(v);
+			this.initialPositions.push(v);
 		}
 	} else {
 		for (var i = 0; i < 8; i++) {
@@ -148,11 +152,23 @@ PuzzleView.prototype.initInitialPositions = function() {
 							: (this.puzzle.getPuzzleAreaSize() / 2));
 			v.y = (this.puzzle.getCubeSize() + this.separation) * (i % 4)
 					- (this.separation + this.puzzle.getCubeSize()) * 3 / 2;
-			this.iniPos.push(v);
+			this.initialPositions.push(v);
 		}
 	}
 	// Desordenamos el array
-	Utils.shuffle(this.iniPos);
+	Utils.shuffle(this.initialPositions);
+}
+
+/**
+ * Método para crear las rotaciones iniciales iniciales que tendran los cubos
+ */
+PuzzleView.prototype.initInitialRotations = function() {
+	// Rellenamos las rotaciones iniciales con cantidades aleatorias entre 0 y 360 grados
+	this.initialRotations = [];
+	for (var i = 0; i < this.initialPositions.length; i++) {
+		this.initialRotations[i] = new THREE.Vector3(Utils.roundAngle(Math.random() * Math.PI * 2), Utils
+				.roundAngle(Math.random() * Math.PI * 2), 0);
+	}
 }
 
 /***********************************************************************************************************************

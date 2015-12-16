@@ -57,6 +57,7 @@ TooManyPiecesPuzzleView.prototype.constructor = TooManyPiecesPuzzleView;
  * Método para crear las posiciones iniciales que tendran los cubos
  */
 TooManyPiecesPuzzleView.prototype.initInitialPositions = function() {
+	this.initialPositions = [];
 	// Creamos las posiciones iniciales dependiendo del numero de cubos
 	if (this.numberOfCubes == 3) {
 		// Posiciones laterales
@@ -68,14 +69,14 @@ TooManyPiecesPuzzleView.prototype.initInitialPositions = function() {
 							: (this.puzzle.getPuzzleAreaSize() / 2 - this.puzzle.getCubeSize() * 1.5));
 			v.y = (this.puzzle.getCubeSize() + this.separation) * (i % 6)
 					- (this.separation + this.puzzle.getCubeSize()) * 5 / 2;
-			this.iniPos.push(v);
+			this.initialPositions.push(v);
 		}
 		// Posiciones inferiores
 		for (var i = -1; i < 2; i++) {
 			var v = new THREE.Vector3();
 			v.x = (this.puzzle.getCubeSize() + this.separation * 2) * i;
 			v.y = -(this.separation + this.puzzle.getCubeSize()) * 5 / 2;
-			this.iniPos.push(v);
+			this.initialPositions.push(v);
 		}
 	} else {
 		for (var i = 0; i < 12; i++) {
@@ -86,9 +87,9 @@ TooManyPiecesPuzzleView.prototype.initInitialPositions = function() {
 							: (this.puzzle.getPuzzleAreaSize() / 2));
 			v.y = (this.puzzle.getCubeSize() + this.separation) * (i % 4)
 					- (this.separation + this.puzzle.getCubeSize()) * 3 / 2;
-			this.iniPos.push(v);
+			this.initialPositions.push(v);
 		}
 	}
 	// Desordenamos el array
-	Utils.shuffle(this.iniPos);
+	Utils.shuffle(this.initialPositions);
 }
