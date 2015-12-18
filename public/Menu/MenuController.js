@@ -97,7 +97,7 @@ function MenuController() {
 		// Calculamos donde esta el raton con el eje de coordenadas en el centro
 		mouse.x = (event.clientX / windowWidth) * 2 - 1;
 		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
-		
+
 		// Usamos la utilidad de Utils indicando que hacer si hay o no hay entradas de menu
 		ThreeDUtils.intersectObjects(mouse, menuEntrys[currentMenu], null, function(intersect) {
 			remove();
@@ -133,7 +133,7 @@ function MenuController() {
 		// Calculamos donde esta el raton con el eje de coordenadas en el centro
 		mouse.x = (event.clientX / windowWidth) * 2 - 1;
 		mouse.y = -(event.clientY / windowHeight) * 2 + 1;
-		
+
 		// Usamos la utilidad de Utils indicando que hacer si hay o no hay entradas de menu
 		ThreeDUtils.intersectObjects(mouse, menuEntrys[currentMenu], 'pointer', function(intersect) {
 			// Si no se le ha cambiado ya el color
@@ -321,11 +321,11 @@ function MenuController() {
 				socket = new Socket();
 			}
 			// Obtenemos el nombre y el tipo de la partida
-			var name = menuEntrys[currentMenu][0].getElementsByTagName('form')[0].gameName.value || "Sin Nombre";
+			var name = menuEntrys[currentMenu][0].getElementsByTagName('form')[0].gameName.value || __["words.noName"];
 			var type = lastEntrySelected;
 
 			// Mostramos un dialogo mientras se espera a que se codifiquen las imagenes para enviarlas al servidor
-			view.showWaitingDialog("CARGANDO ...", function() {
+			view.showWaitingDialog(__["words.loading"] + " ...", function() {
 				view.showMenu(currentMenu);
 				socket.finishedGame();
 			});
@@ -350,7 +350,7 @@ function MenuController() {
 					view.hideWaitingDialog();
 
 					// Mostramos un dialogo mientras se espera a que se el otro jugador este listo
-					view.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
+					view.showWaitingDialog(__["dialogs.waitingPlayerReady"], function() {
 						view.showMenu(currentMenu);
 						socket.finishedGame();
 					});
@@ -364,7 +364,7 @@ function MenuController() {
 						multiplayerCtl.show();
 					});
 				}, function() {
-					alert("El otro jugador ha abandonado la partida. Se finalizara la partida.");
+					alert(__["dialogs.playerLeft"]);
 					// Ocultamos la vista de la partida
 					multiplayerCtl.hide();
 					view.hideWaitingDialog();
@@ -374,7 +374,7 @@ function MenuController() {
 					// Ocultamos el dialogo de espera de carga
 					view.hideWaitingDialog();
 					// Mostramos un dialogo mientras se espera a otro jugador
-					view.showWaitingDialog("ESPERANDO A OTRO JUGADOR", function() {
+					view.showWaitingDialog(__["dialogs.waitingPlayer"], function() {
 						show(currentMenu);
 						socket.finishedGame();
 					});
@@ -391,7 +391,7 @@ function MenuController() {
 			// Obtenemos el ID del juego seleccionado
 			var gameID = menuEntrys[currentMenu][0].getElementsByTagName('tBody')[0].children[lastEntrySelected].ID;
 			// Mostramos un dialogo mientras se espera a que se codifiquen las imagenes para enviarlas al servidor
-			view.showWaitingDialog("CARGANDO ...", function() {
+			view.showWaitingDialog(__["words.loading"] + " ...", function() {
 				view.showMenu(currentMenu);
 				socket.finishedGame();
 			});
@@ -418,7 +418,7 @@ function MenuController() {
 						view.hideWaitingDialog();
 
 						// Mostramos un dialogo mientras se espera a que se el otro jugador este listo
-						view.showWaitingDialog("ESPERANDO A QUE EL OTRO JUGADOR ESTE LISTO", function() {
+						view.showWaitingDialog(__["dialogs.waitingPlayerReady"], function() {
 							view.showMenu(currentMenu);
 							socket.finishedGame();
 						});
@@ -436,11 +436,11 @@ function MenuController() {
 				}, 1);
 			};
 			var wrongAction = function() {
-				alert("La partida que ha seleccionado no esta disponible. Intentelo de nuevo o conectese a otra partida.");
+				alert(__["dialogs.noAvailableGame"]);
 				show(currentMenu);
 			};
 			var discAction = function() {
-				alert("El otro jugador ha abandonado la partida. Se finalizara la partida.");
+				alert(__["dialogs.playerLeft"]);
 				// Ocultamos la vista de la partida
 				multiplayerCtl.hide();
 				view.hideWaitingDialog();

@@ -262,7 +262,7 @@ function MenuView(menuData) {
 		}
 		// Si no hay partidas
 		if (items.length == 0) {
-			alert("No se ha encontrado ninguna partida. Pruebe a crear una.");
+			alert(__["dialogs.noFoundGames"]);
 			return;
 		}
 		// Rellenamos el dialogo con las entradas suministras

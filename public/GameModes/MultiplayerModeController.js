@@ -128,7 +128,7 @@ MultiplayerModeController.prototype.initOtherPlayerPuzzle = function() {
 			map : texture
 		}));
 	}
-	this.otherPlayerPuzzle = new MultiplayerPuzzle(this.numberOfCubes, materials);
+	this.otherPlayerPuzzle = new Puzzle(this.numberOfCubes, materials);
 	// Obtenemos las posiciones y rotaciones iniciales
 	var initialPositions = this.puzzle.getInitialPositions();
 	var initialRotations = this.puzzle.getInitialRotations();
@@ -226,24 +226,24 @@ MultiplayerModeController.prototype.finish = function(time, winner) {
 	// Si se trata del modo cooperativo
 	if (this.type == 0 || this.type == 1) {
 		sound.playFinal();
-		text = "Enhorabuena!!! Habeis solucionado el puzzle! en ";
+		text = __["dialogs.solvedMultiplayer"] + " ";
 	}
 	// Si se trata del modo contrareloj
 	if (this.type == 2 || this.type == 3) {
 		// Si se ha ganado la partida
 		if (winner) {
 			sound.playFinal();
-			text = "Enhorabuena!!! Has conseguido solucionar el puzzle antes que el otro jugagador! en ";
+			text = __["dialogs.wonMultiplayer"] + " ";
 		} else {
 			sound.playExplosion();
-			text = "Lo sentimos. El otro jugador ha solucionado el puzzle antes en ";
+			text = __["dialogs.lostMultiplayer"] + " ";
 		}
 	}
 	// Añadimos el tiempo
 	if (hour != 0) {
-		text += hour + " horas, ";
+		text += hour + " " + __["words.hours"] + ", ";
 	}
-	text += min + " minutos y " + sec + " segundos";
+	text += min + " " + __["words.minutes"] + " " + __["words.and"] + " " + sec + " " + __["words.seconds"];
 	// Mostramos el dialogo para guardar la puntuacion
 	ScoresController.saveScoreDialog(text, time, 4, this.type);
 };
@@ -256,7 +256,7 @@ MultiplayerModeController.prototype.finish = function(time, winner) {
  */
 MultiplayerModeController.prototype.onMenuClick = function(event) {
 	// Confirmamos que se desea salir
-	if (confirm("Esta seguro que desea salir?")) {
+	if (confirm(__["dialogs.confirmExit"])) {
 		this.hide();
 		menuCtl.show(0);
 		// Si el puzzle esta resuelto

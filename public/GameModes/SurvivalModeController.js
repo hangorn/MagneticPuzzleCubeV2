@@ -130,11 +130,12 @@ SurvivalModeController.prototype.finish = function() {
 	var sec = time % 60;
 	var min = Math.floor(time / 60) % 60;
 	var hour = Math.floor(time / 3600);
-	var text = "Enhorabuena!!! Puzzle solucionado !!! Te han sobrado ";
+	var text = __["dialogs.solvedSurvival.1"] + " ";
 	if (hour != 0) {
-		text += hour + " horas, ";
+		text += hour + " " + __["words.hours"] + ", ";
 	}
-	text += min + " minutos y " + sec + " segundos para la siguiente ronda";
+	text += min + " " + __["words.minutes"] + " " + __["words.and"] + " " + sec + " " + __["words.seconds"]
+			+ __["dialogs.solvedSurvival.2"];
 	alert(text);
 	this.restart();
 };
@@ -145,7 +146,7 @@ SurvivalModeController.prototype.finish = function() {
 SurvivalModeController.prototype.timeFinished = function() {
 	this.finished = true;
 	sound.playExplosion();
-	this.finishMode("Se ha terminado el tiempo. ");
+	this.finishMode(__["dialogs.timeOver"] + " ");
 	this.puzzle.setDone();
 }
 
@@ -156,7 +157,7 @@ SurvivalModeController.prototype.timeFinished = function() {
  *            cadena que se mostrara al inicio del mensaje.
  */
 SurvivalModeController.prototype.finishMode = function(str) {
-	var text = str + " Has conseguido solucionar " + this.solvedPuzzles + " puzzles. Enhorabuena!!!";
+	var text = str + __["dialogs.finishedSurvival.1"] + this.solvedPuzzles + __["dialogs.finishedSurvival.2"];
 	// Mostramos el dialogo para guardar la puntuacion
 	var submode = this.difficulty * 2 + (3 - this.numberOfCubes);
 	ScoresController.saveScoreDialog(text, this.solvedPuzzles, 3, submode);
@@ -170,7 +171,7 @@ SurvivalModeController.prototype.finishMode = function(str) {
  */
 SurvivalModeController.prototype.onMenuClick = function(event) {
 	// Confirmamos que se desea salir
-	if (confirm("Esta seguro que desea salir?")) {
+	if (confirm(__["dialogs.confirmExit"])) {
 		// Si no se ha acabado el tiempo ejecutamos la accion de finalizacion de modo
 		if (!this.puzzle.isDone()) {
 			this.finishMode("");
@@ -188,7 +189,7 @@ SurvivalModeController.prototype.onMenuClick = function(event) {
  */
 SurvivalModeController.prototype.onRestartClick = function(event) {
 	// Confirmamos que se desea reiniciar
-	if (confirm("Esta seguro que desea reiniciar?")) {
+	if (confirm(__["dialogs.confirmRestart"])) {
 		// Si no se ha acabado el tiempo ejecutamos la accion de finalizacion de modo
 		if (!this.puzzle.isDone()) {
 			this.finishMode("");

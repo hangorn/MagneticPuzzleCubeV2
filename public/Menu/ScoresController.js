@@ -373,7 +373,7 @@ ScoresController.saveScoreDialog = function(text, score, mode, submode) {
 		// para que lo haga con los nuevos datos y no con los antiguos
 		saveScoreCont.getElementsByClassName('saveDialogOK')[0].onclick = function() {
 			// Obtenemos el nombre
-			var name = saveScoreCont.getElementsByClassName('saveDialogInput')[0].value || "Anonimo";
+			var name = saveScoreCont.getElementsByClassName('saveDialogInput')[0].value || __["words.anonymous"];
 			// Si no tenemos conexion con el servidor la creamos
 			if (socket == undefined) {
 				socket = new Socket();

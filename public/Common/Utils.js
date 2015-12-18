@@ -257,12 +257,14 @@ Utils.randomColor = function() {
  * @returns String cadena de caracteres con la fecha en español.
  */
 Utils.spanishDate = function(d) {
-	var weekday = [ "Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado" ];
-	var monthname = [ "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre",
-			"Octubre", "Noviembre", "Diciembre" ];
-	return weekday[d.getDay()] + " " + d.getDate() + " de " + monthname[d.getMonth()] + " de " + d.getFullYear()
-			+ " a las " + (d.getHours() < 10 ? "0" : "") + d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "")
-			+ d.getMinutes();
+	var weekday = [ __["words.sunday"], __["words.monday"], __["words.tuesday"], __["words.wednesday"],
+			__["words.thursday"], __["words.friday"], __["words.saturday"] ];
+	var monthname = [ __["words.january"], __["words.february"], __["words.march"], __["words.april"], __["words.may"],
+			__["words.june"], __["words.july"], __["words.august"], __["words.september"], __["words.october"],
+			__["words.november"], __["words.december"] ];
+	return weekday[d.getDay()] + " " + d.getDate() + __["words.dateConnective"] + monthname[d.getMonth()]
+			+ __["words.dateConnective"] + d.getFullYear() + __["words.timeConnective"]
+			+ (d.getHours() < 10 ? "0" : "") + d.getHours() + ":" + (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
 }
 
 /**

@@ -119,6 +119,7 @@ body {
 	border-bottom: 3px double black;
 	border-bottom-left-radius: 10px;
 	zIndex: -5000;
+	pointer-events: none;
 }
 
 #otherPlayerRender {

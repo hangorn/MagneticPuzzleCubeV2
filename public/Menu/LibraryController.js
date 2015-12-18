@@ -464,7 +464,7 @@ function LibraryController(type, backAction) {
 							// Añadimos el material a la lista de materiales
 							IMAGES.push(material);
 						} else {
-							alert("No caben mas imágenes en la biblioteca.");
+							alert(__["dialogs.fullLibrary"]);
 							// No seguimos añadiendo imagenes
 							k = texture.length;
 						}

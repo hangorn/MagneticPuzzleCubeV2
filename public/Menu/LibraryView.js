@@ -334,10 +334,10 @@ function LibraryView(ty) {
 			scene.add(button);
 			return button;
 		}
-		acceptButton = createButton("Aceptar", -margins.x / 2 - 200);
-		addImgButton = createButton("Añadir imagen", -450);
+		acceptButton = createButton(__["buttons.accept"], -margins.x / 2 - 200);
+		addImgButton = createButton(__["buttons.addImage"], -450);
 		addImgButton.implode = true;
-		backButton = createButton("Atrás", margins.x / 2 - 500);
+		backButton = createButton(__["buttons.back"], margins.x / 2 - 500);
 	}
 
 	/*******************************************************************************************************************

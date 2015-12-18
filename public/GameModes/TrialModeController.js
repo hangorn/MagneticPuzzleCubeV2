@@ -104,11 +104,11 @@ TrialModeController.prototype.finish = function() {
 	var sec = time % 60;
 	var min = Math.floor(time / 60) % 60;
 	var hour = Math.floor(time / 3600);
-	var text = "Enhorabuena!!! Puzzle solucionado !!! Te han sobrado ";
+	var text = __["dialogs.solvedSurvival.1"] + " ";
 	if (hour != 0) {
-		text += hour + " horas, ";
+		text += hour + " " + __["words.hours"] + ", ";
 	}
-	text += min + " minutos y " + sec + " segundos";
+	text += min + " " + __["words.minutes"] + " " + __["words.and"] + " " + sec + " " + __["words.seconds"];
 	// Mostramos el dialogo para guardar la puntuacion
 	var submode = this.difficulty * 2 + (3 - this.numberOfCubes);
 	ScoresController.saveScoreDialog(text, time, 2, submode);
@@ -120,6 +120,6 @@ TrialModeController.prototype.finish = function() {
 TrialModeController.prototype.timeFinished = function() {
 	this.finished = true;
 	sound.playExplosion();
-	alert("Se ha terminado el tiempo.");
+	alert(__["dialogs.timeOver"]);
 	this.puzzle.setDone();
 };

@@ -90,6 +90,8 @@
 		var puzzle2Data;
 		//Datos para crear letras con cubos
 		var lettersData;
+		//Datos de i18n, todos los textos necesarios
+		var __;
 
 		//Elementos html
 		var container;
@@ -136,6 +138,13 @@
 			Utils.ajaxRequest('data/2SolPuzzle.json', function(resp) {
 				//Transformamos los datos del fichero a notacion JSON
 				puzzle2Data = JSON.parse(resp).data;
+			});
+			
+			//Realizamos la peticion de los datos de i18n
+			Utils.ajaxRequest('locales/lang.json', function(resp) {
+				//Transformamos los datos del fichero a notacion JSON
+				__ = JSON.parse(resp);
+
 			});
 
 			windowHeight = window.innerHeight;

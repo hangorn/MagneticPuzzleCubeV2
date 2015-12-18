@@ -227,9 +227,9 @@ LevelsModeController.prototype.finish = function() {
 	var hour = Math.floor(time / 3600);
 	var timeString = "";
 	if (hour != 0) {
-		timeString += hour + " horas, ";
+		timeString += hour + " " + __["words.hours"] + ", ";
 	}
-	timeString += min + " minutos y " + sec + " segundos !!!";
+	timeString += min + " " + __["words.minutes"] + " " + __["words.and"] + " " + sec + " " + __["words.seconds"];
 
 	// Creamos un dialogo para mostrar al terminar y mostrar las distintas opciones
 	if (this.finishedDialog == undefined) {
@@ -253,16 +253,16 @@ LevelsModeController.prototype.finish = function() {
 				ctl.nextLevel();
 			};
 			// Definimos el texto del dialogo
-			ctl.finishedDialog.getElementsByClassName('finishedLevelText')[0].innerHTML += "NIVEL SOLUCIONADO en "
-					+ timeString;
+			ctl.finishedDialog.getElementsByClassName('finishedLevelText')[0].innerHTML += __["dialogs.solvedLevel"]
+					+ " " + timeString;
 		});
 	} else {
 		// Definimos el texto del dialogo y lo mostramos
-		this.finishedDialog.getElementsByClassName('finishedLevelText')[0].innerHTML += "NIVEL SOLUCIONADO en "
+		this.finishedDialog.getElementsByClassName('finishedLevelText')[0].innerHTML += __["dialogs.solvedLevel"] + " "
 				+ timeString;
 		document.body.appendChild(this.finishedDialog);
 	}
-	var text = "Enhorabuena!!! Puzzle solucionado ! en " + timeString;
+	var text = __["dialogs.solvedPuzzle"] + " " + timeString;
 	// Mostramos el dialogo para guardar la puntuacion
 	ScoresController.saveScoreDialog(text, time, 1, this.level);
 }
@@ -272,8 +272,8 @@ LevelsModeController.prototype.finish = function() {
  */
 LevelsModeController.prototype.nextLevel = function() {
 	// Si estamos en el ultimo nivel
-	if (this.level == this.levelsData.length*2 - 1) {
-		alert("No hay mas niveles.");
+	if (this.level == this.levelsData.length * 2 - 1) {
+		alert(__["dialogs.noMoreLevels"]);
 		return;
 	}
 	this.isRestarted = false;
@@ -288,7 +288,7 @@ LevelsModeController.prototype.nextLevel = function() {
 LevelsModeController.prototype.previousLevel = function() {
 	// Si estamos en el primer nivel
 	if (this.level == 0) {
-		alert("Este es el primer nivel.");
+		alert(__["dialogs.firstLevel"]);
 		return;
 	}
 	this.isRestarted = false;
@@ -305,7 +305,7 @@ LevelsModeController.prototype.previousLevel = function() {
  */
 LevelsModeController.prototype.onNextClick = function(event) {
 	// Confirmamos que se desea pasar al nivel siguiente
-	if (confirm("Esta seguro que desea pasar al nivel siguiente?")) {
+	if (confirm(__["dialogs.confirmNextLevel"])) {
 		this.nextLevel();
 	}
 }
@@ -318,7 +318,7 @@ LevelsModeController.prototype.onNextClick = function(event) {
  */
 LevelsModeController.prototype.onPreviousClick = function(event) {
 	// Confirmamos que se desea pasar al nivel anterior
-	if (confirm("Esta seguro que desea pasar al nivel anterior?")) {
+	if (confirm(__["dialogs.confirmPreviousLevel"])) {
 		this.previousLevel();
 	}
 }

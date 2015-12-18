@@ -130,11 +130,11 @@ ClassicModeController.prototype.finish = function() {
 	var sec = time % 60;
 	var min = Math.floor(time / 60) % 60;
 	var hour = Math.floor(time / 3600);
-	var text = "Enhorabuena!!! Puzzle solucionado ! en ";
+	var text = __["dialogs.solvedPuzzle"] + " ";
 	if (hour != 0) {
-		text += hour + " horas, ";
+		text += hour + " " + __["words.hours"] + ", ";
 	}
-	text += min + " minutos y " + sec + " segundos";
+	text += min + " " + __["words.minutes"] + " " + __["words.and"] + " " + sec + " " + __["words.seconds"];
 	// Mostramos el dialogo para guardar la puntuacion
 	ScoresController.saveScoreDialog(text, time, 0, 3 - this.numberOfCubes);
 };
@@ -178,11 +178,11 @@ ClassicModeController.prototype.onShowSolutionsClick = function(event) {
 ClassicModeController.prototype.onShowSolutionClick = function(event) {
 	if (this.showingSolution) {
 		this.puzzle.hideSolution();
-		this.form.showSolution.value = "mostrar una posible solucion";
+		this.form.showSolution.value = __["buttons.showSolution"];
 		this.showingSolution = false;
 	} else {
 		this.puzzle.showSolution();
-		this.form.showSolution.value = "ocultar la posible solucion";
+		this.form.showSolution.value = __["buttons.hideSolution"];
 		this.showingSolution = true;
 		this.clock.addTime(20);
 	}
@@ -207,7 +207,7 @@ ClassicModeController.prototype.onPlaceCubeClick = function(event) {
  */
 ClassicModeController.prototype.onMenuClick = function(event) {
 	// Confirmamos que se desea salir
-	if (confirm("Esta seguro que desea salir?")) {
+	if (confirm(__["dialogs.confirmExit"])) {
 		this.hide();
 		menuCtl.show(0);
 	}
@@ -221,7 +221,7 @@ ClassicModeController.prototype.onMenuClick = function(event) {
  */
 ClassicModeController.prototype.onRestartClick = function(event) {
 	// Confirmamos que se desea reiniciar
-	if (confirm("Esta seguro que desea reiniciar?")) {
+	if (confirm(__["dialogs.confirmRestart"])) {
 		this.restart();
 	}
 };
@@ -309,7 +309,7 @@ ClassicModeController.prototype.enable = function() {
  * 
  */
 ClassicModeController.prototype.getButtonsWithActions = function() {
-	//Ocultamos los botones de siguiente y anterior, no se usan en este modo
+	// Ocultamos los botones de siguiente y anterior, no se usan en este modo
 	this.form.removeChild(this.form.next);
 	this.form.removeChild(this.form.previous);
 	var ctl = this;
@@ -352,9 +352,9 @@ ClassicModeController.prototype.getButtonsWithActions = function() {
 	} ];
 };
 
-/*******************************************************************************************************************
+/***********************************************************************************************************************
  * Métodos Publicos
- ******************************************************************************************************************/
+ **********************************************************************************************************************/
 
 /**
  * Método para mostrar en la interfaz todos los elementos de la vista

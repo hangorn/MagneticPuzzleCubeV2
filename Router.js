@@ -26,12 +26,18 @@ var compCtl = require('./controllers/ComponentsCtl');
 
 // JSON con los datos de los niveles
 router.get('/data/Menu.json', jsonCtl.getJson);
+router.get('/data/MultiplayerLevels.json', jsonCtl.getJson);
 router.get('/data/Scores.json', jsonCtl.getScores);
 router.get('/menu/*.html', menuCtl.getMenu);
 router.get('/html/*.html', compCtl);
 router.get('/lang/:locale', function(req, res) {
 	res.cookie('locale', req.params.locale);
 	res.redirect('back');
+});
+router.get('/locales/lang.json', function(req, res) {
+	var locale = req.getLocale();
+	var json = require('./locales/public_' + locale + '.json');
+	res.json(json);
 });
 
 module.exports = router;
