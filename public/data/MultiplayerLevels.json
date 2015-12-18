@@ -1,10 +1,9 @@
 {
 "data":
 [
-    {"name" : "Cooperativo con 8 cubos",	"img" : "img/levels/mult1.png",   "description" : "Ambos jugadores deberan cooperar para resolver el puzzle. Se resaltaran en azul los cubos que estan siendo usados por el otro jugador."},
-    {"name" : "Cooperativo con 27 cubos",	"img" : "img/levels/mult1.png",   "description" : "Ambos jugadores deberan cooperar para resolver el puzzle. Se resaltaran en azul los cubos que estan siendo usados por el otro jugador."},
-    {"name" : "Contrareloj con 8",			"img" : "img/levels/mult2.png",   "description" : "Ambos jugadores deberan competir para ver quien acaba antes el puzzle."},
-    {"name" : "Contrareloj con 27",			"img" : "img/levels/mult2.png",   "description" : "Ambos jugadores deberan competir para ver quien acaba antes el puzzle."}
+    {"i18nname" : "dialogs.multiplayer.game.1",		"img" : "img/levels/mult1.png",   "i18ndescription" : "dialogs.multiplayer.game.1.description"},
+    {"i18nname" : "dialogs.multiplayer.game.2",		"img" : "img/levels/mult1.png",   "i18ndescription" : "dialogs.multiplayer.game.1.description"},
+    {"i18nname" : "dialogs.multiplayer.game.3",		"img" : "img/levels/mult2.png",   "i18ndescription" : "dialogs.multiplayer.game.3.description"},
+    {"i18nname" : "dialogs.multiplayer.game.4",		"img" : "img/levels/mult2.png",   "i18ndescription" : "dialogs.multiplayer.game.3.description"}
 ]
-    
 }

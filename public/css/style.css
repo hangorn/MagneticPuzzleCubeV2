@@ -131,7 +131,7 @@ body {
  *****************************************/
 .menu {
 	width: 70%;
-	margin: 50px 10%;
+	margin: 50px 10% 0px;
 	padding: 20px 5%;
 	background-color: #dddddd;
 	border-radius: 30px;
@@ -160,6 +160,15 @@ body {
 	overflow: auto;
 }
 
+.menu .menuContainer p {
+	margin: 10px 5px;
+	text-align: left;
+}
+
+.menu .menuContainer li {
+	text-align: left;
+}
+
 .menu .leftContainer {
 	float: left;
 	width: 70%;
@@ -183,6 +192,10 @@ body {
 	border: 1px solid red;
 	float: left;
 	margin: 5px;
+}
+
+.menu .menuItem p {
+	text-align: center;
 }
 
 .menu .menuItem img {
@@ -315,7 +328,7 @@ body {
  *****************************************/
 .langMenu {
 	position: absolute;
-	right: 0px;
+	right: 12px;
 	top: 0px;
 	pointer-events: none;
 }

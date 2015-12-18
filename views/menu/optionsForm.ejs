@@ -1,37 +1,39 @@
 <div class="menu">
 	<form>
-		<h1>Opciones</h1>
+		<h1><%= __('menu.options') %></h1>
 		<div class="menuContainer list expandedList">
 			<table>
 				<tbody>
 					<tr>
-						<td>sensibilidad de giro:</td>
+						<td><%= __('dialogs.options.sensitivity') %>:</td>
 						<td><input type="range" name="sensitivitySlide" min="1" max="10" step="0.5"> <input
 								type="number" name="sensitivityText" size="3" min="1" max="10" maxlength="2"></td>
 					</tr>
 					<tr>
-						<td><span for="audioHelpCheckID">activar ayuda con sonidos: </span></td>
+						<td><span for="audioHelpCheckID"><%= __('dialogs.options.soundHelp') %>:</span></td>
 						<td><input type="checkbox" name="audioHelpCheck" id="audioHelpCheckID"></td>
 					</tr>
 					<tr>
-						<td>mover (traslacion):</td>
+						<td><%= __('dialogs.options.move') %>:</td>
 						<td><input type="radio" name=movOpt id="movOptLeftClick"> <label
-								for="movOptLeftClick">boton izquierdo</label> <input type="radio" name=movOpt
-								id="movOptRigthClick"> <label for="movOptRigthClick">boton derecho</label></td>
+								for="movOptLeftClick"><%= __('words.leftButton') %></label> <input type="radio" name=movOpt
+								id="movOptRigthClick"> <label for="movOptRigthClick"><%=
+								__('words.rightButton') %></label></td>
 					</tr>
 					<tr>
-						<td>girar (rotacion):</td>
+						<td><%= __('dialogs.options.rotate') %>:</td>
 						<td><input type="radio" name=rotOpt id="rotOptLeftClick"> <label
-								for="rotOptLeftClick">boton izquierdo</label> <input type="radio" name=rotOpt
-								id=rotOptRigthClick> <label for="rotOptRigthClick">boton derecho</label></td>
+								for="rotOptLeftClick"><%= __('words.leftButton') %></label> <input type="radio" name=rotOpt
+								id=rotOptRigthClick> <label for="rotOptRigthClick"><%=
+								__('words.rightButton') %></label></td>
 					</tr>
 				</tbody>
 
 			</table>
 		</div>
 		<div class="buttonsMenu">
-			<input type="button" name="cancel" value="cancelar">
-			<input type="button" name="accept" value="aceptar">
+			<input type="button" name="cancel" value="<%= __('buttons.cancel') %>">
+			<input type="button" name="accept" value="<%= __('buttons.accept') %>">
 		</div>
 	</form>
 </div>

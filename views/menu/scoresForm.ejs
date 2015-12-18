@@ -1,48 +1,48 @@
 <div class="menu">
 	<form>
-		<h1>Puntuaciones</h1>
+		<h1><%= __('menu.scores') %></h1>
 		<div class="modesContainer tabContainer">
-			<div class="clickable tab">Clasico</div>
-			<div class="clickable tab">Niveles</div>
-			<div class="clickable tab">Contrareloj</div>
-			<div class="clickable tab">Supervivencia</div>
-			<div class="clickable tab">Multijugador</div>
+			<div class="clickable tab"><%= __('menu.classicMode') %></div>
+			<div class="clickable tab"><%= __('menu.levelsMode') %></div>
+			<div class="clickable tab"><%= __('menu.trialMode') %></div>
+			<div class="clickable tab"><%= __('menu.survivalMode') %></div>
+			<div class="clickable tab"><%= __('buttons.multiplayer') %></div>
 		</div>
 		<div class="submodesContainer tabContainer">
 			<div class="hide">
-				<div class="clickable tab">27 Cubos</div>
-				<div class="clickable tab">8 Cubos</div>
+				<div class="clickable tab">27 <%= __('words.cubes') %></div>
+				<div class="clickable tab">8 <%= __('words.cubes') %></div>
 			</div>
 			<div class="hide">
 				<% for (var i = 1; i <= 16; i++) { %>
-				<div class="clickable tab">Nivel <%=i%></div>
+				<div class="clickable tab"><%= __('words.level') %> <%=i%></div>
 				<% } %>
 			</div>
 			<div class="hide">
-				<div class="clickable tab">Facil 27 Cubos</div>
-				<div class="clickable tab">Facil 8 Cubos</div>
-				<div class="clickable tab">Medio 27 Cubos</div>
-				<div class="clickable tab">Medio 8 Cubos</div>
-				<div class="clickable tab">Dificil 27 Cubos</div>
-				<div class="clickable tab">Dificil 8 Cubos</div>
-				<div class="clickable tab">Imposible 27 Cubos</div>
-				<div class="clickable tab">Imposible 8 Cubos</div>
+				<div class="clickable tab"><%= __('words.easy') %> 27 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.easy') %> 8 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.medium') %> 27 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.medium') %> 8 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.hard') %> 27 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.hard') %> 8 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.impossible') %> 27 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.impossible') %> 8 <%= __('words.cubes') %></div>
 			</div>
 			<div class="hide">
-				<div class="clickable tab">Facil 27 Cubos</div>
-				<div class="clickable tab">Facil 8 Cubos</div>
-				<div class="clickable tab">Medio 27 Cubos</div>
-				<div class="clickable tab">Medio 8 Cubos</div>
-				<div class="clickable tab">Dificil 27 Cubos</div>
-				<div class="clickable tab">Dificil 8 Cubos</div>
-				<div class="clickable tab">Imposible 27 Cubos</div>
-				<div class="clickable tab">Imposible 8 Cubos</div>
+				<div class="clickable tab"><%= __('words.easy') %> 27 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.easy') %> 8 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.medium') %> 27 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.medium') %> 8 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.hard') %> 27 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.hard') %> 8 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.impossible') %> 27 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.impossible') %> 8 <%= __('words.cubes') %></div>
 			</div>
 			<div class="hide">
-				<div class="clickable tab">Cooperativo 8 Cubos</div>
-				<div class="clickable tab">Cooperativo 27 Cubos</div>
-				<div class="clickable tab">Contrareloj 8 Cubos</div>
-				<div class="clickable tab">Contrareloj 27 Cubos</div>
+				<div class="clickable tab"><%= __('words.cooperative') %> 8 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.cooperative') %> 27 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.againstClock') %> 8 <%= __('words.cubes') %></div>
+				<div class="clickable tab"><%= __('words.againstClock') %> 27 <%= __('words.cubes') %></div>
 			</div>
 		</div>
 
@@ -50,18 +50,18 @@
 			<table>
 				<thead>
 					<tr>
-						<th>Nombre</th>
-						<th>Puntuacion</th>
-						<th>Fecha</th>
+						<th><%= __('words.name') %></th>
+						<th><%= __('words.score') %></th>
+						<th><%= __('words.date') %></th>
 					</tr>
 				</thead>
 				<tbody>
 				</tbody>
 			</table>
-			<img class="hide" alt="Cargando" src="img/loading.gif">
+			<img class="hide" alt="<%= __('words.loading') %>" src="img/loading.gif">
 		</div>
 		<div class="buttonsMenu">
-			<input type="button" name="back" value="atras">
+			<input type="button" name="back" value="<%= __('buttons.back') %>">
 		</div>
 	</form>
 </div>

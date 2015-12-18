@@ -144,6 +144,8 @@
 			//Creamos y añadimos un contenedor para el render
 			container = document.createElement('div');
 			container.style.position = 'absolute';
+			container.style.height = '100%';
+			container.style.overflow = 'hidden';
 			document.body.appendChild(container);
 			//Creamos una escena
 			scene = new THREE.Scene();

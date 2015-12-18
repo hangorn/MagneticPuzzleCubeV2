@@ -1,6 +1,6 @@
 <div class="msgMenu">
-	<h1>Crear Partida</h1>
-	<p>Selecciona un tipo de partida</p>
+	<h1><%= __('menu.createServer') %></h1>
+	<p><%= __('dialogs.multiplayer.chooseKindOfGame') %> :</p>
 	<div class="menuContainer leftContainer">
 		<% for (var i=0; i < levelsData.length; i++) { %>
 		<div class="clickable menuItem blockMenuItem">
@@ -11,7 +11,7 @@
 		<% } %>
 	</div>
 	<div class="rightContainer">
-		<label for="gameName">Introduce el nombre de la partida:</label>
+		<label for="gameName"><%= __('dialogs.multiplayer.enterGameName') %>:</label>
 		<input id="gameName" type="text" maxlength="20" name="gameName">
 		<p class="description"></p>
 	</div>

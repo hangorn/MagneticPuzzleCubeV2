@@ -1,28 +1,26 @@
 <div class="msgMenu">
-	<h1>Modo Contrareloj</h1>
-	<p>Se debera resolver el puzzle antes de que se agote el tiempo, determinado en funcion de la
-		dificultad seleccionada. Se pueden elegir las imagenes del puzzle haciendo click en 'personalizar
-		imagenes'.</p>
+	<h1><%= __('menu.trialMode') %></h1>
+	<p><%= __('dialogs.trialMode.description') %></p>
 	<div>
-		Elige el número de piezas del puzzle:
+		<%= __('buttons.chooseNumberOfCubes') %>:
 		<fieldset>
-			<input type="radio" id="cubes27trial" checked="checked" name="cubesNumber">
-			<label for="cubes27trial">27 cubos</label>
-			<input type="radio" id="cubes8trial" name="cubesNumber">
-			<label for="cubes8trial">8 cubos</label>
+			<input type="radio" id="cubes27survival" checked="checked" name="cubesNumber">
+			<label for="cubes27survival"><%= __('27 cubos') %></label>
+			<input type="radio" id="cubes8survival" name="cubesNumber">
+			<label for="cubes8survival"><%= __('8 cubos') %></label>
 		</fieldset>
 	</div>
 	<div>
-		Elige la dificultad del puzzle:
+		<%= __('buttons.chooseDifficulty') %>:
 		<fieldset>
-			<input type="radio" id="easyTrial" name="difficulty">
-			<label for="easyTrial">facil</label>
-			<input type="radio" id="mediumTrial" checked="checked" name="difficulty">
-			<label for="mediumTrial">medio</label>
-			<input type="radio" id="hardTrial" name="difficulty">
-			<label for="hardTrial">dificil</label>
-			<input type="radio" id="hopelessTrial" name="difficulty">
-			<label for="hopelessTrial">imposible</label>
+			<input type="radio" id="easySurvival" name="difficulty">
+			<label for="easySurvival"><%= __('words.easy') %></label>
+			<input type="radio" id="mediumSurvival" checked="checked" name="difficulty">
+			<label for="mediumSurvival"><%= __('words.medium') %></label>
+			<input type="radio" id="hardSurvival" name="difficulty">
+			<label for="hardSurvival"><%= __('words.hard') %></label>
+			<input type="radio" id="hopelessSurvival" name="difficulty">
+			<label for="hopelessSurvival"><%= __('words.impossible') %></label>
 		</fieldset>
 	</div>
 </div>

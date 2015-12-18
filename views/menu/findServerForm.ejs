@@ -1,14 +1,14 @@
 <div class="menu">
 	<form>
 		<div class="msgMenu">
-			<h1>Buscar Partida</h1>
-			<p>Selecciona una de las partidas que ya estan creadas:</p>
+			<h1><%= __('menu.findServer') %></h1>
+			<p><%= __('dialogs.multiplayer.chooseGame') %>:</p>
 			<div class="menuContainer list leftContainer">
 				<table>
 					<thead>
 						<tr>
-							<th>Nombre</th>
-							<th>Tipo</th>
+							<th><%= __('words.name') %></th>
+							<th><%= __('words.kind') %></th>
 						</tr>
 					</thead>
 					<tbody></tbody>
@@ -16,11 +16,11 @@
 			</div>
 		</div>
 		<div class="rightContainer">
-			<input type="button" name="refresh" value="VOLVER A BUSCAR PARTIDAS" class="bold">
+			<input type="button" name="refresh" value="<%= __('buttons.refreshGames') %>" class="bold">
 		</div>
 		<div class="buttonsMenu">
-			<input type="button" name="back" value="atras">
-			<input type="button" name="start" value="empezar">
+			<input type="button" name="back" value="<%= __('buttons.back') %>">
+			<input type="button" name="start" value="<%= __('buttons.start') %>">
 		</div>
 	</form>
 </div>

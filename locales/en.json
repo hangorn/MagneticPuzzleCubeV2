@@ -13,5 +13,9 @@
 	"menu.trialMode": 		"Trial",
 	"menu.survivalMode": 	"Survival",
 	"menu.createServer": 	"Create game",
-	"menu.findServer": 		"Search game"
+	"menu.findServer": 		"Search game",
+	
+	"buttons.watchSolvedPuzzle": 	"Watch solved puzzle",
+	"buttons.restartLevel":			"Restart level",
+	"buttons.nextLevel":			"Next level"
 }

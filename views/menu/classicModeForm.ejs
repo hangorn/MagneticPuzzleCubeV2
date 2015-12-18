@@ -1,14 +1,13 @@
 <div class="msgMenu">
-	<h1>Modo Clásico</h1>
-	<p>Se debera resolver el puzzle, cronometrandose cuanto tiempo se emplea en ello. Se pueden
-		elegir las imagenes del puzzle haciendo click en 'personalizar imagenes'.</p>
+	<h1><%= __('menu.classicMode') %></h1>
+	<p><%= __('dialogs.classicMode.description') %></p>
 	<div>
-		Elige el número de piezas del puzzle:
+		<%= __('buttons.chooseNumberOfCubes') %>:
 		<fieldset>
 			<input type="radio" id="cubes27classic" checked="checked" name="cubesNumber">
-			<label for="cubes27classic">27 cubos</label>
+			<label for="cubes27classic"><%= __('buttons.27cubes') %></label>
 			<input type="radio" id="cubes8classic" name="cubesNumber">
-			<label for="cubes8classic">8 cubos</label>
+			<label for="cubes8classic"><%= __('buttons.8cubes') %></label>
 		</fieldset>
 	</div>
 </div>
