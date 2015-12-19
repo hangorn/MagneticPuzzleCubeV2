@@ -470,6 +470,17 @@ function MenuController() {
 		}
 		selectEntry(i);
 	}
+	
+	/**
+	 * Manejador del evento de doble click en una entrada: nivel, tipo de partida o partida multijugador
+	 * 
+	 * @param EventObject:event
+	 *            caracteristicas del evento lanzado.
+	 */
+	function onEntryDblClick(event) {
+		onEntryClick(event);
+		onMenuStartClick(event);
+	}
 
 	/**
 	 * Método que realizará las acciones necesarias para seleccionar la entrada indicada
@@ -517,12 +528,14 @@ function MenuController() {
 			// Quitamos los eventos de las entradas antiguas
 			for (var i = 0; i < table.children.length; i++) {
 				table.children[i].removeEventListener('click', onEntryClick, false);
+				table.children[i].removeEventListener('dblclick', onEntryDblClick, false);
 			}
 			// Mostramos las partidas actuales
 			view.fillGameEntrys(items);
 			// Registramos los eventos para las partidas actuales
 			for (var i = 0; i < table.children.length; i++) {
 				table.children[i].addEventListener('click', onEntryClick, false);
+				table.children[i].addEventListener('dblclick', onEntryDblClick, false);
 			}
 		});
 	}
@@ -554,6 +567,7 @@ function MenuController() {
 				var entrys = form.getElementsByClassName('menuItem');
 				for (var i = 0; i < entrys.length; i++) {
 					entrys[i].removeEventListener('click', onEntryClick, false);
+					entrys[i].removeEventListener('dblclick', onEntryDblClick, false);
 					entrys[i].classList.remove('menuItemSelected');
 				}
 			}
@@ -595,6 +609,7 @@ function MenuController() {
 				// Registramos los eventos de seleccion de entradas para todos las entradas
 				for (var i = 0; i < entrys.length; i++) {
 					entrys[i].addEventListener('click', onEntryClick, false);
+					entrys[i].addEventListener('dblclick', onEntryDblClick, false);
 				}
 			}
 			// Registramos el evento de la pulsacion del boton de empezar

@@ -2,7 +2,9 @@
 	<div class="dialogContainer">
 		<p class="saveDialogText"></p>
 		<p style="margin-bottom: 0"><%= __('components.saveScore.name') %> :</p>
-		<input type="text" class="saveDialogInput">
+		<form action="#" onsubmit="this.parentElement.getElementsByClassName('saveDialogOK')[0].onclick();">
+			<input type="text" class="saveDialogInput">
+		</form>
 		<div>
 			<input type="button" value="<%= __('buttons.cancel') %>" class="saveDialogCancel">
 			<input type="button" value="<%= __('buttons.accept') %>" class="saveDialogOK">
