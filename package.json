@@ -4,6 +4,7 @@
   "engines": {
     "node": "0.10.x"
   },
+  "main": "App.js",
   "description": "puzzle 3D game where each piece is a cube, with the cubes you can shape a big cube. developed using WebGL, with his framework Three.js",
   "version": "1.3.0-0",
   "private": false,
