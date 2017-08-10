@@ -1,5 +1,5 @@
 {
-  "name": "magnetic_puzzle_cube",
+  "name": "magneticube",
   "author": "Javier Vaquero Marcos",
   "engines": {
     "node": "0.10.x"
