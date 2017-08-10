@@ -41,6 +41,7 @@ if (process.env.SUBDOMAIN == 'magneticube') {
 } else {
 	gameport = 8080;
 }
+gameport = process.env.PORT || gameport;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
