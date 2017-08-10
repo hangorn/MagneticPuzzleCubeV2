@@ -16,9 +16,5 @@
     "ejs": "2.3.x",
     "i18n": "0.5.0",
     "cookie-parser": "~1.4.0"
-  },
-  "subdomain": "magneticube",
-  "scripts": {
-    "start": "node App.js"
   }
 }
