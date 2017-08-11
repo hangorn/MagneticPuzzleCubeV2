@@ -7,7 +7,7 @@ Developt with WebGL using [THREE.js](https://github.com/mrdoob/three.js) framewo
 
 Using [node.js](http://nodejs.org/) in server-side, with [socket.io](http://socket.io/) for multiplayer, [Express](http://expressjs.com) as main framework with [EjS](http://www.embeddedjs.com/) as template engine, and [mongoDB](https://www.mongodb.org/) as database.
 
-The game is [here](http://magneticube.jit.su).
+The game is [here](https://magneticube.herokuapp.com/).
 
 Usage
 =======================
