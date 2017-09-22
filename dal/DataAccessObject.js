@@ -72,7 +72,7 @@ DataAccessObject = function() {
 			};
 		}
 		// URI de acceso con el formato: mongodb://[username:password@]host[:port][/[database]
-		var url = 'mongodb://' + credentials.DB_USER + ':' + credentials.DB_PWD + '@ds035633.mongolab.com:35633/magpcdb';
+		var url = 'mongodb://' + credentials.DB_USER + ':' + credentials.DB_PWD + '@ds035633.mlab.com:35633/magpcdb';
 		mongoClient.connect(url, function(err, db) {
 			// Si hay error los registramos y salimos
 			if (err) {
