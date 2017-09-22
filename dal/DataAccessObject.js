@@ -25,7 +25,10 @@ DataAccessObject = function() {
 	 * Atributos (son privados, no se podrá acceder a ellos fuera de la clase)
 	 ******************************************************************************************************************/
 
-	var credentials = require('./Credentials.js');
+	var credentials;
+	try {
+		credentials = require('./Credentials.js');
+	} catch (e) {}
 	// Cliente con el cual nos conectaremos a la base de datos
 	var mongoClient = require('mongodb').MongoClient;
 	// Base de datos que se utilizará con MongoDB
